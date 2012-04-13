@@ -23,7 +23,12 @@ typedef enum {
       COUPE1,COUPE2,COUPE3,COUPE4,COUPE5,COUPE6,COUPE7,COUPE10,COUPE11,COUPE12
 } card_num;
       
-      
+
+enum {
+	CARD_EMPTY, CARD_FRONT, CARD_BACK
+}       
+
+
 typedef struct card {
 	SDL_Surface* surf;
 	card_num number;

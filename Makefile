@@ -2,7 +2,7 @@
 CC=gcc
 CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=main.c
+SOURCES=main.c random.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=ronda
 INCLUDE= -I/usr/include/SDL

@@ -3,14 +3,15 @@
 
 #include <SDL/SDL.h>
 
-/*constants definitions to clarify the significance of the numbers
-  most are cards related, others just for algorithmic use.
+/**constants definitions to clarify the significance of the numbers
+ * most are cards related, others just for algorithmic use.
  */
 	#define NB_CARDS 40
-    #define NB_CARDS_ 4
-    #define MAX_NB_CARDS_ 10
+    #define NB_CARDS_TABLE 4
+    #define MAX_NB_CARDS_TABLE 10
     #define MAX_NB_CARDS_HAND 3
     #define EMPTY -1
+    #define HIDDEN -2
     
 /**Definition of data structures used in the program such as cards and 
  * players
@@ -23,11 +24,6 @@ typedef enum {
       COUPE1,COUPE2,COUPE3,COUPE4,COUPE5,COUPE6,COUPE7,COUPE10,COUPE11,COUPE12
 } card_num;
       
-
-enum {
-	CARD_EMPTY, CARD_FRONT, CARD_BACK
-}       
-
 
 typedef struct card {
 	SDL_Surface* surf;

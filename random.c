@@ -6,18 +6,18 @@ int rand_a_b(int a, int b)
 }
 
 
-void mix(int* array, int size)
+void mix(card_num array[], int size)
 {
 	int i=0;
 	int number=0;
-	int temp=0;
+	int tmp=0;
 
 	for(i = 0; i< size;i++) {
 		number=rand_a_b(0,size);
 		// Swapping 
-		temp = array[i];
+		tmp = array[i];
 		array[i] = array[number];
-		array[number]=temp;
+		array[number]=tmp;
 	}
 }
 

@@ -5,12 +5,12 @@
 #include "define.h"
 
 void swap(card_num *a, card_num *b);
-unsigned short int equal(int a, int b);
-unsigned short int exist(card tab[], int size, int value);
+shortint equal(shortint a, shortint b);
+shortint exist(card tab[], int size, int value);
 void getFile(card_num n, char* file);
 void init(card table[],player *p1, player *p2);
-void distributeTable(card_num cardList[],card table[], unsigned short int* nbCardsRemaining);
-void distributePlayer(card_num cardList[],player *pl, unsigned short int* nbCardsRemaining);
+void distributeTable(card_num cardList[],card table[]);
+void distributePlayer(card_num cardList[],player *pl);
 
 
 #endif

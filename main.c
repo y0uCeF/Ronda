@@ -10,11 +10,12 @@ int main(int argc,char** argv) {
 	int running=1,i;
 	player user,computer;
 	card table[MAX_NB_CARDS_TABLE],selected[11];
-	card_num cardList[NB_CARDS]={ARGENT1,ARGENT2,ARGENT3,ARGENT4,ARGENT5,ARGENT6,ARGENT7,ARGENT10,ARGENT11,ARGENT12,
-                    BATON1,BATON2,BATON3,BATON4,BATON5,BATON6,BATON7,BATON10,BATON11,BATON12,
-                    EPEE1,EPEE2,EPEE3,EPEE4,EPEE5,EPEE6,EPEE7,EPEE10,EPEE11,EPEE12,
-                    COUPE1,COUPE2,COUPE3,COUPE4,COUPE5,COUPE6,COUPE7,COUPE10,COUPE11,COUPE12};
-    unsigned short int nbCardsRemaining=NB_CARDS,droppedCard=50;                
+	card_num cardList[NB_CARDS]={COIN1,COIN2,COIN3,COIN4,COIN5,COIN6,COIN7,COIN10,COIN11,COIN12,
+                    CLUB1, CLUB2, CLUB3, CLUB4, CLUB5, CLUB6, CLUB7, CLUB10, CLUB11, CLUB12,
+                    SWORD1, SWORD2, SWORD3, SWORD4, SWORD5, SWORD6, SWORD7, SWORD10, SWORD11, SWORD12,
+                    CUP1, CUP2, CUP3, CUP4, CUP5, CUP6, CUP7, CUP10, CUP11, CUP12};
+    shortint droppedCard=50;      
+    extern shortint nbCardsRemaining;          
 	SDL_Event event;
 	SDL_Surface *screen=NULL;
 	
@@ -24,16 +25,17 @@ int main(int argc,char** argv) {
 	init(table,&user,&computer);
 	
 	//SDL_WM_SetIcon(icon, NULL);
-	screen=SDL_SetVideoMode(440, 460, 32,  SDL_DOUBLEBUF | SDL_HWSURFACE );
+	screen=SDL_SetVideoMode(800, 600, 32,  SDL_DOUBLEBUF | SDL_HWSURFACE );
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 30, 170, 45));
+	SDL_WM_SetCaption("Ronda - beta", NULL);
 		
 	//mixing the cards
 	mix(cardList, NB_CARDS);
 	
 	//distributing cards
-	distributeTable(cardList, table, &nbCardsRemaining);
-	distributePlayer(cardList, &user, &nbCardsRemaining);
-	distributePlayer(cardList, &computer, &nbCardsRemaining);
+	distributeTable(cardList, table);
+	distributePlayer(cardList, &user);
+	distributePlayer(cardList, &computer);
 	
 	while (running) {
 		while(SDL_PollEvent(&event))	{
@@ -72,6 +74,9 @@ int main(int argc,char** argv) {
 				
 		for (i=0; i<user.nbCardsInHand;i++)
 			if (SDL_BlitSurface(user.hand[i].surf, NULL, screen, user.hand[i].position) == -1) return 1; 
+			
+		for (i=0; i<computer.nbCardsInHand;i++)
+			if (SDL_BlitSurface(computer.hand[i].surf, NULL, screen, computer.hand[i].position) == -1) return 1;	
 		SDL_Flip(screen);	
 	}	
 	
@@ -83,6 +88,11 @@ int main(int argc,char** argv) {
 	for (i=0; i<user.nbCardsInHand;i++) {
 		if(user.hand[i].surf != NULL)	SDL_FreeSurface(user.hand[i].surf); 
 		if(user.hand[i].position != NULL) free(user.hand[i].position);
+	}
+	
+	for (i=0; i<computer.nbCardsInHand;i++) {
+		if(computer.hand[i].surf != NULL)	SDL_FreeSurface(computer.hand[i].surf); 
+		if(computer.hand[i].position != NULL) free(computer.hand[i].position);
 	}
 	
 	SDL_Quit(); 	

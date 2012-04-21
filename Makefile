@@ -10,7 +10,7 @@ INCLUDE= -I/usr/include/SDL
 all: $(SOURCES) $(EXECUTABLE)
 	
 $(EXECUTABLE): $(OBJECTS) 
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ -lSDL
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ -lSDL -lSDL_image
 
 .c.o:
 	$(CC) $(CFLAGS) $< -o $@

@@ -35,8 +35,9 @@ typedef struct card {
 
 
 typedef struct score {
-	unsigned short int gainedCards;
-	unsigned short int points;
+	//SDL_Surface* box;
+	shortint gainedCards;
+	shortint points;
 } score;
 
 

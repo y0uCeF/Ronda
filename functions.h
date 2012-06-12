@@ -1,6 +1,7 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
+#include <SDL/SDL_image.h>
 #include <string.h>
 #include "define.h"
 
@@ -11,6 +12,7 @@ void getFile(card_num n, char* file);
 void init(card table[],player *p1, player *p2);
 void distributeTable(card_num cardList[],card table[]);
 void distributePlayer(card_num cardList[],player *pl);
-
+short getSelectedHand(int x);
+short getSelectedTable(int x, int y);
 
 #endif

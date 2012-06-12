@@ -1,4 +1,4 @@
-#include <SDL/SDL_image.h>
+
 #include "functions.h"
 
 
@@ -18,7 +18,7 @@ shortint exist(card tab[], int size, int value)
 {
     shortint i;
     for (i=0; i<size; i++) {
-        if (equal(tab[i].number,value)) return 1;
+        if (equal(tab[i].number, value)) return 1;
     }
     return 0;
 }
@@ -71,37 +71,27 @@ void distributeTable(card_num cardList[],card table[]) {
     table[0].surf=IMG_Load(file);
     table[0].position=malloc(sizeof(SDL_Rect));
     table[0].position->x=40;
-    table[0].position->y=165;
+    table[0].position->y=160;
     
     for (i=1; i<MAX_NB_CARDS_TABLE ; i++) {
+		while (exist(table, i, cardList[nbCardsRemaining-j-1])) {
+			swap(&cardList[nbCardsRemaining-j-1], &cardList[nbCardsRemaining-j-k-1]);
+			k++;
+		}
 		if ((i==2) || (i==4) || (i==6)) {
-			while (exist(table, i, cardList[nbCardsRemaining-j-1])) {
-				swap(&cardList[nbCardsRemaining-j-1], &cardList[nbCardsRemaining-j-k-1]);
-				k++;
-			}
-			file[0]='\0';
-			table[i].number=cardList[nbCardsRemaining-j-1];
-			getFile(table[i].number,file);
-			table[i].surf=IMG_Load(file);
-			table[i].position=malloc(sizeof(SDL_Rect));
-			switch (i) {
-				case 2: 
-					table[i].position->x=250;
-					table[i].position->y=165;
-				break;
-			
-				case 4: 
-					table[i].position->x=460;
-					table[i].position->y=165;
-				break;
-			
-				case 6: 
-					table[i].position->x=145;
-					table[i].position->y=300;
-				break;
-			}
-			j++;
-		}  
+		file[0]='\0';
+		table[i].number=cardList[nbCardsRemaining-j-1];
+		getFile(table[i].number,file);
+		table[i].surf=IMG_Load(file);
+		}
+		else {
+			table[i].number=EMPTY;
+			table[i].surf=IMG_Load("cards/blank.gif");	
+		}
+		table[i].position=malloc(sizeof(SDL_Rect));
+		table[i].position->x= (90+15)*(i%5) + 40;
+		table[i].position->y= (i<=4)? 160:305; 
+		j++;
 	}	
     nbCardsRemaining -= j;
 }
@@ -111,46 +101,48 @@ void distributePlayer(card_num cardList[],player *pl) {
     for(i=0; i<MAX_NB_CARDS_HAND;i++) {
         pl->hand[i].number=cardList[nbCardsRemaining-1-i];
         pl->hand[i].position=malloc(sizeof(SDL_Rect));
+        pl->hand[i].position->x=(90+40)*i+150;
         if (pl->type == USER) {
 			char file[13]="";
 			getFile(pl->hand[i].number,file);		
-			pl->hand[i].surf=IMG_Load(file);
-			switch (i) {
-				case 0:
-					pl->hand[i].position->x=150;
-					pl->hand[i].position->y=450;
-				break;
-				case 1:
-					pl->hand[i].position->x=280;
-					pl->hand[i].position->y=450;
-				break;
-					
-				case 2:
-					pl->hand[i].position->x=410;
-					pl->hand[i].position->y=450;
-				break;
-			}
+			pl->hand[i].surf=IMG_Load(file);		
+			pl->hand[i].position->y=450;
 		}
 		else {
 			pl->hand[i].surf=IMG_Load("cards/back.gif");
-			switch (i) {
-				case 0:
-					pl->hand[i].position->x=150;
-					pl->hand[i].position->y=15;
-				break;
-				
-				case 1:
-					pl->hand[i].position->x=280;
-					pl->hand[i].position->y=15;
-				break;
-				
-				case 2:
-					pl->hand[i].position->x=410;
-					pl->hand[i].position->y=15;
-				break;
-			}
+			pl->hand[i].position->y=15;
 		}
         pl->nbCardsInHand++;
     }
     nbCardsRemaining -= i;
+}
+
+short getSelectedHand(int x) {
+	if ((x >150) && (x<240)) {
+		return 0;
+	}
+	else if ((x >280) && (x<370)) {
+		return 1;
+	}
+	else if ((x >410) && (x<500)) {
+		return 2;
+	}
+	else return -1;	
+}
+
+short getSelectedTable(int x, int y) {
+	shortint temp=5, c=0;
+	if ((x>40) && (x<130)) temp=0;
+	else if((x>145) && (x<235)) temp=1;
+	else if ((x>250) && (x<340)) temp=2;
+	else if((x>355) && (x<445)) temp=3;
+	else if ((x>460) && (x<550)) temp=4;
+	
+	if (temp!=5) { 
+		if ((y>160) && (y<295))	c=temp;
+		else if ((y>305) && (y<440)) c=temp+5;
+		return c;
+	}
+	else return -1;
+	
 }

@@ -1,18 +1,14 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
-#include <SDL/SDL_image.h>
-#include <string.h>
-#include "define.h"
-
-void swap(card_num *a, card_num *b);
-shortint equal(shortint a, shortint b);
-shortint exist(card tab[], int size, int value);
-void getFile(card_num n, char* file);
 void init(card table[],player *p1, player *p2);
-void distributeTable(card_num cardList[],card table[]);
-void distributePlayer(card_num cardList[],player *pl);
+shortint distributeTable(card_num cardList[],card table[]);
+shortint distributePlayer(card_num cardList[],player *pl);
 short getSelectedHand(int x);
 short getSelectedTable(int x, int y);
+void play(player *p, card table[], short selectedHand, short selectedTable);
+shortint render(card tabl[], player user, player computer, SDL_Surface *screen);
+void delete(card table[], player user, player computer);
+void treatEvent(SDL_Event event, shortint *running, player *user,short *selectedHand,short *selectedTable);
 
 #endif

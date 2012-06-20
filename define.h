@@ -4,14 +4,16 @@
 #include <SDL/SDL.h>
 
 /**constants definitions to clarify the significance of the numbers
- * most are cards related, others just for algorithmic use.
+ * most are cards related, others just for algorithmic use or for graphics info.
  */
 	#define NB_CARDS 40
     #define NB_CARDS_TABLE 4
     #define MAX_NB_CARDS_TABLE 10
     #define MAX_NB_CARDS_HAND 3
- //   #define EMPTY -1
-  //  #define HIDDEN -2
+	#define WINDOW_WIDTH 800
+	#define WINDOW_HEIGHT 600
+	#define FPS 30
+	#define FRAME_RATE 1000/FPS
     
 /**Definition of data structures used in the program such as cards and 
  * players
@@ -41,11 +43,14 @@ typedef struct score {
 } score;
 
 
+typedef enum {USER, COMPUTER} Type;
 typedef struct player {
     card hand[MAX_NB_CARDS_HAND];
     score score_player;
+    SDL_Surface *scoreBox;
+    SDL_Rect posScoreBox;
     int nbCardsInHand;
-    enum {USER, COMPUTER} type;
+    Type type;
     int ronda_tringla;
 } player;
 

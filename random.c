@@ -1,6 +1,6 @@
 #include "random.h"
 
-int rand_a_b(int a, int b)
+static int rand_a_b(int a, int b)
 {
     return rand()%(b-a) +a;
 }

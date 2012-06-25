@@ -51,7 +51,7 @@ void init(card table[],player *p1, player *p2) {
 shortint distributeTable(card_num cardList[],card table[]) {
 	shortint i,k=0,j=1;
 	table[0].number=cardList[nbCardsRemaining-1];
-    char file[13]="";
+    char file[16]="";
     getFile(table[0].number,file);
     table[0].surf=IMG_Load(file);
     if(table[0].surf == NULL) {
@@ -94,7 +94,7 @@ shortint distributeTable(card_num cardList[],card table[]) {
 shortint distributePlayer(card_num cardList[],player *pl) {
     shortint i;   
     for(i=0; i<MAX_NB_CARDS_HAND;i++) {
-		char file[13]="";
+		char file[15]="";
         pl->hand[i].number=cardList[nbCardsRemaining-1-i];
         pl->hand[i].position=malloc(sizeof(SDL_Rect));
         pl->hand[i].position->x=(90+40)*i+150;
@@ -147,7 +147,7 @@ short getSelectedTable(int x, int y) {
 	else return -1;	
 }
 
-void eat(player *p, card table[], short selectedHand, short selectedTable) {
+static void eat(player *p, card table[], short selectedHand, short selectedTable) {
 	int i=0, indice=0;
 	card_num playedCard=p->hand[selectedHand].number;
 	p->hand[selectedHand].surf=IMG_Load("cards/blank.gif");

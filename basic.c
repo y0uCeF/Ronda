@@ -1,5 +1,25 @@
 #include "basic.h"
 
+static int rand_a_b(int a, int b)
+{
+    return rand()%(b-a) +a;
+}
+
+void mix(card_num array[], int size)
+{
+	int i=0;
+	int number=0;
+	int tmp=0;
+
+	for(i = 0; i< size;i++) {
+		number=rand_a_b(0,size);
+		// Swapping 
+		tmp = array[i];
+		array[i] = array[number];
+		array[number]=tmp;
+	}
+}
+
 
 void swap(card_num *a, card_num *b) {
     int tmp = *a;
@@ -7,7 +27,7 @@ void swap(card_num *a, card_num *b) {
     *b = tmp;
 }
 
-shortint equal(card_num a, card_num b) {
+bool equal(card_num a, card_num b) {
     return ((a%10) == (b%10));
 }
 
@@ -23,7 +43,7 @@ short exist(card tab[], int size, card_num value)
 }
 
 
-shortint empty(card tab[], shortint size) {
+bool empty(card tab[], shortint size) {
 	shortint i;
 	for (i=0; i<size; i++) {
 		if (tab[i].number != -1) return 0;	
@@ -50,6 +70,6 @@ void getFile(card_num n, char* file) {
 	strcat(file,".gif");
 }
 
-shortint between(shortint x, shortint a, shortint b) {
-	return 	((x<=b) && (x>=a));
+bool between(shortint x, shortint a, shortint b) {
+	return 	((x>=a) && (x<=b));
 }

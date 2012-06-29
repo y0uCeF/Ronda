@@ -10,16 +10,12 @@
     #define NB_CARDS_TABLE 4
     #define MAX_NB_CARDS_TABLE 10
     #define MAX_NB_CARDS_HAND 3
-	#define WINDOW_WIDTH 800
-	#define WINDOW_HEIGHT 600
-	#define FPS 30
-	#define FRAME_RATE 1000/FPS
     
 /**Definition of data structures used in the program such as cards and 
  * players
  */  
   
-typedef unsigned short int shortint; 
+typedef unsigned short shortint; 
 
 typedef enum { HIDDEN = -2, EMPTY=-1,
 			COIN1, COIN2, COIN3, COIN4, COIN5, COIN6, COIN7, COIN10, COIN11, COIN12,
@@ -29,30 +25,13 @@ typedef enum { HIDDEN = -2, EMPTY=-1,
 } card_num;
       
 
-typedef struct card {
+typedef struct {
 	SDL_Surface* surf;
 	SDL_Rect* position;
 	card_num number;
 } card;      
 
+typedef shortint bool;
 
-typedef struct score {
-	//SDL_Surface* box;
-	shortint gainedCards;
-	shortint points;
-} score;
-
-
-typedef enum {USER, COMPUTER} Type;
-typedef struct player {
-    card hand[MAX_NB_CARDS_HAND];
-    score score_player;
-    SDL_Surface *scoreBox;
-    SDL_Rect posScoreBox;
-    int nbCardsInHand;
-    Type type;
-    int ronda_tringla;
-} player;
-
-      
+   
 #endif

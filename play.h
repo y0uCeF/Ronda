@@ -2,8 +2,8 @@
 #define PLAY_H
 
 #include "player.h"
-short getSelectedHand(int x);
-short getSelectedTable(int x, int y);
-void play(player *p, card table[], short selectedHand, short selectedTable, card_num *droppedCard);
+short get_selected_hand(int x);
+short get_selected_table(int x, int y);
+void user_turn(player *p, card table[], short selectedHand, short selectedTable, card_num *droppedCard);
 
 #endif

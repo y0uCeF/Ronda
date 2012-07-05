@@ -1,7 +1,7 @@
-
 #include "game.h"
 
-int main(int argc,char** argv) {	
+int main(int argc,char** argv) 
+{	
 	game_t *g=game_init();
 	
 	if (g==NULL) return 1;

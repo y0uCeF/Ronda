@@ -3,13 +3,14 @@
 
 #include "define.h"
 
+bool between(unsigned short x, unsigned short a, unsigned short b);
+bool equal(int a, int b);
 void mix(card_num array[], int size);
 void swap(card_num *a, card_num *b);
-bool equal(int a, int b);
 short exist(card tab[], int size, card_num value);
-bool empty(card tab[], shortint size);
-shortint nbCards(card tab[], shortint size);
-void getFile(card_num n, char* file);
-bool between(shortint x, shortint a, shortint b);
-
+bool empty(card tab[], unsigned short size);
+unsigned short nb_cards(card tab[], unsigned short size);
+char* get_file(card_num n);
+bool sdl_error();
+bool set_card(card *c, card_num num, short posx, short posy, bool back);
 #endif

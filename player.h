@@ -6,9 +6,9 @@
 typedef enum {USER, COMPUTER} type_t;
 
 typedef struct {
-	//SDL_Surface* box;
-	shortint gainedCards;
-	shortint points;
+	/* SDL_Surface* box; */
+	unsigned short gainedCards;
+	unsigned short points;
 } score_t;
 
 
@@ -17,14 +17,18 @@ typedef struct player {
     score_t score;
     SDL_Surface *scoreBox;
     SDL_Rect posScoreBox;
-    int nbCardsInHand;
+    int nb_cards_in_hand;
     type_t type;
     int ronda_tringla;
 } player;
 
+inline card_num get_card(player p, short index);
 
 player* player_init(type_t t);
 
-bool player_distribute(card_num cardList[],player *p, shortint* nbCardsRemaining);
+bool player_distribute(card_num cardList[],player *p, unsigned short *nbCardsRemaining);
 
+bool player_render(player *p, SDL_Surface *scr);
+
+void player_free(player *p);
 #endif

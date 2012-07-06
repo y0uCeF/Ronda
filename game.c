@@ -9,21 +9,21 @@
 
 
 
-static bool table_distribute(card_num cardList[],card table[], 
+static bool table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
 {
-	unsigned short i, k = 0, j = 0;
-	unsigned short xpos, ypos;
+	unsigned short i, k = 0, j = 0;    /* itérators */
+	unsigned short xpos, ypos;    /*x, y positions */
 	
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
-		while (exist(table, i, cardList[*nb_cards_remaining-j-1]) != -1) {
-			swap(&cardList[*nb_cards_remaining-j-1], &cardList[*nb_cards_remaining-j-k-1]);
+		while (exist(table, i, card_list[*nb_cards_remaining-j-1]) != -1) {
+			swap(&card_list[*nb_cards_remaining-j-1], &card_list[*nb_cards_remaining-j-k-1]);
 			k++;
 		}
 		xpos = (90+15)*(i%5) + 40;
 		ypos = (i<=4)? 160:305;
 		if ((i==0) || (i==2) || (i==4) || (i==6)) {
-			set_card(&table[i], cardList[*nb_cards_remaining-j-1], xpos, ypos, 0);
+			set_card(&table[i], card_list[*nb_cards_remaining-j-1], xpos, ypos, 0);
 			j++;
 		} else {
 			set_card(&table[i], EMPTY, xpos, ypos, 0);
@@ -39,7 +39,8 @@ static bool env_init(game_t *g)
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) 
 		return sdl_error("Unable to init SDL");
 	putenv("SDL_VIDEO_CENTERED=1");
-	g->screen=SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32,  SDL_DOUBLEBUF | SDL_HWSURFACE );
+	g->screen=SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32,  
+				SDL_DOUBLEBUF | SDL_HWSURFACE );
 	if (g->screen == NULL) 
 		return sdl_error("Video initialization failed");
 	if (SDL_FillRect(g->screen, NULL, SDL_MapRGB(g->screen->format, 53, 131, 68)) == -1) 
@@ -56,32 +57,32 @@ game_t* game_init()
 	if (!env_init(g)) 
 		return NULL;
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
-		g->table[i].number=EMPTY;
+		g->table[i].value=EMPTY;
 		g->table[i].surf=NULL;
 		g->table[i].position=NULL;
 	}
 	
 	for(i=0; i < NB_CARDS; i++) 
-		g->cardList[i] = i;
+		g->card_list[i] = i;
 	
 	g->running = 1;
 	g->user = player_init(USER);
 	g->comp = player_init(COMPUTER);
-	g->selectedHand = -1;
-	g->selectedTable = -1;
+	g->sel_hand = -1;
+	g->sel_table = -1;
 	g->nb_cards_remaining = NB_CARDS; 
-	g->currentPlayer = USER;
-	g->droppedCard = EMPTY;
+	g->current_player = USER;
+	g->dropped_card = EMPTY;
 	
 	/*mixing the cards*/
-	mix(g->cardList, NB_CARDS);
+	mix(g->card_list, NB_CARDS);
 	
 	/*distributing cards*/
-	if(!table_distribute(g->cardList, g->table, &g->nb_cards_remaining)) 
+	if(!table_distribute(g->card_list, g->table, &g->nb_cards_remaining)) 
 		return NULL;
-	if(!player_distribute(g->cardList, g->user, &g->nb_cards_remaining)) 
+	if(!player_distribute(g->card_list, g->user, &g->nb_cards_remaining)) 
 		return NULL;
-	if(!player_distribute(g->cardList, g->comp, &g->nb_cards_remaining)) 
+	if(!player_distribute(g->card_list, g->comp, &g->nb_cards_remaining)) 
 		return NULL;
 	
 	return g;
@@ -89,7 +90,7 @@ game_t* game_init()
 
 static bool game_render(game_t *g) 
 {
-	int i;
+	unsigned short i;
 	SDL_FillRect(g->screen, NULL, SDL_MapRGB(g->screen->format, 53, 131, 68));
 	
 	if (!player_render(g->user, g->screen)) 
@@ -149,19 +150,19 @@ static void treat_mouse_down_event(game_t *g)
 {
 	switch(g->event.button.button) {
 	case SDL_BUTTON_LEFT:
-		if (g->selectedHand != -1) 
-			g->user->hand[g->selectedHand].position->y = 450;	
+		if (g->sel_hand != -1) 
+			g->user->hand[g->sel_hand].position->y = 450;	
 			
 		if (between(g->event.button.y, 450, 585)) {						
-			g->selectedHand = get_selected_hand(g->event.button.x);
-			if ((g->selectedHand != -1) && (get_card(*g->user, g->selectedHand) != EMPTY)) {		       
+			g->sel_hand = get_selected_hand(g->event.button.x);
+			if ((g->sel_hand != -1) && (get_card_val(*g->user, g->sel_hand) != EMPTY)) {		       
 				/*selectionHand=IMG_Load("cards/selection.png"); */
-				g->user->hand[g->selectedHand].position->y = 447;
+				g->user->hand[g->sel_hand].position->y = 447;
 			}
-			g->selectedTable = -1;
+			g->sel_table = -1;
 		} else if (((between(g->event.button.y, 160, 295)) || (between(g->event.button.y, 305, 440)))
-				&& (g->selectedHand != -1))  {
-			g->selectedTable = get_selected_table(g->event.button.x, g->event.button.y);
+				&& (g->sel_hand != -1))  {
+			g->sel_table = get_selected_table(g->event.button.x, g->event.button.y);
 		}
 	break;
 						
@@ -182,7 +183,7 @@ static void game_treat_event(game_t *g)
 	break;
 	
 	case SDL_MOUSEBUTTONUP:
-		if (g->currentPlayer == USER)
+		if (g->current_player == USER)
 			treat_mouse_down_event(g);
 	break;
 			
@@ -198,9 +199,11 @@ static void game_treat_event(game_t *g)
 
 bool game_run(game_t *g) 
 {
-	int currentTime = 0, oldTime = 0, timeDiff;
+	int currentTime = 0, oldTime = 0, 
+		timeDiff; /* time difference calculations */
 	
-	while (g->running) {
+	/* main loop */
+	while (g->running) {     
 		while(SDL_PollEvent(&g->event))	{
 			game_treat_event(g);		
 		}
@@ -212,11 +215,11 @@ bool game_run(game_t *g)
 		else 
 			SDL_Delay(FRAME_RATE - timeDiff);
 		
-		if ((g->selectedHand != -1) && (g->selectedTable != -1)) {					
-			user_turn(g->user, g->table, g->selectedHand, g->selectedTable, &g->droppedCard);
-			/*currentPlayer = COMPUTER; */
-			g->selectedHand = -1;
-			g->selectedTable = -1;
+		if ((g->sel_hand != -1) && (g->sel_table != -1)) {					
+			user_turn(g->user, g->table, g->sel_hand, g->sel_table, &g->dropped_card);
+			/*current_llayer = COMPUTER; */
+			g->sel_hand = -1;
+			g->sel_table = -1;
 		}
 
 		/*rendering*/

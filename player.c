@@ -8,22 +8,22 @@ player* player_init(type_t t)
 	unsigned short i;
 	player *p=malloc(sizeof(player));
 	for (i=0; i<MAX_NB_CARDS_HAND; i++) {
-		p->hand[i].number=EMPTY;
+		p->hand[i].value=EMPTY;
 		p->hand[i].surf=NULL;
 		p->hand[i].position=NULL;
 	}	
 	p->nb_cards_in_hand=0;
-	p->score.gainedCards=0;
+	p->score.gained_cards=0;
 	p->score.points=0;
 	p->type=t;
-	p->posScoreBox.x=600;
-	p->posScoreBox.y= (t == USER)? 470:40;
-	p->scoreBox=SDL_CreateRGBSurface(SDL_HWSURFACE, 130, 90, 32,  0, 0, 0, 0);
+	p->pos_score_box.x=600;
+	p->pos_score_box.y= (t == USER)? 470:40;
+	p->score_box=SDL_CreateRGBSurface(SDL_HWSURFACE, 130, 90, 32,  0, 0, 0, 0);
 	return p;	
 }
 
 
-bool player_distribute(card_num cardList[],player *p, unsigned short *nb_cards_remaining) 
+bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_remaining) 
 {
 	unsigned short i;   
 	unsigned short posx, posy;
@@ -41,7 +41,7 @@ bool player_distribute(card_num cardList[],player *p, unsigned short *nb_cards_r
 			back=1;
 		}
 		
-		set_card(&p->hand[i], cardList[*nb_cards_remaining-1-i], posx, posy, back);
+		set_card(&p->hand[i], card_list[*nb_cards_remaining-1-i], posx, posy, back);
 
 		p->nb_cards_in_hand++;
 	}
@@ -52,12 +52,12 @@ bool player_distribute(card_num cardList[],player *p, unsigned short *nb_cards_r
 bool player_render(player *p, SDL_Surface *scr)
 {
 	unsigned short i;
-	SDL_FillRect(p->scoreBox, NULL, SDL_MapRGB(p->scoreBox->format, 35, 50, 20));
+	SDL_FillRect(p->score_box, NULL, SDL_MapRGB(p->score_box->format, 35, 50, 20));
 	
 	for (i=0; i < MAX_NB_CARDS_HAND; i++)
 		if (SDL_BlitSurface(p->hand[i].surf, NULL, scr, p->hand[i].position) == -1) 
 			return 0; 
-	if(SDL_BlitSurface(p->scoreBox, NULL, scr, &p->posScoreBox) == -1) 
+	if(SDL_BlitSurface(p->score_box, NULL, scr, &p->pos_score_box) == -1) 
 		return 0;	
 	return 1;
 }
@@ -71,12 +71,12 @@ void player_free(player *p)
 		if(p->hand[i].position != NULL) 
 			free(p->hand[i].position);
 	}
-	if(p->scoreBox != NULL) 
-		SDL_FreeSurface(p->scoreBox);
+	if(p->score_box != NULL) 
+		SDL_FreeSurface(p->score_box);
 	free(p);	
 }
 
-inline card_num get_card(player p, short index)
+inline card_num get_card_val(player p, short index)
 {
-	return p.hand[index].number;
+	return p.hand[index].value;
 }

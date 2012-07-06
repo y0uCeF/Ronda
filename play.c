@@ -33,49 +33,50 @@ short get_selected_table(int x, int y)
 	else return -1;	
 }
 
-static void eat(player *p, card table[], short selectedHand, short selectedTable) 
+static void eat(player *p, card table[], short sel_hand, short sel_table) 
 {
 	int i=0, index=0;
-	card_num playedCard=get_card(*p, selectedHand);
-	set_card(&p->hand[selectedHand], EMPTY, -1, 450, 0);
-	p->score.gainedCards++;
+	card_num played_card=get_card_val(*p, sel_hand);
+	set_card(&p->hand[sel_hand], EMPTY, -1, 450, 0);
+	p->score.gained_cards++;
 	
-	index=exist(table, MAX_NB_CARDS_TABLE, playedCard);
-	while((index != -1) && (i<= 9-playedCard%10)) {  
+	index=exist(table, MAX_NB_CARDS_TABLE, played_card);
+	while((index != -1) && (i<= 9-played_card%10)) {  
 	SDL_FreeSurface(table[index].surf);
 	set_card(&table[index], EMPTY, -1, -1, 0);
-	p->score.gainedCards++;
+	p->score.gained_cards++;
 	i++;
-	index=exist(table, MAX_NB_CARDS_TABLE, playedCard+i);
+	index=exist(table, MAX_NB_CARDS_TABLE, played_card+i);
 	}
 	
 	if (empty(table, MAX_NB_CARDS_TABLE)) p->score.points++;	
 }
 
 
-void user_turn(player *p, card table[], short selectedHand, short selectedTable, card_num *droppedCard) 
+void user_turn(player *p, card table[], short sel_hand, short sel_table,
+		card_num *dropped_card) 
 {
 	if (p->nb_cards_in_hand == 3) 
-		*droppedCard=EMPTY;
-	if ((table[selectedTable].number == EMPTY) && 
-		(exist(table, MAX_NB_CARDS_TABLE, p->hand[selectedHand].number) == -1)) {
-		SDL_FreeSurface(table[selectedTable].surf);
-		table[selectedTable].surf=p->hand[selectedHand].surf;
-		table[selectedTable].number=p->hand[selectedHand].number;
-		*droppedCard=get_card(*p, selectedHand);
-		set_card(&p->hand[selectedHand], EMPTY, -1, 450, 0); 
+		*dropped_card=EMPTY;
+	if ((table[sel_table].value == EMPTY) && 
+		(exist(table, MAX_NB_CARDS_TABLE, p->hand[sel_hand].value) == -1)) {
+		SDL_FreeSurface(table[sel_table].surf);
+		table[sel_table].surf=p->hand[sel_hand].surf;
+		table[sel_table].value=p->hand[sel_hand].value;
+		*dropped_card=get_card_val(*p, sel_hand);
+		set_card(&p->hand[sel_hand], EMPTY, -1, 450, 0); 
 		
-	} else if (table[selectedTable].number != EMPTY) {
-		if (equal(p->hand[selectedHand].number, table[selectedTable].number)) {
-			if(table[selectedTable].number == *droppedCard) 
+	} else if (table[sel_table].value != EMPTY) {
+		if (equal(p->hand[sel_hand].value, table[sel_table].value)) {
+			if(table[sel_table].value == *dropped_card) 
 				p->score.points++;
-			*droppedCard=EMPTY;
-			eat(p, table, selectedHand, selectedTable);
+			*dropped_card=EMPTY;
+			eat(p, table, sel_hand, sel_table);
 		} else {
-			p->hand[selectedHand].position->y=450;
+			p->hand[sel_hand].position->y=450;
 		}
 	} else {
-		p->hand[selectedHand].position->y=450;
+		p->hand[sel_hand].position->y=450;
 	}
 	p->nb_cards_in_hand--;	
 }

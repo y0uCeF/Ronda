@@ -26,7 +26,7 @@ typedef enum { HIDDEN = -2, EMPTY=-1,
 typedef struct {
 	SDL_Surface* surf;
 	SDL_Rect* position;
-	card_num number;
+	card_num value;
 } card;      
 
 typedef unsigned short bool;

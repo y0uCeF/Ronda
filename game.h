@@ -12,18 +12,18 @@
 
 /* types definition */    
 typedef struct {
-	unsigned short running;
+	unsigned short running;  /* main loop condition */
 	SDL_Surface *screen;	
 	SDL_Event event;
-	player *user;
+	player *user;    
 	player *comp;
 	card table[MAX_NB_CARDS_TABLE];
-	card_num cardList[NB_CARDS];
-	short selectedTable;
-	short selectedHand;
+	card_num card_list[NB_CARDS];
+	short sel_table;
+	short sel_hand;
 	unsigned short nb_cards_remaining;
-	type_t currentPlayer;
-	card_num droppedCard;
+	type_t current_player;
+	card_num dropped_card;  /* last card dropped */
 } game_t;
 
 /* functions definition */

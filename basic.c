@@ -1,5 +1,6 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <SDL/SDL_image.h>
 
 #include "basic.h"
 
@@ -18,7 +19,7 @@ inline bool equal(card_num a, card_num b)
 	return ((a%10) == (b%10));
 }
 
-void mix(card_num array[], int size)
+void mix(card_num array[], unsigned short size)
 {
 	int i=0;
 	int random_number=0;
@@ -40,12 +41,12 @@ void swap(card_num *a, card_num *b)
 	*b = tmp;
 }
 
-short exist(card tab[], int size, card_num value)
+short exist(card tab[], unsigned short size, card_num value)
 {
 	short i;
 	for (i=0; i < size; i++) 
-		if(tab[i].number != EMPTY)
-			if (equal(tab[i].number, value)) 
+		if(tab[i].value != EMPTY)
+			if (equal(tab[i].value, value)) 
 				return i;
     return -1;
 }
@@ -54,7 +55,7 @@ bool empty(card tab[], unsigned short size)
 {
 	unsigned short i;
 	for (i=0; i < size; i++) {
-		if (tab[i].number != -1) return 0;	
+		if (tab[i].value != -1) return 0;	
 	}
 	return 1;
 }
@@ -63,7 +64,7 @@ unsigned short nb_cards(card tab[], unsigned short size)
 {
 	unsigned short i, cpt=0;
 	for (i=0; i < size; i++) 
-		if (tab[i].number != EMPTY) 
+		if (tab[i].value != EMPTY) 
 			cpt++;
 	return cpt;	
 }
@@ -88,7 +89,7 @@ bool sdl_error(char* msg)
 
 bool set_card(card *c, card_num num, short xpos, short ypos, bool back)
 {
-	c->number=num;
+	c->value=num;
 	
 	if(((xpos != -1) || (ypos != -1)) && (!c->position))
 		c->position=malloc(sizeof(SDL_Rect));

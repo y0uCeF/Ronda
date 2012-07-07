@@ -16,7 +16,7 @@ short get_selected_hand(int x);
 short get_selected_table(int x, int y);
 
 /*
- *  
+ * affect changes on cards after user's turn 
  */ 
 void user_turn(player *p, card table[], short sel_hand, short sel_table, 
 		card_num *dropped_card);

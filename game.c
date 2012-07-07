@@ -13,7 +13,7 @@ static bool table_distribute(card_num card_list[],card table[],
 			unsigned short *nb_cards_remaining) 
 {
 	unsigned short i, k = 0, j = 0;    /* itérators */
-	unsigned short xpos, ypos;    /*x, y positions */
+	unsigned short xpos, ypos;    /* x, y positions */
 	
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
 		while (exist(table, i, card_list[*nb_cards_remaining-j-1]) != -1) {

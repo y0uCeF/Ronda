@@ -28,7 +28,6 @@ typedef struct {
 
 /* functions definition */
 
-
 /* 
  * Initializes the game environnement 
  */

@@ -12,7 +12,7 @@
     #define MAX_NB_CARDS_HAND 3
     
 /*
- * Definition of basic data structures 
+ * Definition of common data structures 
  */  
 
 typedef enum { HIDDEN = -2, EMPTY=-1,
@@ -24,12 +24,12 @@ typedef enum { HIDDEN = -2, EMPTY=-1,
       
 
 typedef struct {
-	SDL_Surface* surf;
-	SDL_Rect* position;
-	card_num value;
+	SDL_Surface* surf;  /* sprite of the card */
+	SDL_Rect* position; /* position on the screen */
+	card_num value; /* value of the card */
 } card;      
 
-typedef unsigned short bool;
+typedef unsigned short bool;  /* boolean */
 
    
 #endif

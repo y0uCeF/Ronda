@@ -79,3 +79,52 @@ void user_turn(player *p, card table[], short selectedHand, short selectedTable,
 	}
 	p->nb_cards_in_hand--;	
 }
+
+static unsigned short get_gain(card_num c, card table[], card_num dropped_card)
+{
+	unsigned short i = 0, count = 0;
+	unsigned short res = 1;
+	if (c%10 != 9) {
+		short index = exist(table, MAX_NB_CARDS_TABLE, c);
+		while ((index != -1) && (i<= 9-c%10)) {
+			count++;
+			index = exist(table, MAX_NB_CARDS_TABLE, c+count);
+		}
+	}
+	if (c == dropped_card) 
+		res++;
+        if (count >= 3)
+		res++;
+        
+        return res;
+}
+
+static short get_index_ai(player *p, card table[], card_num dropped_card)
+{
+	unsigned short i, j;
+	bool found=0;
+	unsigned short tmp_gain, gain = 0;
+	short best_card_index = -1;
+	for (i=0; i < MAX_NB_CARDS_HAND; i++) {
+		card_num tmp = get_card(*p, i);
+		if (tmp != EMPTY) 
+			for (j=0; j < MAX_NB_CARDS_TABLE; j++) {
+				if (equal(tmp, table[j].number)) {
+					found = 1;
+					tmp_gain = get_gain(tmp, table, dropped_card);
+					if (gain < tmp_gain) {
+						gain = tmp_gain;
+						best_card_index = i;
+					}
+				}
+			}
+		
+	}
+	
+	return best_card_index;
+}
+
+void computer_turn(player *p, card table[], card_num *dropped_card)
+{
+	short index = 0;
+}

@@ -103,7 +103,7 @@ static bool game_render(game_t *g)
 			return 0;
 	
 	/*	if (selectionHand != NULL)	
-			if(SDL_BlitSurface(selectionHand, NULL, g->screen, g->user.hand[selectedHand].position) == -1) 
+			if(SDL_BlitSurface(selectionHand, NULL, g->screen, g->user.hand[sel_hand].position) == -1) 
 			 	return 0;
 	*/
 	SDL_Flip(g->screen);
@@ -215,15 +215,24 @@ bool game_run(game_t *g)
 		else 
 			SDL_Delay(FRAME_RATE - timeDiff);
 		
-		if ((g->sel_hand != -1) && (g->sel_table != -1)) {					
-			user_turn(g->user, g->table, g->sel_hand, g->sel_table, &g->dropped_card);
-			/*current_llayer = COMPUTER; */
+		
+		if ((g->sel_hand != -1) && (g->sel_table != -1) &&
+			(g->current_player == USER)){
+			user_turn(g->user, g->table, g->sel_hand, 
+				g->sel_table, &g->dropped_card);
+			g->current_player = COMPUTER;	
 			g->sel_hand = -1;
 			g->sel_table = -1;
 		}
-
+		else if (g->current_player == COMPUTER) {
+			SDL_Delay(2000);
+			computer_turn(g->comp, g->table, &g->dropped_card);
+			g->current_player = USER;
+		}
+		
 		/*rendering*/
-		if (!game_render(g)) return 0;	
+		if (!game_render(g)) 
+			return 0;	
 	}		
 	return 1; 		
 }

@@ -21,4 +21,7 @@ short get_selected_table(int x, int y);
 void user_turn(player *p, card table[], short sel_hand, short sel_table, 
 		card_num *dropped_card);
 
+
+void computer_turn(player *p, card table[], card_num *dropped_card);
+
 #endif

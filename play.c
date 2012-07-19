@@ -35,21 +35,24 @@ short get_selected_table(int x, int y)
 
 static void eat(player *p, card table[], short sel_hand, short sel_table) 
 {
-	int i=0, index=0;
+	int i = 0, index = 0;
+
 	card_num played_card=get_card_val(*p, sel_hand);
-	set_card(&p->hand[sel_hand], EMPTY, -1, 450, 0);
+	short y = (p->type == USER)? 450 : 15;
+	set_card(&p->hand[sel_hand], EMPTY, -1, y, 0);
 	p->score.gained_cards++;
 	
-	index=exist(table, MAX_NB_CARDS_TABLE, played_card);
+	index = exist(table, MAX_NB_CARDS_TABLE, played_card);
 	while((index != -1) && (i<= 9-played_card%10)) {  
-	SDL_FreeSurface(table[index].surf);
-	set_card(&table[index], EMPTY, -1, -1, 0);
-	p->score.gained_cards++;
-	i++;
-	index=exist(table, MAX_NB_CARDS_TABLE, played_card+i);
+		SDL_FreeSurface(table[index].surf);
+		set_card(&table[index], EMPTY, -1, -1, 0);
+		p->score.gained_cards++;
+		i++;
+		index=exist(table, MAX_NB_CARDS_TABLE, played_card+i);
 	}
 	
-	if (empty(table, MAX_NB_CARDS_TABLE)) p->score.points++;	
+	if (empty(table, MAX_NB_CARDS_TABLE)) 
+		p->score.points++;	
 }
 
 
@@ -58,14 +61,19 @@ void user_turn(player *p, card table[], short sel_hand, short sel_table,
 {
 	if (p->nb_cards_in_hand == 3) 
 		*dropped_card=EMPTY;
+	
+	short y = (p->type == USER)? 450 : 15;	
 	if ((table[sel_table].value == EMPTY) && 
 		(exist(table, MAX_NB_CARDS_TABLE, p->hand[sel_hand].value) == -1)) {
 		SDL_FreeSurface(table[sel_table].surf);
-		table[sel_table].surf=p->hand[sel_hand].surf;
-		table[sel_table].value=p->hand[sel_hand].value;
-		*dropped_card=get_card_val(*p, sel_hand);
-		set_card(&p->hand[sel_hand], EMPTY, -1, 450, 0); 
+		if (p->type == USER)
+			table[sel_table].surf = p->hand[sel_hand].surf;
+		else
+			table[sel_table].surf = IMG_Load(get_file(p->hand[sel_hand].value));
 		
+		table[sel_table].value = p->hand[sel_hand].value;
+		*dropped_card = get_card_val(*p, sel_hand);
+		set_card(&p->hand[sel_hand], EMPTY, -1, y, 0); 
 	} else if (table[sel_table].value != EMPTY) {
 		if (equal(p->hand[sel_hand].value, table[sel_table].value)) {
 			if(table[sel_table].value == *dropped_card) 
@@ -73,10 +81,76 @@ void user_turn(player *p, card table[], short sel_hand, short sel_table,
 			*dropped_card=EMPTY;
 			eat(p, table, sel_hand, sel_table);
 		} else {
-			p->hand[sel_hand].position->y=450;
+			p->hand[sel_hand].position->y = y;
 		}
 	} else {
-		p->hand[sel_hand].position->y=450;
+		p->hand[sel_hand].position->y = y;
 	}
 	p->nb_cards_in_hand--;	
+}
+
+static unsigned short get_gain(card_num c, card table[], card_num dropped_card)
+{
+	unsigned short i = 0, count = 0;
+	unsigned short res = 1;
+	if (c%10 != 9) {
+		short index = exist(table, MAX_NB_CARDS_TABLE, c);
+		while ((index != -1) && (i<= 9-c%10)) {
+			count++;
+			index = exist(table, MAX_NB_CARDS_TABLE, c+count);
+		}
+	}
+	if (c == dropped_card) 
+		res++;
+        if (count >= 3)
+		res++;
+        
+        return res;
+}
+
+static short get_index_ai(player *p, card table[], card_num dropped_card, 
+		short *index_tab)
+{
+	unsigned short i, j;
+	unsigned short tmp_gain, gain = 0;
+	short best_card_index = -1;
+	*index_tab = -1;
+	for (i=0; i < MAX_NB_CARDS_HAND; i++) {
+		card_num tmp = get_card_val(*p, i);
+		if (tmp != EMPTY) 
+			for (j=0; j < MAX_NB_CARDS_TABLE; j++) {
+				if (equal(tmp, table[j].value)) {
+					tmp_gain = get_gain(tmp, table, dropped_card);
+					if (gain < tmp_gain) {
+						gain = tmp_gain;
+						best_card_index = i;
+						*index_tab = j;
+					}
+				}
+			}
+		
+	}
+	
+	return best_card_index;
+}
+
+void computer_turn(player *p, card table[], card_num *dropped_card)
+{
+	short index_tab;
+	short index_hand = get_index_ai(p, table, *dropped_card, &index_tab);
+	
+	if (index_hand == -1) {
+		short i = rand_a_b(0, 3);
+		while (p->hand[i].value == EMPTY)
+			i = rand_a_b(0, 3);
+		index_hand = i;	
+	}
+	
+	if (index_tab == -1) {
+		short i = rand_a_b(0, 3);
+		while (table[i].value != EMPTY)
+			i = rand_a_b(0, 3);
+		index_tab = i;	
+	}
+	user_turn(p, table, index_hand, index_tab, dropped_card);	
 }

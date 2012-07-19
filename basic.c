@@ -4,7 +4,7 @@
 
 #include "basic.h"
 
-inline static int rand_a_b(int a, int b)
+inline int rand_a_b(int a, int b)
 {
 	return rand() % (b - a) + a;
 }

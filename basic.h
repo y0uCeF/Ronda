@@ -3,6 +3,7 @@
 
 #include "define.h"
 
+
 /*
  * checks if  a <= x <= b
  */
@@ -13,6 +14,8 @@ inline bool between(unsigned short x, unsigned short a, unsigned short b);
  */ 
 inline bool equal(int a, int b);
 
+inline int rand_a_b(int a, int b);
+
 /*
  * mixes cards in array
  */ 
@@ -21,6 +24,7 @@ void mix(card_num array[], unsigned short size);
 /*
  * swaps contents of a and b
  */ 
+
 void swap(card_num *a, card_num *b);
 
 /*

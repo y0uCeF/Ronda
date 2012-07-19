@@ -3,6 +3,7 @@
 
 #include "define.h"
 
+inline int rand_a_b(int a, int b);
 bool between(unsigned short x, unsigned short a, unsigned short b);
 bool equal(int a, int b);
 void mix(card_num array[], int size);

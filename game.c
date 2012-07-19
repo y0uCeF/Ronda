@@ -212,13 +212,29 @@ bool game_run(game_t *g)
 		else 
 			SDL_Delay(FRAME_RATE - timeDiff);
 		
-		if ((g->selectedHand != -1) && (g->selectedTable != -1)) {					
-			user_turn(g->user, g->table, g->selectedHand, g->selectedTable, &g->droppedCard);
-			/*currentPlayer = COMPUTER; */
+		/*if (g->currentPlayer == COMPUTER) 
+			computer_turn(g->comp, g->table, &g->droppedCard);
+		else if (g->currentPlayer == USER) 
+			if ((g->selectedHand != -1) && (g->selectedTable != -1))
+				user_turn(g->user, g->table, g->selectedHand, 
+						g->selectedTable, &g->droppedCard);
+		g->currentPlayer = (g->currentPlayer == USER)? COMPUTER : USER; 
+		g->selectedHand = -1;
+		g->selectedTable = -1;*/
+		if ((g->selectedHand != -1) && (g->selectedTable != -1) &&
+			(g->currentPlayer == USER)){
+			user_turn(g->user, g->table, g->selectedHand, 
+				g->selectedTable, &g->droppedCard);
+			g->currentPlayer = COMPUTER;	
 			g->selectedHand = -1;
 			g->selectedTable = -1;
 		}
-
+		else if (g->currentPlayer == COMPUTER) {
+			SDL_Delay(2000);
+			computer_turn(g->comp, g->table, &g->droppedCard);
+			g->currentPlayer = USER;
+		}
+		
 		/*rendering*/
 		if (!game_render(g)) return 0;	
 	}		

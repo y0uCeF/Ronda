@@ -1,49 +1,20 @@
 #include <SDL/SDL_image.h>
 
 #include "play.h"
-#include "basic.h"
+#include "common.h"
 
 
-
-short get_selected_hand(int x) 
-{
-	if (between(x,150, 240)) {
-		return 0;
-	} else if (between(x, 280,370)) {
-		return 1;
-	} else if (between(x,410, 500)) {
-		return 2;
-	} else return -1;	
-}
-
-short get_selected_table(int x, int y) 
-{
-	unsigned short temp=5, c=0;
-	if (between(x, 40, 130)) temp=0;
-	else if(between(x, 145, 235)) temp=1;
-	else if (between(x, 250, 340)) temp=2;
-	else if(between(x, 355, 445)) temp=3;
-	else if (between(x, 460, 550)) temp=4;
-	
-	if (temp!=5) { 
-		if (between(y, 160, 295))	c=temp;
-		else if (between(y, 305, 440)) c=temp+5;
-		return c;
-	}
-	else return -1;	
-}
-
-static void eat(player *p, card table[], short sel_hand, short sel_table) 
+static void take_cards(player *p, card table[]) 
 {
 	int i = 0, index = 0;
 
-	card_num played_card=get_card_val(*p, sel_hand);
+	card_num played_card = get_sel_hand_val(*p);
 	short y = (p->type == USER)? 450 : 15;
-	set_card(&p->hand[sel_hand], EMPTY, -1, y, 0);
+	set_card(&p->hand[p->sel_hand], EMPTY, -1, y, 0);
 	p->score.gained_cards++;
 	
 	index = exist(table, MAX_NB_CARDS_TABLE, played_card);
-	while((index != -1) && (i<= 9-played_card%10)) {  
+	while((index != -1) && (i <= 9-played_card%10)) {  
 		SDL_FreeSurface(table[index].surf);
 		set_card(&table[index], EMPTY, -1, -1, 0);
 		p->score.gained_cards++;
@@ -53,40 +24,6 @@ static void eat(player *p, card table[], short sel_hand, short sel_table)
 	
 	if (empty(table, MAX_NB_CARDS_TABLE)) 
 		p->score.points++;	
-}
-
-
-void user_turn(player *p, card table[], short sel_hand, short sel_table,
-		card_num *dropped_card) 
-{
-	if (p->nb_cards_in_hand == 3) 
-		*dropped_card=EMPTY;
-	
-	short y = (p->type == USER)? 450 : 15;	
-	if ((table[sel_table].value == EMPTY) && 
-		(exist(table, MAX_NB_CARDS_TABLE, p->hand[sel_hand].value) == -1)) {
-		SDL_FreeSurface(table[sel_table].surf);
-		if (p->type == USER)
-			table[sel_table].surf = p->hand[sel_hand].surf;
-		else
-			table[sel_table].surf = IMG_Load(get_file(p->hand[sel_hand].value));
-		
-		table[sel_table].value = p->hand[sel_hand].value;
-		*dropped_card = get_card_val(*p, sel_hand);
-		set_card(&p->hand[sel_hand], EMPTY, -1, y, 0); 
-	} else if (table[sel_table].value != EMPTY) {
-		if (equal(p->hand[sel_hand].value, table[sel_table].value)) {
-			if(table[sel_table].value == *dropped_card) 
-				p->score.points++;
-			*dropped_card=EMPTY;
-			eat(p, table, sel_hand, sel_table);
-		} else {
-			p->hand[sel_hand].position->y = y;
-		}
-	} else {
-		p->hand[sel_hand].position->y = y;
-	}
-	p->nb_cards_in_hand--;	
 }
 
 static unsigned short get_gain(card_num c, card table[], card_num dropped_card)
@@ -116,7 +53,7 @@ static short get_index_ai(player *p, card table[], card_num dropped_card,
 	short best_card_index = -1;
 	*index_tab = -1;
 	for (i=0; i < MAX_NB_CARDS_HAND; i++) {
-		card_num tmp = get_card_val(*p, i);
+		card_num tmp = p->hand[i].value;
 		if (tmp != EMPTY) 
 			for (j=0; j < MAX_NB_CARDS_TABLE; j++) {
 				if (equal(tmp, table[j].value)) {
@@ -134,6 +71,53 @@ static short get_index_ai(player *p, card table[], card_num dropped_card,
 	return best_card_index;
 }
 
+bool valid_move(player p, card table[])
+{
+	card_num selected_hand = get_sel_hand_val(p);
+	card_num selected_table = table[p.sel_table].value;
+	if ((selected_table == EMPTY) && 
+		(exist(table, MAX_NB_CARDS_TABLE, selected_hand) != -1))
+		return 0;
+	else if ((selected_table != EMPTY) &&
+		(!equal(selected_hand, selected_table)))
+		return 0;
+	else return 1;		
+}
+
+void user_turn(player *p, card table[], card_num *dropped_card) 
+{
+	if (p->nb_cards_in_hand == 3) 
+		*dropped_card = EMPTY;
+	
+	card_num selected_hand = get_sel_hand_val(*p);
+	card_num selected_table = table[p->sel_table].value;
+	short y = (p->type == USER)? 450 : 15;	
+	if ((selected_table == EMPTY) && 
+		(exist(table, MAX_NB_CARDS_TABLE, selected_hand) == -1)) {
+		SDL_FreeSurface(table[p->sel_table].surf);
+		if (p->type == USER)
+			table[p->sel_table].surf = get_sel_hand_surf(*p);
+		else
+			table[p->sel_table].surf = IMG_Load(get_file(selected_hand));
+		
+		table[p->sel_table].value = selected_hand;
+		*dropped_card = selected_hand;
+		set_card(&p->hand[p->sel_hand], EMPTY, -1, y, 0); 
+	} else if (selected_table != EMPTY) {
+		if (equal(selected_hand, selected_table)) {
+			if(selected_table == *dropped_card) 
+				p->score.points++;
+			*dropped_card=EMPTY;
+			take_cards(p, table);
+		} else {
+			p->hand[p->sel_hand].position->y = y;
+		}
+	} else {
+		p->hand[p->sel_hand].position->y = y;
+	}
+	p->nb_cards_in_hand--;	
+}
+
 void computer_turn(player *p, card table[], card_num *dropped_card)
 {
 	short index_tab;
@@ -147,10 +131,13 @@ void computer_turn(player *p, card table[], card_num *dropped_card)
 	}
 	
 	if (index_tab == -1) {
-		short i = rand_a_b(0, 3);
+		short i = rand_a_b(0, 10);
 		while (table[i].value != EMPTY)
-			i = rand_a_b(0, 3);
+			i = rand_a_b(0, 10);
 		index_tab = i;	
 	}
-	user_turn(p, table, index_hand, index_tab, dropped_card);	
+	p->sel_hand = index_hand;
+	p->sel_table = index_tab;
+	
+	user_turn(p, table, dropped_card);	
 }

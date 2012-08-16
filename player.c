@@ -1,23 +1,25 @@
 #include <SDL/SDL_image.h>
 
 #include "player.h"
-#include "basic.h"
+#include "common.h"
 
 player* player_init(type_t t) 
 {
 	unsigned short i;
-	player *p=malloc(sizeof(player));
+	player *p = malloc(sizeof(player));
 	for (i=0; i<MAX_NB_CARDS_HAND; i++) {
-		p->hand[i].value=EMPTY;
-		p->hand[i].surf=NULL;
-		p->hand[i].position=NULL;
+		p->hand[i].value = EMPTY;
+		p->hand[i].surf = NULL;
+		p->hand[i].position = NULL;
 	}	
-	p->nb_cards_in_hand=0;
-	p->score.gained_cards=0;
-	p->score.points=0;
-	p->type=t;
-	p->pos_score_box.x=600;
-	p->pos_score_box.y= (t == USER)? 470:40;
+	p->nb_cards_in_hand = 0;
+	p->score.gained_cards = 0;
+	p->score.points = 0;
+	p->type = t;
+	p->pos_score_box.x = 600;
+	p->pos_score_box.y = (t == USER)? 470:40;
+	p->sel_hand = -1;
+	p->sel_table = -1;
 	p->score_box=SDL_CreateRGBSurface(SDL_HWSURFACE, 130, 90, 32,  0, 0, 0, 0);
 	return p;	
 }
@@ -32,13 +34,12 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
 	for(i=0; i<MAX_NB_CARDS_HAND;i++) {
 		posx = (90+40)*i+150;
 		
-
 		if (p->type == USER) {			
 			posy = 450;
-			back=0;
+			back = 0;
 		} else {
 			posy = 15;
-			back=1;
+			back = 1;
 		}
 		
 		set_card(&p->hand[i], card_list[*nb_cards_remaining-1-i], posx, posy, back);
@@ -76,7 +77,18 @@ void player_free(player *p)
 	free(p);	
 }
 
-inline card_num get_card_val(player p, short index)
+inline card_num get_sel_hand_val(player p)
 {
-	return p.hand[index].value;
+	if (p.sel_hand != -1)
+		return p.hand[p.sel_hand].value;
+	else 
+		return -1;	
 }
+
+inline SDL_Surface* get_sel_hand_surf(player p)
+{
+	if (p.sel_hand != -1)
+		return p.hand[p.sel_hand].surf;
+	else
+		return NULL;
+}		

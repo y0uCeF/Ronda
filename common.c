@@ -2,7 +2,7 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_image.h>
 
-#include "basic.h"
+#include "common.h"
 
 inline int rand_a_b(int a, int b)
 {

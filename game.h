@@ -2,7 +2,7 @@
 #define GAME_H
 
 #include "player.h"
-
+#include "game_state.h"
 /* Constants definition */
 	#define WINDOW_WIDTH 800
 	#define WINDOW_HEIGHT 600
@@ -15,15 +15,7 @@ typedef struct {
 	unsigned short running;  /* main loop condition */
 	SDL_Surface *screen;	
 	SDL_Event event;
-	player *user;    
-	player *comp;
-	card table[MAX_NB_CARDS_TABLE];
-	card_num card_list[NB_CARDS];
-	short sel_table;
-	short sel_hand;
-	unsigned short nb_cards_remaining;
-	type_t current_player;
-	card_num dropped_card;  /* last card dropped */
+	game_state_t *state;
 } game_t;
 
 /* functions definition */

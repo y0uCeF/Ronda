@@ -4,24 +4,16 @@
 #include "player.h"
 /* functions definition */
 
-/*
- * returns index of the selected card in the screen (user hand)
- */ 
-short get_selected_hand(int x);
-
-/*
- * returns index of the selected card in the screen (table)
- */ 
-
-short get_selected_table(int x, int y);
+bool valid_move(player p, card table[]);
 
 /*
  * affect changes on cards after user's turn 
  */ 
-void user_turn(player *p, card table[], short sel_hand, short sel_table, 
-		card_num *dropped_card);
+void user_turn(player *p, card table[], card_num *dropped_card);
 
-
+/*
+ * computer turn with automatic card choosing
+ */ 
 void computer_turn(player *p, card table[], card_num *dropped_card);
 
 #endif

@@ -20,16 +20,22 @@ typedef struct player {
     SDL_Rect pos_score_box;
     int nb_cards_in_hand;
     type_t type;
+    short sel_hand;
+    short sel_table;
     int ronda_tringla;
 } player;
 
 /* functions definition */
 
 /*
- * returns card value specified by index
+ * returns card value specified by sel_hand
  */  
-inline card_num get_card_val(player p, short index);
+inline card_num get_sel_hand_val(player p);
 
+/*
+ * returns card surface specified by sel_hand
+ */  
+inline SDL_Surface* get_sel_hand_surf(player p);
 /*
  * initializes player data
  */ 

@@ -94,7 +94,6 @@ void user_turn(player *p, card table[], card_num *dropped_card)
 	short y = (p->type == USER)? 450 : 15;	
 	if ((selected_table == EMPTY) && 
 		(exist(table, MAX_NB_CARDS_TABLE, selected_hand) == -1)) {
-		SDL_FreeSurface(table[p->sel_table].surf);
 		if (p->type == USER)
 			table[p->sel_table].surf = get_sel_hand_surf(*p);
 		else

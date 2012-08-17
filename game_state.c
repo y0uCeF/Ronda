@@ -1,7 +1,10 @@
-
+#include <SDL/SDL_image.h>
 #include "game_state.h"
 #include "common.h"
 #include "play.h"
+
+extern SDL_Surface *empty_card;
+extern SDL_Surface *back_card;
 
 static bool table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
@@ -92,6 +95,9 @@ game_state_t* game_state_init()
 {
 	game_state_t *s = malloc(sizeof(game_state_t));
 	unsigned short i;
+	
+	empty_card = IMG_Load("cards/blank.gif");
+	back_card = IMG_Load("cards/back.gif");
 	
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
 		s->table[i].value=EMPTY;
@@ -186,7 +192,6 @@ void game_state_free(game_state_t *s)
 	
 	player_free(s->user);
 	player_free(s->comp);
-	
 	
 	free(s);
 }

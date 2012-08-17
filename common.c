@@ -1,8 +1,10 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
-#include <SDL/SDL_image.h>
 
 #include "common.h"
+
+SDL_Surface *back_card = NULL;
+SDL_Surface *empty_card = NULL;
 
 inline int rand_a_b(int a, int b)
 {
@@ -100,13 +102,11 @@ bool set_card(card *c, card_num num, short xpos, short ypos, bool back)
 		c->position->y=ypos;
 	
 	if (num == EMPTY) {
-		c->surf=IMG_Load("cards/blank.gif");
+		c->surf = empty_card;
 	} else if (back){
-		char *file=calloc(15, sizeof(char));
-		strcat(file, "cards/back.gif");
-		c->surf=IMG_Load(file);
+		c->surf = back_card;
 	} else {
-		char *file=get_file(num);
+		char *file = get_file(num);
 		c->surf=IMG_Load(file);
 	}
 	

@@ -1,5 +1,5 @@
 #include <SDL/SDL_image.h>
-#include "game_state.h"
+#include "main_game.h"
 #include "common.h"
 #include "play.h"
 
@@ -91,9 +91,9 @@ static short get_selected_table(int x, int y)
 	else return -1;	
 }
 
-game_state_t* game_state_init()
+main_game_t* main_game_init()
 {
-	game_state_t *s = malloc(sizeof(game_state_t));
+	main_game_t *s = malloc(sizeof(main_game_t));
 	unsigned short i;
 	
 	empty_card = IMG_Load("cards/blank.gif");
@@ -129,7 +129,7 @@ game_state_t* game_state_init()
 	return s;
 }
 
-void game_state_handle_input(SDL_Event event, game_state_t *s)
+void main_game_handle_input(SDL_Event event, main_game_t *s)
 {
 	if(s->current_player != USER) 
 		return;
@@ -141,7 +141,7 @@ void game_state_handle_input(SDL_Event event, game_state_t *s)
 		s->user->sel_table = get_selected_table(x, y);
 }
 
-void game_state_process_actions(game_state_t *s)
+void main_game_process_actions(main_game_t *s)
 {
 	if (s->current_player != USER)
 		return;
@@ -157,14 +157,14 @@ void game_state_process_actions(game_state_t *s)
 	s->user->sel_table = -1;
 }
 
-void game_state_computer_turn(game_state_t *s)
+void main_game_computer_turn(main_game_t *s)
 {
 	SDL_Delay(2000);
 	computer_turn(s->comp, s->table, &s->dropped_card);
 	s->current_player = USER;
 }
 	
-bool game_state_render(game_state_t *s, SDL_Surface *screen)
+bool main_game_render(main_game_t *s, SDL_Surface *screen)
 {
 	unsigned short i;
 	if (!player_render(s->user, screen)) 
@@ -180,11 +180,14 @@ bool game_state_render(game_state_t *s, SDL_Surface *screen)
 	return 1;
 }
 
-void game_state_free(game_state_t *s)
+void main_game_free(main_game_t *s)
 {
 	unsigned short i;
+	
+	SDL_FreeSurface(empty_card);
+	SDL_FreeSurface(back_card);
 	for (i=0;i < MAX_NB_CARDS_TABLE;i++) {
-		if(s->table[i].surf != NULL) 
+		if((s->table[i].surf != NULL) && (s->table[i].value != EMPTY))
 			SDL_FreeSurface(s->table[i].surf);
 		if(s->table[i].position != NULL) 
 			free(s->table[i].position);

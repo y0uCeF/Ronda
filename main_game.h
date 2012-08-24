@@ -13,7 +13,7 @@ typedef struct {
 	unsigned short nb_cards_remaining;
 	type_t current_player;
 	card_num dropped_card;  /* last card dropped */
-} game_state_t;
+} main_game_t;
 
 
 /* functions definition */
@@ -21,32 +21,32 @@ typedef struct {
 /* 
  * Initializes the game state environnement 
  */
-game_state_t* game_state_init();
+main_game_t* main_game_init();
 
 /*
  * handles user input
  */ 
-void game_state_handle_input(SDL_Event event, game_state_t *s);
+void main_game_handle_input(SDL_Event event, main_game_t *s);
 
 /*
  * processes actions specified by user input 
  */  
-void game_state_process_actions(game_state_t *s);
+void main_game_process_actions(main_game_t *s);
 
 /*
  * moves the turn to the computer
  */ 
-void game_state_computer_turn(game_state_t *s);
+void main_game_computer_turn(main_game_t *s);
 
 /*
  * draws everything on the screen
  */ 
-bool game_state_render(game_state_t *s, SDL_Surface *screen);
+bool main_game_render(main_game_t *s, SDL_Surface *screen);
 
 /*
  * frees memory held by the game state
  */ 
-void game_state_free(game_state_t *s);
+void main_game_free(main_game_t *s);
 
 
 #endif

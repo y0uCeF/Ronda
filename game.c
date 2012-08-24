@@ -31,7 +31,7 @@ game_t* game_init()
 		return NULL;
 	
 	g->running = 1;
-	g->state = game_state_init();
+	g->state = main_game_init();
 	
 	return g;
 }	
@@ -40,12 +40,12 @@ static bool game_render(game_t *g)
 {
 	SDL_FillRect(g->screen, NULL, SDL_MapRGB(g->screen->format, 53, 131, 68));
 	
-	return game_state_render(g->state, g->screen);	
+	return main_game_render(g->state, g->screen);	
 }
 
 void game_free(game_t *g) 
 {
-	game_state_free(g->state);
+	main_game_free(g->state);
 	free(g);
 	
 	SDL_Quit();
@@ -72,7 +72,7 @@ static void treat_mouse_down_event(game_t *g)
 {
 	switch(g->event.button.button) {
 	case SDL_BUTTON_LEFT:
-		game_state_handle_input(g->event, g->state);
+		main_game_handle_input(g->event, g->state);
 	break;
 						
 	default:
@@ -93,9 +93,9 @@ static void game_handle_input(game_t *g)
 void game_update(game_t *g)
 {
 	if (g->state->current_player == USER)
-		game_state_process_actions(g->state);
+		main_game_process_actions(g->state);
 	else	
-		game_state_computer_turn(g->state);	
+		main_game_computer_turn(g->state);	
 }
 
 bool game_run(game_t *g) 

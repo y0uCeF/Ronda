@@ -2,7 +2,7 @@
 #define GAME_H
 
 #include "player.h"
-#include "game_state.h"
+#include "main_game.h"
 /* Constants definition */
 	#define WINDOW_WIDTH 800
 	#define WINDOW_HEIGHT 600
@@ -15,7 +15,7 @@ typedef struct {
 	unsigned short running;  /* main loop condition */
 	SDL_Surface *screen;	
 	SDL_Event event;
-	game_state_t *state;
+	main_game_t *state;
 } game_t;
 
 /* functions definition */

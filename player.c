@@ -67,7 +67,7 @@ void player_free(player *p)
 {
 	unsigned short i;
 	for (i=0; i < p->nb_cards_in_hand;i++) {
-		if(p->hand[i].surf != NULL)	
+		if((p->hand[i].surf != NULL) && (p->hand[i].value != EMPTY))	
 			SDL_FreeSurface(p->hand[i].surf); 
 		if(p->hand[i].position != NULL) 
 			free(p->hand[i].position);

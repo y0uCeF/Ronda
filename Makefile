@@ -2,7 +2,7 @@
 CC=gcc
 CFLAGS=-c -Wall
 LDFLAGS=
-SOURCES=main.c common.c play.c player.c game.c game_state.c
+SOURCES=main.c common.c play.c player.c game.c main_game.c
 OBJECTS=$(SOURCES:.c=.o)
 EXECUTABLE=ronda
 INCLUDE= -I/usr/include/SDL

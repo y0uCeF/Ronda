@@ -1,5 +1,5 @@
-#ifndef BASIC_H
-#define BASIC_H
+#ifndef COMMON_H
+#define COMMON_H
 
 #include "define.h"
 

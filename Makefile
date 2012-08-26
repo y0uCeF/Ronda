@@ -1,11 +1,11 @@
 
-CC=gcc
-CFLAGS=-c -Wall
-LDFLAGS=
-SOURCES=main.c common.c play.c player.c game.c main_game.c
-OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=ronda
-INCLUDE= -I/usr/include/SDL
+CC = gcc
+CFLAGS = -c -Wall
+LDFLAGS =
+SOURCES = common.c play.c player.c game_state.c  main_game.c game.c main.c 
+OBJECTS = $(SOURCES:.c=.o)
+EXECUTABLE = ronda
+INCLUDE = -I/usr/include/SDL
 
 all: $(SOURCES) $(EXECUTABLE)
 	

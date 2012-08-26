@@ -22,7 +22,7 @@ typedef struct player {
     type_t type;
     short sel_hand;
     short sel_table;
-    int ronda_tringla;
+    //int ronda_tringla;
 } player;
 
 /* functions definition */

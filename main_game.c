@@ -1,10 +1,16 @@
+#include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+
 #include "main_game.h"
 #include "common.h"
 #include "play.h"
+#include "game_state.h"
 
 extern SDL_Surface *empty_card;
 extern SDL_Surface *back_card;
+extern stack s;
+
+static main_game_t *m_g = NULL;
 
 static bool table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
@@ -91,110 +97,165 @@ static short get_selected_table(int x, int y)
 	else return -1;	
 }
 
-main_game_t* main_game_init()
+void main_game_init()
 {
-	main_game_t *s = malloc(sizeof(main_game_t));
+	m_g = malloc(sizeof(main_game_t));
 	unsigned short i;
 	
 	empty_card = IMG_Load("cards/blank.gif");
 	back_card = IMG_Load("cards/back.gif");
 	
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
-		s->table[i].value=EMPTY;
-		s->table[i].surf=NULL;
-		s->table[i].position=NULL;
+		m_g->table[i].value=EMPTY;
+		m_g->table[i].surf=NULL;
+		m_g->table[i].position=NULL;
 	}
 	
 	for(i=0; i < NB_CARDS; i++) 
-		s->card_list[i] = i;
+		m_g->card_list[i] = i;
 	
 	
-	s->user = player_init(USER);
-	s->comp = player_init(COMPUTER);
-	s->nb_cards_remaining = NB_CARDS; 
-	s->current_player = USER;
-	s->dropped_card = EMPTY;
+	m_g->user = player_init(USER);
+	m_g->comp = player_init(COMPUTER);
+	m_g->nb_cards_remaining = NB_CARDS; 
+	m_g->current_player = USER;
+	m_g->dropped_card = EMPTY;
 	
 	/*mixing the cards*/
-	mix(s->card_list, NB_CARDS);
+	mix(m_g->card_list, NB_CARDS);
 	
 	/*distributing cards*/
-	if(!table_distribute(s->card_list, s->table, &s->nb_cards_remaining)) 
-		return NULL;
-	if(!player_distribute(s->card_list, s->user, &s->nb_cards_remaining)) 
-		return NULL;
-	if(!player_distribute(s->card_list, s->comp, &s->nb_cards_remaining)) 
-		return NULL;
+	if(!table_distribute(m_g->card_list, m_g->table, &m_g->nb_cards_remaining)) 
+		return;
+	if(!player_distribute(m_g->card_list, m_g->user, &m_g->nb_cards_remaining)) 
+		return;
+	if(!player_distribute(m_g->card_list, m_g->comp, &m_g->nb_cards_remaining)) 
+		return;
 	
-	return s;
+	//return m_g;
 }
 
-void main_game_handle_input(SDL_Event event, main_game_t *s)
+static void treat_keyboard_event(SDL_Event event)
 {
-	if(s->current_player != USER) 
+	
+	switch(event.key.keysym.sym) {
+	case SDLK_ESCAPE:
+	top(s).free();
+	pop(&s);
+	break;
+		
+	default:
+		
+	break;
+	}	
+}
+
+static void treat_mouse_down_event(SDL_Event event)
+{
+	switch(event.button.button) {
+	case SDL_BUTTON_LEFT:
+		if(m_g->current_player != USER) 
 		return;
 	int x = event.button.x;
 	int y = event.button.y;	
 	if (valid_card_hand(x, y))
-		s->user->sel_hand = get_selected_hand(x);	
-	else if (valid_card_table(x, y) && (s->user->sel_hand != -1)) 
-		s->user->sel_table = get_selected_table(x, y);
-}
-
-void main_game_process_actions(main_game_t *s)
-{
-	if (s->current_player != USER)
-		return;
-	
-	if ((s->user->sel_hand == -1) || (s->user->sel_table == -1))
-		return;
-	
-	if (valid_move(*s->user, s->table)) {
-		user_turn(s->user, s->table, &s->dropped_card);
-		s->current_player = COMPUTER;
+		m_g->user->sel_hand = get_selected_hand(x);	
+	else if (valid_card_table(x, y) && (m_g->user->sel_hand != -1)) 
+		m_g->user->sel_table = get_selected_table(x, y);
+	break;
+						
+	default:
+	break;
 	}
-	s->user->sel_hand = -1;
-	s->user->sel_table = -1;
 }
 
-void main_game_computer_turn(main_game_t *s)
+void main_game_handle_input()
+{
+	SDL_Event event;
+	while (SDL_PollEvent(&event)) {
+		if (event.type == SDL_QUIT)
+			while(!stack_empty(s)) {
+				top(s).free();
+				pop(&s);
+			}
+		else if (event.type == SDL_KEYDOWN)
+			treat_keyboard_event(event);
+		else if (event.type == SDL_MOUSEBUTTONUP)
+			treat_mouse_down_event(event);
+	}		
+}
+
+static void main_game_user_turn()
+{
+	if (m_g->current_player != USER)
+		return;
+	
+	if ((m_g->user->sel_hand == -1) || (m_g->user->sel_table == -1))
+		return;
+	
+	if (valid_move(*m_g->user, m_g->table)) {
+		user_turn(m_g->user, m_g->table, &m_g->dropped_card);
+		m_g->current_player = COMPUTER;
+	}
+	m_g->user->sel_hand = -1;
+	m_g->user->sel_table = -1;
+}
+
+static void main_game_computer_turn()
 {
 	SDL_Delay(2000);
-	computer_turn(s->comp, s->table, &s->dropped_card);
-	s->current_player = USER;
+	computer_turn(m_g->comp, m_g->table, &m_g->dropped_card);
+	m_g->current_player = USER;
 }
-	
-bool main_game_render(main_game_t *s, SDL_Surface *screen)
+
+void main_game_update()
+{
+	if (m_g->current_player == USER)
+		main_game_user_turn();
+	else	
+		main_game_computer_turn();
+}
+		
+bool main_game_render(SDL_Surface *screen)
 {
 	unsigned short i;
-	if (!player_render(s->user, screen)) 
+	if (!player_render(m_g->user, screen)) 
 		return 0;
-	if (!player_render(s->comp, screen))
+	if (!player_render(m_g->comp, screen))
 		return 0;			
 	
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) 
-		if (SDL_BlitSurface(s->table[i].surf, NULL, screen, s->table[i].position) == -1) 
+		if (SDL_BlitSurface(m_g->table[i].surf, NULL, screen, m_g->table[i].position) == -1) 
 			return 0;
 	
 	SDL_Flip(screen);
 	return 1;
 }
 
-void main_game_free(main_game_t *s)
+void main_game_free()
 {
 	unsigned short i;
 	
 	SDL_FreeSurface(empty_card);
 	SDL_FreeSurface(back_card);
 	for (i=0;i < MAX_NB_CARDS_TABLE;i++) {
-		if((s->table[i].surf != NULL) && (s->table[i].value != EMPTY))
-			SDL_FreeSurface(s->table[i].surf);
-		if(s->table[i].position != NULL) 
-			free(s->table[i].position);
+		if((m_g->table[i].surf != NULL) && (m_g->table[i].value != EMPTY))
+			SDL_FreeSurface(m_g->table[i].surf);
+		if(m_g->table[i].position != NULL) 
+			free(m_g->table[i].position);
 	}
 	
-	player_free(s->user);
-	player_free(s->comp);
+	player_free(m_g->user);
+	player_free(m_g->comp);
 	
-	free(s);
+	free(m_g);
+}
+
+void set_state_main_game(game_state_t *gs)
+{
+	gs->init = main_game_init;
+	gs->handle_input = main_game_handle_input;
+	gs->update = main_game_update;
+	gs->render = main_game_render;
+	gs->free = main_game_free;
 }

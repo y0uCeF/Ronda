@@ -3,127 +3,74 @@
 #include <SDL/SDL_image.h>
 
 #include "game.h"
+#include "main_game.h"
+#include "game_state.h"
 #include "common.h"
 #include "play.h"
 
 
-static bool env_init(game_t *g) 
+SDL_Surface *screen = NULL;
+stack s;
+
+static bool env_init() 
 {
 	srand(time(NULL));
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) 
 		return sdl_error("Unable to init SDL");
 	putenv("SDL_VIDEO_CENTERED=1");
-	g->screen = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32,  
+	screen = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32,  
 				SDL_DOUBLEBUF | SDL_HWSURFACE );
-	if (g->screen == NULL) 
+	if (screen == NULL) 
 		return sdl_error("Video initialization failed");
-	if (SDL_FillRect(g->screen, NULL, SDL_MapRGB(g->screen->format, 53, 131, 68)) == -1) 
+	if (SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 53, 131, 68)) == -1) 
 		return sdl_error("Setting screen failed");
 		
 	SDL_WM_SetCaption("Ronda - alpha", NULL);
 	return 1;
 }
 
-game_t* game_init() 
+void game_init() 
 {
-	game_t *g = malloc(sizeof(game_t));
-	if (!env_init(g)) 
-		return NULL;
+	s = NULL;
+	game_state_t tmp;
+	set_state_main_game(&tmp);
+	push(&s, tmp);
+	if (!env_init()) 
+		return;
 	
-	g->running = 1;
-	g->state = main_game_init();
-	
-	return g;
+	top(s).init();
 }	
 
-static bool game_render(game_t *g) 
+void game_handle_input()
 {
-	SDL_FillRect(g->screen, NULL, SDL_MapRGB(g->screen->format, 53, 131, 68));
-	
-	return main_game_render(g->state, g->screen);	
+	top(s).handle_input();
 }
 
-void game_free(game_t *g) 
-{
-	main_game_free(g->state);
-	free(g);
-	
-	SDL_Quit();
-}
-
-static void treat_keyboard_event(SDL_Event event, unsigned short *running)
-{
-	switch(event.key.keysym.sym) {
-		case SDLK_ESCAPE:
-			*running = 0;
-		break;
-			
-		case SDLK_RETURN:
-			*running = 0;
-		break;
-					
-		default:
-			
-		break;
-	}	
-}
-
-static void treat_mouse_down_event(game_t *g)
-{
-	switch(g->event.button.button) {
-	case SDL_BUTTON_LEFT:
-		main_game_handle_input(g->event, g->state);
-	break;
-						
-	default:
-	break;
-	}
-}
-
-static void game_handle_input(game_t *g)
-{
-	if (g->event.type == SDL_QUIT) 
-		g->running = 0;
-	else if (g->event.type == SDL_KEYDOWN)
-		treat_keyboard_event(g->event, &g->running);
-	else if (g->event.type == SDL_MOUSEBUTTONUP)
-		treat_mouse_down_event(g);
-}
-
-void game_update(game_t *g)
-{
-	if (g->state->current_player == USER)
-		main_game_process_actions(g->state);
-	else	
-		main_game_computer_turn(g->state);	
-}
-
-bool game_run(game_t *g) 
+void game_update()
 {
 	int currentTime = 0, oldTime = 0,
-		timeDiff; /* time difference calculations */
+		timeDiff; /* time difference calculations */	
 	
-	/* main loop */
-	while (g->running) {     
-		while(SDL_PollEvent(&g->event))	{
-			game_handle_input(g);		
-		}
-		
-		/*setting fps to 30 */
+	/*setting fps to 30 */
 		currentTime = SDL_GetTicks();
 		if ((timeDiff = currentTime - oldTime) > FRAME_RATE ) 
 			oldTime = currentTime;
 		else 
 			SDL_Delay(FRAME_RATE - timeDiff);
-		
-		
-		game_update(g);
-		
-		
-		/*rendering*/
-		if (!game_render(g)) 
-			return 0;	
-	}
-					
-	return 1; 		
+	if (!stack_empty(s))		
+		top(s).update();
+}
+
+void game_render() 
+{
+	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 53, 131, 68));
+	
+	if(!stack_empty(s))
+		top(s).render(screen);
+}
+
+void game_free() 
+{
+	SDL_FreeSurface(screen);
+	SDL_Quit();
 }

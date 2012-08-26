@@ -1,12 +1,18 @@
 #include "game.h"
+#include "game_state.h"
 
-int main(int argc,char** argv) 
-{	
-	game_t *g = game_init();
+extern stack s;
+
+int main() 
+{
+	game_init();
 	
-	if (g == NULL) 
-		return 1;
-	game_run(g);
-	game_free(g);	
-	return 0;
+	while (!stack_empty(s)) {     
+		game_handle_input();		
+		game_update();
+		game_render(); 
+	}
+	
+	game_free();	
+	return 0; 		
 }

@@ -1,8 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "player.h"
-#include "main_game.h"
+#include "define.h"
+#include "game_state.h"
 /* Constants definition */
 	#define WINDOW_WIDTH 800
 	#define WINDOW_HEIGHT 600
@@ -10,29 +10,31 @@
 	#define FRAME_RATE 1000/FPS
     
 
-/* types definition */    
-typedef struct {
-	unsigned short running;  /* main loop condition */
-	SDL_Surface *screen;	
-	SDL_Event event;
-	main_game_t *state;
-} game_t;
-
 /* functions definition */
 
 /* 
  * Initializes the game environnement 
  */
-game_t* game_init();
+void game_init();
 
 /*
- * the main loop 
+ * handles current state's input
  */ 
-bool game_run(game_t *g);
+void game_handle_input();
 
 /*
- * freeing the memory
+ * updates the game
  */ 
-void game_free(game_t *g);
+void game_update();
+
+/*
+ * renders the current state
+ */ 
+void game_render();
+
+/*
+ * freeing the memory of the current state
+ */ 
+void game_free();
 
 #endif

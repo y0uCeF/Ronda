@@ -32,9 +32,8 @@ static bool env_init()
 void game_init() 
 {
 	s = NULL;
-	game_state_t tmp;
-	set_state_main_game(&tmp);
-	push(&s, tmp);
+	game_state_t *tmp = set_state_main_game();
+	push(&s, *tmp);
 	if (!env_init()) 
 		return;
 	
@@ -61,12 +60,12 @@ void game_update()
 		top(s).update();
 }
 
-void game_render() 
+bool game_render() 
 {
-	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 53, 131, 68));
-	
 	if(!stack_empty(s))
-		top(s).render(screen);
+		if(!top(s).render(screen))
+			return 0;
+	return 1;		
 }
 
 void game_free() 

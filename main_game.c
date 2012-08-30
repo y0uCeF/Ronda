@@ -5,6 +5,7 @@
 #include "common.h"
 #include "play.h"
 #include "game_state.h"
+#include "menu.h"
 
 extern SDL_Surface *empty_card;
 extern SDL_Surface *back_card;
@@ -137,11 +138,12 @@ void main_game_init()
 
 static void treat_keyboard_event(SDL_Event event)
 {
-	
+	game_state_t *tmp  = NULL;
 	switch(event.key.keysym.sym) {
 	case SDLK_ESCAPE:
-	top(s).free();
-	pop(&s);
+		tmp = set_state_menu();
+		push(&s, *tmp);
+		top(s).init();
 	break;
 		
 	default:
@@ -219,6 +221,8 @@ void main_game_update()
 bool main_game_render(SDL_Surface *screen)
 {
 	unsigned short i;
+	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 53, 131, 68));
+	
 	if (!player_render(m_g->user, screen)) 
 		return 0;
 	if (!player_render(m_g->comp, screen))
@@ -251,11 +255,14 @@ void main_game_free()
 	free(m_g);
 }
 
-void set_state_main_game(game_state_t *gs)
+game_state_t* set_state_main_game()
 {
+	game_state_t *gs = malloc(sizeof(game_state_t));
 	gs->init = main_game_init;
 	gs->handle_input = main_game_handle_input;
 	gs->update = main_game_update;
 	gs->render = main_game_render;
 	gs->free = main_game_free;
+	
+	return gs;
 }

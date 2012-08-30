@@ -47,5 +47,5 @@ void main_game_free();
 /*
  * sets the main game as the current state
  */ 
-void set_state_main_game(game_state_t *gs);
+game_state_t* set_state_main_game();
 #endif

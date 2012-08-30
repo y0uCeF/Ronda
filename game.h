@@ -30,7 +30,7 @@ void game_update();
 /*
  * renders the current state
  */ 
-void game_render();
+bool game_render();
 
 /*
  * freeing the memory of the current state

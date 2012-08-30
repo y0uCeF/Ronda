@@ -10,7 +10,8 @@ int main()
 	while (!stack_empty(s)) {     
 		game_handle_input();		
 		game_update();
-		game_render(); 
+		if(!game_render())
+			return 1; 
 	}
 	
 	game_free();	

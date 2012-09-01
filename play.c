@@ -1,8 +1,11 @@
 #include <SDL/SDL_image.h>
 
+#include "player.h"
 #include "play.h"
 #include "common.h"
 
+
+player *last_card_taker = NULL;
 
 static void take_cards(player *p, card table[]) 
 {
@@ -107,6 +110,7 @@ void user_turn(player *p, card table[], card_num *dropped_card)
 			if(selected_table == *dropped_card) 
 				p->score.points++;
 			*dropped_card=EMPTY;
+			last_card_taker = p;
 			take_cards(p, table);
 		} else {
 			p->hand[p->sel_hand].position->y = y;

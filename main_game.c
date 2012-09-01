@@ -10,9 +10,19 @@
 extern SDL_Surface *empty_card;
 extern SDL_Surface *back_card;
 extern stack s;
+extern player *last_card_taker;
+
 
 static main_game_t *m_g = NULL;
 static int last_time = 0;
+
+static inline void game_exit()
+{
+	while(!stack_empty(s)) {
+		top(s).free();
+		pop(&s);
+	}	
+}
 
 static bool table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
@@ -210,8 +220,51 @@ static void main_game_computer_turn()
 	m_g->current_player = USER;
 }
 
+static unsigned short nb_cards_table()
+{
+	short cpt = 0, i;
+	for (i=0; i < MAX_NB_CARDS_TABLE; ++i)
+		if(m_g->table[i].value != EMPTY)
+			cpt++;
+	return cpt;		
+}
+
+static inline bool turn_end()
+{
+	return (m_g->user->nb_cards_in_hand == 0) &&
+		(m_g->comp->nb_cards_in_hand == 0);
+}
+
+static inline bool game_end()
+{
+	return (m_g->nb_cards_remaining == 0) && turn_end();
+}
+
+static void take_all_cards(player *p, card table[])
+{
+	unsigned short i;
+	for (i = 0; i < MAX_NB_CARDS_TABLE; ++i) 
+		if (table[i].value != EMPTY){
+			SDL_FreeSurface(table[i].surf);
+			set_card(&table[i], EMPTY, -1, -1, 0);
+			p->score.gained_cards++;
+		}	
+}
+
 void main_game_update()
 {
+	if (game_end()) {
+		if (nb_cards_table() != 0) {
+			take_all_cards(last_card_taker, m_g->table);
+			game_exit();
+		}
+	}	
+	else if (turn_end()) {
+		SDL_Delay(800);
+		player_distribute(m_g->card_list, m_g->user, &m_g->nb_cards_remaining);
+		player_distribute(m_g->card_list, m_g->comp, &m_g->nb_cards_remaining);
+	}
+	
 	if (m_g->current_player == USER)
 		main_game_user_turn();
 	else if (last_time == 0)

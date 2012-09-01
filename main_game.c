@@ -12,6 +12,7 @@ extern SDL_Surface *back_card;
 extern stack s;
 
 static main_game_t *m_g = NULL;
+static int last_time = 0;
 
 static bool table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
@@ -205,7 +206,6 @@ static void main_game_user_turn()
 
 static void main_game_computer_turn()
 {
-	SDL_Delay(2000);
 	computer_turn(m_g->comp, m_g->table, &m_g->dropped_card);
 	m_g->current_player = USER;
 }
@@ -214,8 +214,12 @@ void main_game_update()
 {
 	if (m_g->current_player == USER)
 		main_game_user_turn();
-	else	
+	else if (last_time == 0)
+		last_time = SDL_GetTicks();
+	else if ((SDL_GetTicks() - last_time) > 2000) {
+		last_time = 0;
 		main_game_computer_turn();
+	}
 }
 		
 bool main_game_render(SDL_Surface *screen)

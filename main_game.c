@@ -14,7 +14,7 @@ extern player *last_card_taker;
 
 
 static main_game_t *m_g = NULL;
-static int last_time = 0;
+static int nb_frames_round = 0;
 
 static inline void game_exit()
 {
@@ -265,14 +265,14 @@ void main_game_update()
 		player_distribute(m_g->card_list, m_g->comp, &m_g->nb_cards_remaining);
 	}
 	
-	if (m_g->current_player == USER)
-		main_game_user_turn();
-	else if (last_time == 0)
-		last_time = SDL_GetTicks();
-	else if ((SDL_GetTicks() - last_time) > 2000) {
-		last_time = 0;
-		main_game_computer_turn();
-	}
+	if (m_g->current_player == USER) {
+                main_game_user_turn();
+        } else if (nb_frames_round < 60) {
+                nb_frames_round++;
+        } else {
+                nb_frames_round = 0;		
+                main_game_computer_turn();
+        }
 }
 		
 bool main_game_render(SDL_Surface *screen)

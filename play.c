@@ -4,7 +4,7 @@
 #include "play.h"
 #include "common.h"
 
-
+card_num dropped_card = EMPTY;  /* last card dropped */
 player *last_card_taker = NULL;
 
 static void take_cards(player *p, card table[]) 
@@ -26,10 +26,10 @@ static void take_cards(player *p, card table[])
 	}
 	
 	if (empty(table, MAX_NB_CARDS_TABLE)) 
-		p->score.points++;	
+		p->score.points++;
 }
 
-static unsigned short get_gain(card_num c, card table[], card_num dropped_card)
+static unsigned short get_gain(card_num c, card table[])
 {
 	unsigned short i = 0, count = 0;
 	unsigned short res = 1;
@@ -48,8 +48,7 @@ static unsigned short get_gain(card_num c, card table[], card_num dropped_card)
         return res;
 }
 
-static short get_index_ai(player *p, card table[], card_num dropped_card, 
-		short *index_tab)
+static short get_index_ai(player *p, card table[], short *index_tab)
 {
 	unsigned short i, j;
 	unsigned short tmp_gain, gain = 0;
@@ -60,7 +59,7 @@ static short get_index_ai(player *p, card table[], card_num dropped_card,
 		if (tmp != EMPTY) 
 			for (j=0; j < MAX_NB_CARDS_TABLE; j++) {
 				if (equal(tmp, table[j].value)) {
-					tmp_gain = get_gain(tmp, table, dropped_card);
+					tmp_gain = get_gain(tmp, table);
 					if (gain < tmp_gain) {
 						gain = tmp_gain;
 						best_card_index = i;
@@ -87,10 +86,10 @@ bool valid_move(player p, card table[])
 	else return 1;		
 }
 
-void user_turn(player *p, card table[], card_num *dropped_card) 
+void user_turn(player *p, card table[]) 
 {
 	if (p->nb_cards_in_hand == 3) 
-		*dropped_card = EMPTY;
+		dropped_card = EMPTY;
 	
 	card_num selected_hand = get_sel_hand_val(*p);
 	card_num selected_table = table[p->sel_table].value;
@@ -103,13 +102,13 @@ void user_turn(player *p, card table[], card_num *dropped_card)
 			table[p->sel_table].surf = IMG_Load(get_file(selected_hand));
 		
 		table[p->sel_table].value = selected_hand;
-		*dropped_card = selected_hand;
+		dropped_card = selected_hand;
 		set_card(&p->hand[p->sel_hand], EMPTY, -1, y, 0); 
 	} else if (selected_table != EMPTY) {
 		if (equal(selected_hand, selected_table)) {
-			if(selected_table == *dropped_card) 
+			if(selected_table == dropped_card) 
 				p->score.points++;
-			*dropped_card=EMPTY;
+			dropped_card = EMPTY;
 			last_card_taker = p;
 			take_cards(p, table);
 		} else {
@@ -121,10 +120,10 @@ void user_turn(player *p, card table[], card_num *dropped_card)
 	p->nb_cards_in_hand--;	
 }
 
-void computer_turn(player *p, card table[], card_num *dropped_card)
+void computer_turn(player *p, card table[])
 {
 	short index_tab;
-	short index_hand = get_index_ai(p, table, *dropped_card, &index_tab);
+	short index_hand = get_index_ai(p, table, &index_tab);
 	
 	if (index_hand == -1) {
 		short i = rand_a_b(0, 3);
@@ -142,5 +141,5 @@ void computer_turn(player *p, card table[], card_num *dropped_card)
 	p->sel_hand = index_hand;
 	p->sel_table = index_tab;
 	
-	user_turn(p, table, dropped_card);	
+	user_turn(p, table);	
 }

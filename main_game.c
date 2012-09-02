@@ -131,7 +131,6 @@ void main_game_init()
 	m_g->comp = player_init(COMPUTER);
 	m_g->nb_cards_remaining = NB_CARDS; 
 	m_g->current_player = USER;
-	m_g->dropped_card = EMPTY;
 	
 	/*mixing the cards*/
 	mix(m_g->card_list, NB_CARDS);
@@ -207,7 +206,7 @@ static void main_game_user_turn()
 		return;
 	
 	if (valid_move(*m_g->user, m_g->table)) {
-		user_turn(m_g->user, m_g->table, &m_g->dropped_card);
+		user_turn(m_g->user, m_g->table);
 		m_g->current_player = COMPUTER;
 	}
 	m_g->user->sel_hand = -1;
@@ -216,7 +215,7 @@ static void main_game_user_turn()
 
 static void main_game_computer_turn()
 {
-	computer_turn(m_g->comp, m_g->table, &m_g->dropped_card);
+	computer_turn(m_g->comp, m_g->table);
 	m_g->current_player = USER;
 }
 

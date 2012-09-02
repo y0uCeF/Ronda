@@ -9,11 +9,11 @@ bool valid_move(player p, card table[]);
 /*
  * affect changes on cards after user's turn 
  */ 
-void user_turn(player *p, card table[], card_num *dropped_card);
+void user_turn(player *p, card table[]);
 
 /*
  * computer turn with automatic card choosing
  */ 
-void computer_turn(player *p, card table[], card_num *dropped_card);
+void computer_turn(player *p, card table[]);
 
 #endif

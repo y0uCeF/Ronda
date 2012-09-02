@@ -13,7 +13,6 @@ typedef struct {
 	card_num card_list[NB_CARDS];
 	unsigned short nb_cards_remaining;
 	type_t current_player;
-	card_num dropped_card;  /* last card dropped */
 } main_game_t;
 
 

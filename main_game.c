@@ -2,19 +2,25 @@
 #include <SDL/SDL_image.h>
 
 #include "main_game.h"
+#include "player.h"
 #include "common.h"
 #include "play.h"
 #include "game_state.h"
 #include "menu.h"
 
+#define PAUSE_FRAMES 75
 extern SDL_Surface *empty_card;
 extern SDL_Surface *back_card;
 extern stack s;
 extern player *last_card_taker;
 
-
-static main_game_t *m_g = NULL;
+static player *user, *comp;
+static card table[MAX_NB_CARDS_TABLE];
+static card_num card_list[NB_CARDS];
+static unsigned short nb_cards_remaining;
+static type_t current_player;
 static int nb_frames_round = 0;
+
 
 static inline void game_exit()
 {
@@ -63,39 +69,38 @@ static void set_bonus(player *p1, player *p2)
 
 void main_game_init()
 {
-	m_g = malloc(sizeof(main_game_t));
 	unsigned short i;
 	
 	empty_card = IMG_Load("cards/blank.gif");
 	back_card = IMG_Load("cards/back.gif");
 	
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
-		m_g->table[i].value=EMPTY;
-		m_g->table[i].surf=NULL;
-		m_g->table[i].position=NULL;
+		table[i].value=EMPTY;
+		table[i].surf=NULL;
+		table[i].position=NULL;
 	}
 	
 	for(i=0; i < NB_CARDS; i++) 
-		m_g->card_list[i] = i;
+		card_list[i] = i;
 	
 	
-	m_g->user = player_init(USER);
-	m_g->comp = player_init(COMPUTER);
-	m_g->nb_cards_remaining = NB_CARDS; 
-	m_g->current_player = USER;
+	user = player_init(USER);
+	comp = player_init(COMPUTER);
+	nb_cards_remaining = NB_CARDS; 
+	current_player = USER;
 	
 	/*mixing the cards*/
-	mix(m_g->card_list, NB_CARDS);
+	mix(card_list, NB_CARDS);
 	
 	/*distributing cards*/
-	if(!table_distribute(m_g->card_list, m_g->table, &m_g->nb_cards_remaining)) 
+	if(!table_distribute(card_list, table, &nb_cards_remaining)) 
 		return;
-	if(!player_distribute(m_g->card_list, m_g->user, &m_g->nb_cards_remaining)) 
+	if(!player_distribute(card_list, user, &nb_cards_remaining)) 
 		return;
-	if(!player_distribute(m_g->card_list, m_g->comp, &m_g->nb_cards_remaining)) 
+	if(!player_distribute(card_list, comp, &nb_cards_remaining)) 
 		return;
 	
-	set_bonus(m_g->user, m_g->comp);
+	set_bonus(user, comp);
 }
 
 static void call_menu_state()
@@ -186,14 +191,14 @@ static void treat_mouse_down_event(SDL_Event event)
 {
 	switch(event.button.button) {
 	case SDL_BUTTON_LEFT:
-		if(m_g->current_player != USER) 
+		if(current_player != USER) 
 		return;
 	int x = event.button.x;
 	int y = event.button.y;	
 	if (valid_card_hand(x, y))
-		m_g->user->sel_hand = get_selected_hand(x);	
-	else if (valid_card_table(x, y) && (m_g->user->sel_hand != -1)) 
-		m_g->user->sel_table = get_selected_table(x, y);
+		user->sel_hand = get_selected_hand(x);	
+	else if (valid_card_table(x, y) && (user->sel_hand != -1)) 
+		user->sel_table = get_selected_table(x, y);
 	break;
 						
 	default:
@@ -216,44 +221,35 @@ void main_game_handle_input()
 
 static void main_game_user_turn()
 {
-	if (m_g->current_player != USER)
+	if (current_player != USER)
 		return;
 	
-	if ((m_g->user->sel_hand == -1) || (m_g->user->sel_table == -1))
+	if ((user->sel_hand == -1) || (user->sel_table == -1))
 		return;
 	
-	if (valid_move(*m_g->user, m_g->table)) {
-		user_turn(m_g->user, m_g->table);
-		m_g->current_player = COMPUTER;
+	if (valid_move(*user, table)) {
+		user_turn(user, table);
+		current_player = COMPUTER;
 	}
-	m_g->user->sel_hand = -1;
-	m_g->user->sel_table = -1;
+	user->sel_hand = -1;
+	user->sel_table = -1;
 }
 
 static void main_game_computer_turn()
 {
-	computer_turn(m_g->comp, m_g->table);
-	m_g->current_player = USER;
+	computer_turn(comp, table);
+	current_player = USER;
 }
 
-static unsigned short nb_cards_table()
+static inline bool round_end()
 {
-	short cpt = 0, i;
-	for (i=0; i < MAX_NB_CARDS_TABLE; ++i)
-		if(m_g->table[i].value != EMPTY)
-			cpt++;
-	return cpt;		
-}
-
-static inline bool turn_end()
-{
-	return (m_g->user->nb_cards_in_hand == 0) &&
-		(m_g->comp->nb_cards_in_hand == 0);
+	return (user->nb_cards_in_hand == 0) &&
+		(comp->nb_cards_in_hand == 0);
 }
 
 static inline bool game_end()
 {
-	return (m_g->nb_cards_remaining == 0) && turn_end();
+	return (nb_cards_remaining == 0) && round_end();
 }
 
 static void take_all_cards(player *p, card table[])
@@ -291,26 +287,26 @@ static void handle_bonus(player *p1, player *p2)
 void main_game_update()
 {
 	if (game_end()) {
-		if (nb_cards_table() != 0)
-			take_all_cards(last_card_taker, m_g->table);
-		handle_bonus(m_g->user, m_g->comp);
+		if (nb_cards(table, MAX_NB_CARDS_TABLE) != 0)
+			take_all_cards(last_card_taker, table);
+		handle_bonus(user, comp);
 		SDL_Delay(1500);		
 				
 		game_exit();
 	
 	} else {
-		if (turn_end()) {
+		if (round_end()) {
 			SDL_Delay(800);
-			handle_bonus(m_g->user, m_g->comp);
-			player_distribute(m_g->card_list, m_g->user, &m_g->nb_cards_remaining);
-			player_distribute(m_g->card_list, m_g->comp, &m_g->nb_cards_remaining);
+			handle_bonus(user, comp);
+			player_distribute(card_list, user, &nb_cards_remaining);
+			player_distribute(card_list, comp, &nb_cards_remaining);
 		
-			set_bonus(m_g->user, m_g->comp);
+			set_bonus(user, comp);
 		}
 	
-		if (m_g->current_player == USER) {
+		if (current_player == USER) {
 			main_game_user_turn();
-		} else if (nb_frames_round < 60) {
+		} else if (nb_frames_round < PAUSE_FRAMES) {  /*pause for 75 frames*/
 			nb_frames_round++;
 		} else {
 			nb_frames_round = 0;		
@@ -324,13 +320,13 @@ bool main_game_render(SDL_Surface *screen)
 	unsigned short i;
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 53, 131, 68));
 	
-	if (!player_render(m_g->user, screen)) 
+	if (!player_render(user, screen)) 
 		return 0;
-	if (!player_render(m_g->comp, screen))
+	if (!player_render(comp, screen))
 		return 0;			
 	
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) 
-		if (SDL_BlitSurface(m_g->table[i].surf, NULL, screen, m_g->table[i].position) == -1) 
+		if (SDL_BlitSurface(table[i].surf, NULL, screen, table[i].position) == -1) 
 			return 0;
 	
 	SDL_Flip(screen);
@@ -344,16 +340,14 @@ void main_game_free()
 	SDL_FreeSurface(empty_card);
 	SDL_FreeSurface(back_card);
 	for (i=0;i < MAX_NB_CARDS_TABLE;i++) {
-		if((m_g->table[i].surf != NULL) && (m_g->table[i].value != EMPTY))
-			SDL_FreeSurface(m_g->table[i].surf);
-		if(m_g->table[i].position != NULL) 
-			free(m_g->table[i].position);
+		if((table[i].surf != NULL) && (table[i].value != EMPTY))
+			SDL_FreeSurface(table[i].surf);
+		if(table[i].position != NULL) 
+			free(table[i].position);
 	}
 	
-	player_free(m_g->user);
-	player_free(m_g->comp);
-	
-	free(m_g);
+	player_free(user);
+	player_free(comp);
 }
 
 game_state_t* set_state_main_game()

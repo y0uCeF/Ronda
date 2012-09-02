@@ -6,16 +6,6 @@
 #include "player.h"
 #include "define.h"
 
-typedef struct {
-	player* user;    
-	player* comp;
-	card table[MAX_NB_CARDS_TABLE];
-	card_num card_list[NB_CARDS];
-	unsigned short nb_cards_remaining;
-	type_t current_player;
-} main_game_t;
-
-
 /* functions definition */
 
 /* 

@@ -25,7 +25,7 @@ static void set_text_surf(SDL_Surface **surf, char* text)
 	SDL_Color background = {0, 0, 0};
 	
 	*surf = TTF_RenderText_Shaded(font, text, foreground, background);
-	if(*surf == NULL) printf("surf is the problem\n");
+	
 	TTF_CloseFont(font);	
 }
 

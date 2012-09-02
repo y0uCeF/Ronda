@@ -1,4 +1,6 @@
 #include <SDL/SDL_image.h>
+#include <SDL/SDL_ttf.h>
+#include <stdio.h>
 
 #include "player.h"
 #include "common.h"
@@ -7,6 +9,8 @@ player* player_init(type_t t)
 {
 	unsigned short i;
 	player *p = malloc(sizeof(player));
+        
+        TTF_Init();
 	for (i=0; i<MAX_NB_CARDS_HAND; i++) {
 		p->hand[i].value = EMPTY;
 		p->hand[i].surf = NULL;
@@ -52,6 +56,30 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
 	return 1;
 }
 
+static void show_text(SDL_Surface *screen, char *font_name, char *text, int size, 
+                        int x, int y)
+{
+        TTF_Font* font = TTF_OpenFont(font_name, size);
+	SDL_Color foreground = {255, 255, 255};
+	
+	SDL_Surface *surf = TTF_RenderText_Blended(font, text, foreground);
+	
+        SDL_Rect pos = {x, y};
+        SDL_BlitSurface(surf, NULL, screen, &pos);
+	TTF_CloseFont(font);	
+}
+
+static void show_score(player *p, SDL_Surface *scr)
+{
+        char s[13] = "";
+        int y = (p->type == USER)? 485 : 55;
+        sprintf(s, "cards   : %d", p->score.gained_cards);
+        show_text(scr, "georgiai.ttf", s, 18, 620, y);
+        
+        sprintf(s, "points : %d", p->score.points);
+        show_text(scr, "georgiai.ttf", s, 18, 620, y + 35);
+}
+
 bool player_render(player *p, SDL_Surface *scr)
 {
 	unsigned short i;
@@ -61,7 +89,9 @@ bool player_render(player *p, SDL_Surface *scr)
 		if (SDL_BlitSurface(p->hand[i].surf, NULL, scr, p->hand[i].position) == -1) 
 			return 0; 
 	if(SDL_BlitSurface(p->score_box, NULL, scr, &p->pos_score_box) == -1) 
-		return 0;	
+		return 0;
+        show_score(p, scr);
+                	
 	return 1;
 }
 
@@ -77,7 +107,8 @@ void player_free(player *p)
 	}
 	if(p->score_box != NULL) 
 		SDL_FreeSurface(p->score_box);
-	free(p);	
+	free(p);
+        TTF_Quit();	
 }
 
 inline card_num get_sel_hand_val(player p)

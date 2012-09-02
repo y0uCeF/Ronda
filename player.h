@@ -22,7 +22,8 @@ typedef struct player {
     type_t type;
     short sel_hand;
     short sel_table;
-    //int ronda_tringla;
+    enum {NONE, RONDA, TRINGLA} bonus_type; /*Ronda or Tringla */
+    short bonus_card;   
 } player;
 
 /* functions definition */
@@ -36,6 +37,17 @@ inline card_num get_sel_hand_val(player p);
  * returns card surface specified by sel_hand
  */  
 inline SDL_Surface* get_sel_hand_surf(player p);
+
+/*
+ * Checks if player has Ronda
+ */ 
+bool ronda(player *p);
+
+/*
+ * Checks if player has Tringla
+ */ 
+bool tringla(player *p);
+
 /*
  * initializes player data
  */ 

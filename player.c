@@ -20,6 +20,8 @@ player* player_init(type_t t)
 	p->pos_score_box.y = (t == USER)? 470:40;
 	p->sel_hand = -1;
 	p->sel_table = -1;
+	p->bonus_card = -1;
+	p->bonus_type = NONE;
 	p->score_box=SDL_CreateRGBSurface(SDL_HWSURFACE, 130, 90, 32,  0, 0, 0, 0);
 	return p;	
 }
@@ -93,3 +95,27 @@ inline SDL_Surface* get_sel_hand_surf(player p)
 	else
 		return NULL;
 }		
+
+bool ronda(player *p)
+{
+	if(equal(p->hand[0].value, p->hand[1].value)) 
+		p->bonus_card = p->hand[0].value % 10;
+	else if (equal(p->hand[0].value, p->hand[2].value))
+		p->bonus_card = p->hand[0].value % 10;
+	else if (equal(p->hand[1].value, p->hand[2].value))
+		p->bonus_card = p->hand[1].value % 10;
+		
+	return 	equal(p->hand[0].value, p->hand[1].value) ||
+		equal(p->hand[0].value, p->hand[2].value) ||
+		equal(p->hand[1].value, p->hand[2].value);
+} 
+
+bool tringla(player *p)
+{
+	if (equal(p->hand[0].value, p->hand[1].value) &&
+		equal(p->hand[0].value, p->hand[2].value))
+		p->bonus_card = p->hand[0].value % 10;
+		
+	return equal(p->hand[0].value, p->hand[1].value) &&
+		equal(p->hand[0].value, p->hand[2].value);
+}

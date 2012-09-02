@@ -48,6 +48,79 @@ static bool table_distribute(card_num card_list[],card table[],
     return 1;
 }
 
+static void set_bonus(player *p1, player *p2)
+{
+	if(tringla(p1))
+		p1->bonus_type = TRINGLA;
+	else if (ronda(p1))
+		p1->bonus_type = RONDA;
+	
+	if(tringla(p2))
+		p2->bonus_type = TRINGLA;
+	else if (ronda(p2))
+		p2->bonus_type = RONDA;
+}
+
+void main_game_init()
+{
+	m_g = malloc(sizeof(main_game_t));
+	unsigned short i;
+	
+	empty_card = IMG_Load("cards/blank.gif");
+	back_card = IMG_Load("cards/back.gif");
+	
+	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
+		m_g->table[i].value=EMPTY;
+		m_g->table[i].surf=NULL;
+		m_g->table[i].position=NULL;
+	}
+	
+	for(i=0; i < NB_CARDS; i++) 
+		m_g->card_list[i] = i;
+	
+	
+	m_g->user = player_init(USER);
+	m_g->comp = player_init(COMPUTER);
+	m_g->nb_cards_remaining = NB_CARDS; 
+	m_g->current_player = USER;
+	
+	/*mixing the cards*/
+	mix(m_g->card_list, NB_CARDS);
+	
+	/*distributing cards*/
+	if(!table_distribute(m_g->card_list, m_g->table, &m_g->nb_cards_remaining)) 
+		return;
+	if(!player_distribute(m_g->card_list, m_g->user, &m_g->nb_cards_remaining)) 
+		return;
+	if(!player_distribute(m_g->card_list, m_g->comp, &m_g->nb_cards_remaining)) 
+		return;
+	
+	set_bonus(m_g->user, m_g->comp);
+}
+
+static void call_menu_state()
+{
+	game_state_t *tmp  = NULL;
+	tmp = set_state_menu();
+	push(&s, *tmp);
+	top(s).init();
+	free(tmp);	
+}
+
+static void treat_keyboard_event(SDL_Event event)
+{
+	
+	switch(event.key.keysym.sym) {
+	case SDLK_ESCAPE:
+		call_menu_state();
+	break;
+		
+	default:
+		
+	break;
+	}	
+}
+
 static bool valid_card_hand(int x, int y)
 {
 	bool res = 0;
@@ -109,59 +182,6 @@ static short get_selected_table(int x, int y)
 	else return -1;	
 }
 
-void main_game_init()
-{
-	m_g = malloc(sizeof(main_game_t));
-	unsigned short i;
-	
-	empty_card = IMG_Load("cards/blank.gif");
-	back_card = IMG_Load("cards/back.gif");
-	
-	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
-		m_g->table[i].value=EMPTY;
-		m_g->table[i].surf=NULL;
-		m_g->table[i].position=NULL;
-	}
-	
-	for(i=0; i < NB_CARDS; i++) 
-		m_g->card_list[i] = i;
-	
-	
-	m_g->user = player_init(USER);
-	m_g->comp = player_init(COMPUTER);
-	m_g->nb_cards_remaining = NB_CARDS; 
-	m_g->current_player = USER;
-	
-	/*mixing the cards*/
-	mix(m_g->card_list, NB_CARDS);
-	
-	/*distributing cards*/
-	if(!table_distribute(m_g->card_list, m_g->table, &m_g->nb_cards_remaining)) 
-		return;
-	if(!player_distribute(m_g->card_list, m_g->user, &m_g->nb_cards_remaining)) 
-		return;
-	if(!player_distribute(m_g->card_list, m_g->comp, &m_g->nb_cards_remaining)) 
-		return;
-	
-	//return m_g;
-}
-
-static void treat_keyboard_event(SDL_Event event)
-{
-	game_state_t *tmp  = NULL;
-	switch(event.key.keysym.sym) {
-	case SDLK_ESCAPE:
-		tmp = set_state_menu();
-		push(&s, *tmp);
-		top(s).init();
-	break;
-		
-	default:
-		
-	break;
-	}	
-}
-
 static void treat_mouse_down_event(SDL_Event event)
 {
 	switch(event.button.button) {
@@ -186,10 +206,7 @@ void main_game_handle_input()
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT)
-			while(!stack_empty(s)) {
-				top(s).free();
-				pop(&s);
-			}
+			game_exit();
 		else if (event.type == SDL_KEYDOWN)
 			treat_keyboard_event(event);
 		else if (event.type == SDL_MOUSEBUTTONUP)
@@ -250,28 +267,56 @@ static void take_all_cards(player *p, card table[])
 		}	
 }
 
+static void handle_bonus(player *p1, player *p2)
+{
+	if ((p1->bonus_type == NONE) && (p2->bonus_type == NONE))
+		return;
+	
+	if (p1->bonus_type > p2->bonus_type)
+		p1->score.points += (p1->bonus_type == RONDA)? 1:5;
+	else if (p1->bonus_type < p2->bonus_type)
+		p2->score.points += (p2->bonus_type == RONDA)? 1:5;
+	else if (p1->bonus_card > p2->bonus_card)
+		p1->score.points += (p1->bonus_type == RONDA)? 2:5;
+	else if (p1->bonus_card > p2->bonus_card)
+		p2->score.points += (p2->bonus_type == RONDA)? 2:5;
+		
+	p1->bonus_card = -1;
+	p1->bonus_type = NONE;
+	p2->bonus_card = -1;
+	p2->bonus_type = NONE;
+	
+}
+
 void main_game_update()
 {
 	if (game_end()) {
-		if (nb_cards_table() != 0) {
+		if (nb_cards_table() != 0)
 			take_all_cards(last_card_taker, m_g->table);
-			game_exit();
-		}
-	}	
-	else if (turn_end()) {
-		SDL_Delay(800);
-		player_distribute(m_g->card_list, m_g->user, &m_g->nb_cards_remaining);
-		player_distribute(m_g->card_list, m_g->comp, &m_g->nb_cards_remaining);
-	}
+		handle_bonus(m_g->user, m_g->comp);
+		SDL_Delay(1500);		
+				
+		game_exit();
 	
-	if (m_g->current_player == USER) {
-                main_game_user_turn();
-        } else if (nb_frames_round < 60) {
-                nb_frames_round++;
-        } else {
-                nb_frames_round = 0;		
-                main_game_computer_turn();
-        }
+	} else {
+		if (turn_end()) {
+			SDL_Delay(800);
+			handle_bonus(m_g->user, m_g->comp);
+			player_distribute(m_g->card_list, m_g->user, &m_g->nb_cards_remaining);
+			player_distribute(m_g->card_list, m_g->comp, &m_g->nb_cards_remaining);
+		
+			set_bonus(m_g->user, m_g->comp);
+		}
+	
+		if (m_g->current_player == USER) {
+			main_game_user_turn();
+		} else if (nb_frames_round < 60) {
+			nb_frames_round++;
+		} else {
+			nb_frames_round = 0;		
+			main_game_computer_turn();
+		}
+	}
 }
 		
 bool main_game_render(SDL_Surface *screen)

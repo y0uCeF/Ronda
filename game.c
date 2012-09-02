@@ -11,6 +11,7 @@
 
 SDL_Surface *screen = NULL;
 stack s;
+int oldTime = 0;
 
 static bool env_init() 
 {
@@ -47,15 +48,15 @@ void game_handle_input()
 
 void game_update()
 {
-	int currentTime = 0, oldTime = 0,
-		timeDiff; /* time difference calculations */	
+	int timeDiff; /* time difference calculations */	
 	
 	/*setting fps to 30 */
-		currentTime = SDL_GetTicks();
-		if ((timeDiff = currentTime - oldTime) > FRAME_RATE ) 
-			oldTime = currentTime;
-		else 
-			SDL_Delay(FRAME_RATE - timeDiff);
+	int currentTime = SDL_GetTicks();
+	if ((timeDiff = currentTime - oldTime) > FRAME_RATE ) 
+		oldTime = currentTime;
+	else 
+		SDL_Delay(FRAME_RATE - timeDiff);
+	
 	if (!stack_empty(s))		
 		top(s).update();
 }

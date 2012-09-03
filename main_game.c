@@ -20,6 +20,8 @@ static card_num card_list[NB_CARDS];
 static unsigned short nb_cards_remaining;
 static type_t current_player;
 static int nb_frames_round = 0;
+static SDL_Surface *selection;
+static SDL_Rect *selection_pos = NULL;
 
 
 static inline void game_exit()
@@ -73,7 +75,8 @@ void main_game_init()
 	
 	empty_card = IMG_Load("cards/blank.gif");
 	back_card = IMG_Load("cards/back.gif");
-	
+	selection = IMG_Load("cards/selection.png");
+        
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
 		table[i].value=EMPTY;
 		table[i].surf=NULL;
@@ -191,7 +194,7 @@ static void treat_mouse_down_event(SDL_Event event)
 {
 	switch(event.button.button) {
 	case SDL_BUTTON_LEFT:
-		if(current_player != USER) 
+        if(current_player != USER) 
 		return;
 	int x = event.button.x;
 	int y = event.button.y;	
@@ -226,7 +229,7 @@ static void main_game_user_turn()
 	
 	if ((user->sel_hand == -1) || (user->sel_table == -1))
 		return;
-	
+        
 	if (valid_move(*user, table)) {
 		user_turn(user, table);
 		current_player = COMPUTER;
@@ -286,6 +289,15 @@ static void handle_bonus(player *p1, player *p2)
 
 void main_game_update()
 {
+        if (user->sel_hand != -1) {
+                selection_pos = malloc(sizeof(SDL_Rect));
+                selection_pos->x = (90+40)*user->sel_hand + 150;
+                selection_pos->y = 450;
+        } else {
+                free(selection_pos);
+                selection_pos = NULL;
+        }
+        
 	if (game_end()) {
 		if (nb_cards(table, MAX_NB_CARDS_TABLE) != 0)
 			take_all_cards(last_card_taker, table);
@@ -327,6 +339,10 @@ bool main_game_render(SDL_Surface *screen)
 	
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) 
 		if (SDL_BlitSurface(table[i].surf, NULL, screen, table[i].position) == -1) 
+			return 0;
+	
+        if (selection_pos != NULL)
+                if (SDL_BlitSurface(selection, NULL, screen, selection_pos) == -1) 
 			return 0;
 	
 	SDL_Flip(screen);

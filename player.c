@@ -69,7 +69,7 @@ static void show_text(SDL_Surface *screen, char *font_name, char *text, int size
 	TTF_CloseFont(font);	
 }
 
-static void show_score(player *p, SDL_Surface *scr)
+static void player_show_score(player *p, SDL_Surface *scr)
 {
         char s[13] = "";
         int y = (p->type == USER)? 485 : 55;
@@ -90,7 +90,7 @@ bool player_render(player *p, SDL_Surface *scr)
 			return 0; 
 	if(SDL_BlitSurface(p->score_box, NULL, scr, &p->pos_score_box) == -1) 
 		return 0;
-        show_score(p, scr);
+        player_show_score(p, scr);
                 	
 	return 1;
 }

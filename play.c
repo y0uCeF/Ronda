@@ -111,12 +111,8 @@ void user_turn(player *p, card table[])
 			dropped_card = EMPTY;
 			last_card_taker = p;
 			take_cards(p, table);
-		} else {
-			p->hand[p->sel_hand].position->y = y;
-		}
-	} else {
-		p->hand[p->sel_hand].position->y = y;
-	}
+		} 
+	} 
 	p->nb_cards_in_hand--;	
 }
 

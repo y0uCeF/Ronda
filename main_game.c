@@ -277,7 +277,7 @@ static void handle_bonus(player *p1, player *p2)
 		p2->score.points += (p2->bonus_type == RONDA)? 1:5;
 	else if (p1->bonus_card > p2->bonus_card)
 		p1->score.points += (p1->bonus_type == RONDA)? 2:5;
-	else if (p1->bonus_card > p2->bonus_card)
+	else if (p1->bonus_card < p2->bonus_card)
 		p2->score.points += (p2->bonus_type == RONDA)? 2:5;
 		
 	p1->bonus_card = -1;

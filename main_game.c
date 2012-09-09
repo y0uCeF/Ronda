@@ -5,11 +5,13 @@
 #include "player.h"
 #include "common.h"
 #include "game_state.h"
+#include "controller.h"
 #include "menu.h"
 #include "game.h"
 
 #define PAUSE_FRAMES_PLAYERS 30
 #define PAUSE_FRAMES_CARDS 20
+
 typedef enum {
         NO_VALID_INPUT, PUT_CARD, GET_FIRST_CARD, GET_CARDS, END_ACTIONS
 } player_state_type;
@@ -26,6 +28,8 @@ static type_t current_player;
 static int nb_frames = 0;
 static SDL_Surface *selection;
 static SDL_Rect *selection_pos = NULL;
+static controller_data *c_data = NULL;
+
 static card_num dropped_card = EMPTY;  /* last card dropped */
 static player *last_card_taker = NULL;
 static player_state_type state = NO_VALID_INPUT;
@@ -88,6 +92,7 @@ void main_game_init()
 	
 	user = player_init(USER);
 	comp = player_init(COMPUTER);
+        c_data = controller_data_init();
 	nb_cards_remaining = NB_CARDS; 
 	current_player = USER;
 	
@@ -105,6 +110,11 @@ void main_game_init()
 	set_bonus(user, comp);
 }
 
+void main_game_handle_input()
+{
+        controller_data_update(c_data);
+}
+
 static void call_menu_state()
 {
 	game_state_t *tmp  = NULL;
@@ -112,113 +122,6 @@ static void call_menu_state()
 	push(&s, *tmp);
 	top(s).init();
 	free(tmp);	
-}
-
-static void treat_keyboard_event(SDL_Event event)
-{
-	
-	switch(event.key.keysym.sym) {
-	case SDLK_ESCAPE:
-		call_menu_state();
-	break;
-		
-	default:
-		
-	break;
-	}	
-}
-
-static bool valid_card_hand(int x, int y)
-{
-	bool res = 0;
-	if (between(y, 450, 585))
-		res = between(x,150, 240) || between(x, 280,370) ||
-			between(x,410, 500);	
-	return res;
-}
-
-static bool valid_card_table(int x, int y)
-{
-	bool res = 0;
-	if (between(y, 160, 295) || between(y, 305, 440))
-		res = between(x, 40, 130) || between(x, 145, 235) ||
-		between(x, 250, 340) || between(x, 355, 445) ||
-		between(x, 460, 550); 
-	return res;
-}
-
-/*
- * returns index of the selected card in the screen (user hand)
- */ 
-static short get_selected_hand(int x) 
-{
-	if (between(x,150, 240)) 
-		return 0;
-	else if (between(x, 280,370)) 
-		return 1;
-	else if (between(x,410, 500)) 
-		return 2;
-	else return -1;
-}
-
-/*
- * returns index of the selected card in the screen (table)
- */ 
-static short get_selected_table(int x, int y) 
-{
-	short temp=-1, c=0;
-	if (between(x, 40, 130)) 
-		temp=0;
-	else if(between(x, 145, 235)) 
-		temp=1;
-	else if (between(x, 250, 340)) 
-		temp=2;
-	else if(between(x, 355, 445)) 
-		temp=3;
-	else if (between(x, 460, 550)) 
-		temp=4;
-	
-	if (temp != -1) { 
-		if (between(y, 160, 295))	
-			c=temp;
-		else if (between(y, 305, 440)) 
-			c=temp+5;
-		else c = -1;	
-		return c;
-	}
-	else return -1;	
-}
-
-static void treat_mouse_down_event(SDL_Event event)
-{
-	switch(event.button.button) {
-	case SDL_BUTTON_LEFT:
-        if(current_player != USER) 
-		return;
-	int x = event.button.x;
-	int y = event.button.y;	
-	if (valid_card_hand(x, y))
-		user->sel_hand = get_selected_hand(x);	
-	else if (valid_card_table(x, y) && (user->sel_hand != -1)) 
-		user->sel_table = get_selected_table(x, y);
-	break;
-						
-	default:
-	break;
-	}
-}
-
-void main_game_handle_input()
-{
-	SDL_Event event;
-	while (SDL_PollEvent(&event)) {
-		if (event.type == SDL_QUIT)
-			game_exit();
-		else if (event.type == SDL_KEYDOWN)
-			treat_keyboard_event(event);
-		else if (event.type == SDL_MOUSEBUTTONUP)
-			treat_mouse_down_event(event);
-	}		
 }
 
 static bool pause(short frames)
@@ -242,8 +145,8 @@ static bool take_card(player *p, card table[])
                         p->score.gained_cards++;
                         if (current_card != 9)
                                 current_card++;
-                        return 1;
                 }
+                return 1;
 	} else {
                 if (empty(table, MAX_NB_CARDS_TABLE)) 
                         p->score.points++;
@@ -458,6 +361,16 @@ static void handle_bonus(player *p1, player *p2)
 
 void main_game_update()
 {
+        if(c_data->call_menu == 1)
+                call_menu_state();
+                
+        if(c_data->selected_card_hand != -1)
+                user->sel_hand = c_data->selected_card_hand;
+                
+        if((c_data->selected_card_table != -1) && (user->sel_hand != -1))
+                user->sel_table = c_data->selected_card_table;
+        
+        
         if (user->sel_hand != -1) {
                 selection_pos = malloc(sizeof(SDL_Rect));
                 selection_pos->x = (90+40)*user->sel_hand + 150;

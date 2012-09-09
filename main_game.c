@@ -7,30 +7,30 @@
 #include "play.h"
 #include "game_state.h"
 #include "menu.h"
+#include "game.h"
 
-#define PAUSE_FRAMES 75
+#define PAUSE_FRAMES_PLAYERS 30
+#define PAUSE_FRAMES_CARDS 20
+typedef enum {
+        NO_VALID_INPUT, PUT_CARD, GET_FIRST_CARD, GET_CARDS, END_ACTIONS
+} player_state_type;
+
 extern SDL_Surface *empty_card;
 extern SDL_Surface *back_card;
 extern stack s;
-extern player *last_card_taker;
 
 static player *user, *comp;
 static card table[MAX_NB_CARDS_TABLE];
 static card_num card_list[NB_CARDS];
 static unsigned short nb_cards_remaining;
 static type_t current_player;
-static int nb_frames_round = 0;
+static int nb_frames = 0;
 static SDL_Surface *selection;
 static SDL_Rect *selection_pos = NULL;
-
-
-static inline void game_exit()
-{
-	while(!stack_empty(s)) {
-		top(s).free();
-		pop(&s);
-	}	
-}
+static card_num dropped_card = EMPTY;  /* last card dropped */
+static player *last_card_taker = NULL;
+static player_state_type state = NO_VALID_INPUT;
+static card_num current_card = EMPTY;
 
 static bool table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
@@ -222,26 +222,196 @@ void main_game_handle_input()
 	}		
 }
 
+static bool pause(short frames)
+{
+        if (nb_frames < frames) {
+		nb_frames++;
+                return 1;
+        } else {
+                nb_frames = 0;
+                return 0;
+        }
+}
+
+static bool take_card(player *p, card table[]) 
+{	
+	int index = exist(table, MAX_NB_CARDS_TABLE, current_card);
+	if(index != -1) {
+                if(!pause(PAUSE_FRAMES_CARDS)) {
+                        SDL_FreeSurface(table[index].surf);
+                        set_card(&table[index], EMPTY, -1, -1, 0);
+                        p->score.gained_cards++;
+                        if (current_card != 9)
+                                current_card++;
+                        return 1;
+                }
+	} else {
+                if (empty(table, MAX_NB_CARDS_TABLE)) 
+                        p->score.points++;
+                current_card = EMPTY;
+                return 0;        
+        }
+}
+
+static unsigned short get_gain(card_num c, card table[])
+{
+	unsigned short i = 0, count = 0;
+	unsigned short res = 1;
+	if (c%10 != 9) {
+		short index = exist(table, MAX_NB_CARDS_TABLE, c);
+		while ((index != -1) && (i<= 9-c%10)) {
+			count++;
+			index = exist(table, MAX_NB_CARDS_TABLE, c+count);
+		}
+	}
+	if (c == dropped_card) 
+		res++;
+        if (count >= 3)
+		res++;
+        
+        return res;
+}
+
+static short get_index_ai(player *p, card table[], short *index_tab)
+{
+	unsigned short i, j;
+	unsigned short tmp_gain, gain = 0;
+	short best_card_index = -1;
+	*index_tab = -1;
+	for (i=0; i < MAX_NB_CARDS_HAND; i++) {
+		card_num tmp = p->hand[i].value;
+		if (tmp != EMPTY) 
+			for (j=0; j < MAX_NB_CARDS_TABLE; j++) {
+				if (equal(tmp, table[j].value)) {
+					tmp_gain = get_gain(tmp, table);
+					if (gain < tmp_gain) {
+						gain = tmp_gain;
+						best_card_index = i;
+						*index_tab = j;
+					}
+				}
+			}
+		
+	}
+	
+	return best_card_index;
+}
+
+void update_state(player p, card table[])
+{
+	card_num selected_hand = get_sel_hand_val(p);
+	card_num selected_table = table[p.sel_table].value;
+	if ((selected_table == EMPTY) && 
+		(exist(table, MAX_NB_CARDS_TABLE, selected_hand) == -1))
+		state = PUT_CARD;
+	else if ((selected_table != EMPTY) &&
+		(equal(selected_hand, selected_table)))
+		state = GET_FIRST_CARD;
+	else 
+                state = NO_VALID_INPUT;
+}
+
+void player_turn(player *p, card table[]) 
+{
+	
+	card_num selected_hand = get_sel_hand_val(*p);
+	card_num selected_table = table[p->sel_table].value;
+        
+	short y = (p->type == USER)? 450 : 15;	
+        
+        switch (state) {
+        case NO_VALID_INPUT:       
+                if ((p->sel_hand != -1) && (p->sel_table != -1))
+                        update_state(*p, table);
+        break;
+        
+        case PUT_CARD:
+                if (pause(PAUSE_FRAMES_PLAYERS) && (p->type == COMPUTER))
+                        break;
+                if (p->type == USER)
+			table[p->sel_table].surf = get_sel_hand_surf(*p);
+		else
+			table[p->sel_table].surf = IMG_Load(get_file(selected_hand));
+		
+		table[p->sel_table].value = selected_hand;
+		dropped_card = selected_hand;
+		set_card(&p->hand[p->sel_hand], EMPTY, -1, y, 0);
+                p->nb_cards_in_hand--;
+                state = END_ACTIONS;
+        break;
+        
+        case GET_FIRST_CARD:
+                if (pause(PAUSE_FRAMES_PLAYERS) && (p->type == COMPUTER))
+                        break;
+                if(selected_table == dropped_card) 
+			p->score.points++;
+                        
+		dropped_card = EMPTY;
+		last_card_taker = p;
+                
+                set_card(&p->hand[p->sel_hand], EMPTY, -1, y, 0);
+                SDL_FreeSurface(table[p->sel_table].surf);
+		set_card(&table[p->sel_table], EMPTY, -1, -1, 0);
+		p->score.gained_cards += 2;
+                p->nb_cards_in_hand--;
+                
+                card_num tmp = selected_hand % 10;
+                if (tmp != 9) {
+                        state = GET_CARDS;
+                        current_card = tmp + 1;
+                } else {
+                        state = END_ACTIONS;
+                }
+        break;
+        
+        case GET_CARDS:
+                p->sel_hand = p->sel_table = -1;
+                if (!take_card(p, table)) 
+                        state = END_ACTIONS;
+        break;
+        
+        case END_ACTIONS:
+                current_player = !p->type;
+                p->sel_hand = p->sel_table = -1;
+                state = NO_VALID_INPUT;
+        break;
+        }
+	
+}
+
+void set_computer_choice(player *p, card table[])
+{
+	short index_tab;
+	short index_hand = get_index_ai(p, table, &index_tab);
+	
+	if (index_hand == -1) {
+		short i = rand_a_b(0, 3);
+		while (p->hand[i].value == EMPTY)
+			i = rand_a_b(0, 3);
+		index_hand = i;	
+	}
+	
+	if (index_tab == -1) {
+		short i = rand_a_b(0, 10);
+		while (table[i].value != EMPTY)
+			i = rand_a_b(0, 10);
+		index_tab = i;	
+	}
+	p->sel_hand = index_hand;
+	p->sel_table = index_tab;
+}
+
 static void main_game_user_turn()
 {
-	if (current_player != USER)
-		return;
-	
-	if ((user->sel_hand == -1) || (user->sel_table == -1))
-		return;
-        
-	if (valid_move(*user, table)) {
-		user_turn(user, table);
-		current_player = COMPUTER;
-	}
-	user->sel_hand = -1;
-	user->sel_table = -1;
+        player_turn(user, table);
 }
 
 static void main_game_computer_turn()
 {
-	computer_turn(comp, table);
-	current_player = USER;
+        if (comp->sel_hand == -1 || comp->sel_table == -1)
+                set_computer_choice(comp, table);
+        
+        player_turn(comp, table);
 }
 
 static inline bool round_end()
@@ -302,6 +472,8 @@ void main_game_update()
 		if (nb_cards(table, MAX_NB_CARDS_TABLE) != 0)
 			take_all_cards(last_card_taker, table);
 		handle_bonus(user, comp);
+                SDL_Delay(800);
+                game_render();
 		SDL_Delay(1500);		
 				
 		game_exit();
@@ -312,18 +484,15 @@ void main_game_update()
 			handle_bonus(user, comp);
 			player_distribute(card_list, user, &nb_cards_remaining);
 			player_distribute(card_list, comp, &nb_cards_remaining);
-		
+                        
+                        dropped_card = EMPTY;
 			set_bonus(user, comp);
 		}
 	
-		if (current_player == USER) {
+		if (current_player == USER)
 			main_game_user_turn();
-		} else if (nb_frames_round < PAUSE_FRAMES) {  /*pause for 75 frames*/
-			nb_frames_round++;
-		} else {
-			nb_frames_round = 0;		
+                else 
 			main_game_computer_turn();
-		}
 	}
 }
 		

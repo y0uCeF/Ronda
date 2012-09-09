@@ -8,10 +8,15 @@
 #include "common.h"
 #include "play.h"
 
-
-SDL_Surface *screen = NULL;
+/* Constants definition */
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+#define FPS 30
+#define FRAME_RATE 1000/FPS
+        
+static SDL_Surface *screen = NULL;
 stack s;
-int oldTime = 0;
+static int oldTime = 0;
 
 static bool env_init() 
 {
@@ -67,6 +72,14 @@ bool game_render()
 		if(!top(s).render(screen))
 			return 0;
 	return 1;		
+}
+
+void game_exit()
+{
+	while(!stack_empty(s)) {
+		top(s).free();
+		pop(&s);
+	}	
 }
 
 void game_free() 

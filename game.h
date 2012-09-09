@@ -3,12 +3,6 @@
 
 #include "define.h"
 #include "game_state.h"
-/* Constants definition */
-	#define WINDOW_WIDTH 800
-	#define WINDOW_HEIGHT 600
-	#define FPS 30
-	#define FRAME_RATE 1000/FPS
-    
 
 /* functions definition */
 
@@ -32,6 +26,11 @@ void game_update();
  */ 
 bool game_render();
 
+/*
+ * pop all the states inside the stack 
+ */
+void game_exit();
+  
 /*
  * freeing the memory of the current state
  */ 

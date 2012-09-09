@@ -4,7 +4,6 @@
 #include "main_game.h"
 #include "player.h"
 #include "common.h"
-#include "play.h"
 #include "game_state.h"
 #include "menu.h"
 #include "game.h"

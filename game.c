@@ -6,7 +6,7 @@
 #include "main_game.h"
 #include "game_state.h"
 #include "common.h"
-#include "play.h"
+
 
 /* Constants definition */
 #define WINDOW_WIDTH 800

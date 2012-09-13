@@ -4,6 +4,7 @@
 
 #include "game.h"
 #include "main_game.h"
+#include "menu.h"
 #include "game_state.h"
 #include "common.h"
 
@@ -38,12 +39,16 @@ static bool env_init()
 void game_init() 
 {
 	s = NULL;
-	game_state_t *tmp = set_state_main_game();
+        game_state_t *tmp = set_state_menu();
+	push(&s, *tmp);
+        free(tmp);
+	tmp = set_state_main_game();
 	push(&s, *tmp);
 	if (!env_init()) 
 		return;
 	
 	top(s).init();
+        free(tmp);
 }	
 
 void game_handle_input()

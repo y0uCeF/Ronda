@@ -1,8 +1,9 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
-#include <stdio.h>
+
 #include "menu.h"
 #include "game_state.h"
+#include "main_game.h"
 #include "define.h"
 
 #define FONT_SIZE 20
@@ -49,32 +50,31 @@ void menu_init()
 void menu_handle_input()
 {
 	SDL_Event event;
+        game_state_t *tmp = NULL;
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_QUIT:
-			while(!stack_empty(s)) {
 				top(s).free();
 				pop(&s);
-			}
 		break;	
 		
 		case SDL_KEYDOWN:
 			switch(event.key.keysym.sym){
 			case SDLK_l:
-				while(!stack_empty(s)) {
 				top(s).free();
 				pop(&s);
-				}
 			break;
 			
 			case SDLK_s:
-				top(s).free();
-				pop(&s);
+                                tmp = set_state_main_game();
+                                push(&s, *tmp);
+                                top(s).init();
 			break;	
 			
 			case SDLK_ESCAPE:
-				top(s).free();
-				pop(&s);
+                                tmp = set_state_main_game();
+                                push(&s, *tmp);
+                                top(s).init();
 			break;	
 			
 			default:

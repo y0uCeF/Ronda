@@ -131,11 +131,8 @@ void main_game_handle_input()
 
 static void call_menu_state()
 {
-	game_state_t *tmp  = NULL;
-	tmp = set_state_menu();
-	push(&s, *tmp);
-	top(s).init();
-	free(tmp);	
+	pop(&s);
+        top(s).init();
 }
 
 static bool pause(short max_frames)

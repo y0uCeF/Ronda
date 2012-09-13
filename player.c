@@ -5,28 +5,41 @@
 #include "player.h"
 #include "common.h"
 
+#define PLAYER_BOX_X 600
+#define USER_BOX_Y 470
+#define COMPUTER_BOX_Y 40
+#define PLAYER_BOX_Y(type) (type == USER)? USER_BOX_Y:COMPUTER_BOX_Y
+#define SCORE_BOX_X 130
+#define SCORE_BOX_Y 90
+#define USER_SCORE_Y 485
+#define COMPUTER_SCORE_Y 55
+#define PLAYER_SCORE_Y(type) (type == USER)? USER_SCORE_Y:COMPUTER_SCORE_Y
+#define PLAYER_SCORE_X 620
+
 player* player_init(type_t t) 
 {
 	unsigned short i;
 	player *p = malloc(sizeof(player));
         
         TTF_Init();
-	for (i=0; i<MAX_NB_CARDS_HAND; i++) {
+	for (i = 0; i < MAX_NB_CARDS_HAND; i++) {
 		p->hand[i].value = EMPTY;
 		p->hand[i].surf = NULL;
 		p->hand[i].position = NULL;
-	}	
+	}
+        	
 	p->nb_cards_in_hand = 0;
 	p->score.gained_cards = 0;
 	p->score.points = 0;
 	p->type = t;
-	p->pos_score_box.x = 600;
-	p->pos_score_box.y = (t == USER)? 470:40;
+	p->pos_score_box.x = PLAYER_BOX_X;
+	p->pos_score_box.y = PLAYER_BOX_Y(t);
 	p->sel_hand = -1;
 	p->sel_table = -1;
 	p->bonus_card = -1;
 	p->bonus_type = NONE;
-	p->score_box=SDL_CreateRGBSurface(SDL_HWSURFACE, 130, 90, 32,  0, 0, 0, 0);
+	p->score_box=SDL_CreateRGBSurface(SDL_HWSURFACE, SCORE_BOX_X, 
+                                SCORE_BOX_Y, 32,  0, 0, 0, 0);
 	return p;	
 }
 
@@ -38,7 +51,7 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
 	bool back;
 
 	for(i=0; i<MAX_NB_CARDS_HAND;i++) {
-		posx = (90+40)*i+150;
+		posx = PLAYER_XPOS(i);
 		
 		if (p->type == USER) {			
 			posy = 450;
@@ -52,8 +65,9 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
 
 		p->nb_cards_in_hand++;
 	}
+        
 	*nb_cards_remaining -= i;
-	return 1;
+        return 1;
 }
 
 static void show_text(SDL_Surface *screen, char *font_name, char *text, int size, 
@@ -72,12 +86,12 @@ static void show_text(SDL_Surface *screen, char *font_name, char *text, int size
 static void player_show_score(player *p, SDL_Surface *scr)
 {
         char s[13] = "";
-        int y = (p->type == USER)? 485 : 55;
+        int y = PLAYER_SCORE_Y(p->type);
         sprintf(s, "cards   : %d", p->score.gained_cards);
-        show_text(scr, "georgiai.ttf", s, 18, 620, y);
+        show_text(scr, "georgiai.ttf", s, 18, PLAYER_SCORE_X, y);
         
         sprintf(s, "points : %d", p->score.points);
-        show_text(scr, "georgiai.ttf", s, 18, 620, y + 35);
+        show_text(scr, "georgiai.ttf", s, 18, PLAYER_SCORE_X, y + 35);
 }
 
 bool player_render(player *p, SDL_Surface *scr)

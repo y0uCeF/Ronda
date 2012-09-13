@@ -18,7 +18,7 @@ inline bool between(unsigned short x, unsigned short a, unsigned short b)
 
 inline bool equal(card_num a, card_num b) 
 {
-	return ((a%10) == (b%10));
+	return ((a % 10) == (b % 10));
 }
 
 void mix(card_num array[], unsigned short size)
@@ -47,8 +47,7 @@ short exist(card tab[], unsigned short size, card_num value)
 {
 	short i;
 	for (i=0; i < size; i++) 
-		if(tab[i].value != EMPTY)
-			if (equal(tab[i].value, value)) 
+		if((tab[i].value != EMPTY) && equal(tab[i].value, value)) 
 				return i;
     return -1;
 }
@@ -56,9 +55,9 @@ short exist(card tab[], unsigned short size, card_num value)
 bool empty(card tab[], unsigned short size) 
 {
 	unsigned short i;
-	for (i=0; i < size; i++) {
-		if (tab[i].value != -1) return 0;	
-	}
+	for (i=0; i < size; i++) 
+		if (tab[i].value != -1) 
+                        return 0;
 	return 1;
 }
 
@@ -97,9 +96,9 @@ bool set_card(card *c, card_num num, short xpos, short ypos, bool back)
 		c->position=malloc(sizeof(SDL_Rect));
 	
 	if (xpos != -1)
-		c->position->x=xpos;
+		c->position->x = xpos;
 	if (ypos != -1)
-		c->position->y=ypos;
+		c->position->y = ypos;
 	
 	if (num == EMPTY) {
 		c->surf = empty_card;
@@ -107,7 +106,7 @@ bool set_card(card *c, card_num num, short xpos, short ypos, bool back)
 		c->surf = back_card;
 	} else {
 		char *file = get_file(num);
-		c->surf=IMG_Load(file);
+		c->surf = IMG_Load(file);
 	}
 	
 	if(c->surf == NULL) 

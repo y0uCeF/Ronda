@@ -9,6 +9,17 @@
 #include "menu.h"
 #include "game.h"
 
+
+#define INNER_SPACE_TABLE 15
+#define TABLE_X 40
+#define TABLE_FIRSTROW 160
+#define TABLE_SECONDROW 305
+
+#define TABLE_XPOS(index) (CARD_WIDTH + INNER_SPACE_TABLE) * (index % 5) \
+                + TABLE_X
+                
+#define TABLE_YPOS(index) (index <= 4)? TABLE_FIRSTROW:TABLE_SECONDROW
+
 #define PAUSE_FRAMES_PLAYERS 30
 #define PAUSE_FRAMES_CARDS 20
 
@@ -20,34 +31,37 @@ extern SDL_Surface *empty_card;
 extern SDL_Surface *back_card;
 extern stack s;
 
+/*local data*/
 static player *user, *comp;
-static card table[MAX_NB_CARDS_TABLE];
+static card table[MAX_NB_CARDS_TABLE];  
 static card_num card_list[NB_CARDS];
 static unsigned short nb_cards_remaining;
 static type_t current_player;
 static int nb_frames = 0;
-static SDL_Surface *selection;
+static SDL_Surface *selection;  /*highlight the selected card*/
 static SDL_Rect *selection_pos = NULL;
 static controller_data *c_data = NULL;
 
 static card_num dropped_card = EMPTY;  /* last card dropped */
 static player *last_card_taker = NULL;
-static player_state_type state = NO_VALID_INPUT;
-static card_num current_card = EMPTY;
+static player_state_type state = NO_VALID_INPUT; /*player turn states*/
+static card_num current_card = EMPTY; /*used when player is taking cards*/
 
 static bool table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
 {
-	unsigned short i, k = 0, j = 0;    /* iterators */
-	unsigned short xpos, ypos;    /* x, y positions */
+	unsigned short i, k = 0, j = 0;    
+	unsigned short xpos, ypos;
 	
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
+                /*making sure the card doesn't exist already*/
 		while (exist(table, i, card_list[*nb_cards_remaining-j-1]) != -1) {
 			swap(&card_list[*nb_cards_remaining-j-1], &card_list[*nb_cards_remaining-j-k-1]);
 			k++;
 		}
-		xpos = (90+15)*(i%5) + 40;
-		ypos = (i<=4)? 160:305;
+		xpos = TABLE_XPOS(i);
+		ypos = TABLE_YPOS(i);
+                /*the first 4 cards are in the 1st, 3rd, 5th and 7th position*/
 		if ((i==0) || (i==2) || (i==4) || (i==6)) {
 			set_card(&table[i], card_list[*nb_cards_remaining-j-1], xpos, ypos, 0);
 			j++;
@@ -59,22 +73,18 @@ static bool table_distribute(card_num card_list[],card table[],
     return 1;
 }
 
-static void set_bonus(player *p1, player *p2)
+static void set_bonus(player *p)
 {
-	if(tringla(p1))
-		p1->bonus_type = TRINGLA;
-	else if (ronda(p1))
-		p1->bonus_type = RONDA;
-	
-	if(tringla(p2))
-		p2->bonus_type = TRINGLA;
-	else if (ronda(p2))
-		p2->bonus_type = RONDA;
+	if(tringla(p))
+		p->bonus_type = TRINGLA;
+	else if (ronda(p))
+		p->bonus_type = RONDA;
 }
 
 void main_game_init()
 {
 	unsigned short i;
+        card_num j;
 	
 	empty_card = IMG_Load("cards/blank.gif");
 	back_card = IMG_Load("cards/back.gif");
@@ -86,18 +96,20 @@ void main_game_init()
 		table[i].position=NULL;
 	}
 	
-	for(i=0; i < NB_CARDS; i++) 
-		card_list[i] = i;
+	/*filling the list with cards*/
+        for(i =0, j = COIN1; j <= CUP12; j++, i++) 
+		card_list[i] = j;
 	
+        /*mixing the cards*/
+	mix(card_list, NB_CARDS);
 	
+        /*initializing users*/
 	user = player_init(USER);
 	comp = player_init(COMPUTER);
+        
         c_data = controller_data_init();
 	nb_cards_remaining = NB_CARDS; 
 	current_player = USER;
-	
-	/*mixing the cards*/
-	mix(card_list, NB_CARDS);
 	
 	/*distributing cards*/
 	if(!table_distribute(card_list, table, &nb_cards_remaining)) 
@@ -107,7 +119,9 @@ void main_game_init()
 	if(!player_distribute(card_list, comp, &nb_cards_remaining)) 
 		return;
 	
-	set_bonus(user, comp);
+        /*setting bonus for the first round*/
+	set_bonus(user);
+        set_bonus(comp);
 }
 
 void main_game_handle_input()
@@ -124,9 +138,9 @@ static void call_menu_state()
 	free(tmp);	
 }
 
-static bool pause(short frames)
+static bool pause(short max_frames)
 {
-        if (nb_frames < frames) {
+        if (nb_frames < max_frames) {
 		nb_frames++;
                 return 1;
         } else {
@@ -140,6 +154,7 @@ static bool take_card(player *p, card table[])
 	int index = exist(table, MAX_NB_CARDS_TABLE, current_card);
 	if(index != -1) {
                 if(!pause(PAUSE_FRAMES_CARDS)) {
+                        /*the cards exists and it's time*/
                         SDL_FreeSurface(table[index].surf);
                         set_card(&table[index], EMPTY, -1, -1, 0);
                         p->score.gained_cards++;
@@ -148,8 +163,10 @@ static bool take_card(player *p, card table[])
                 }
                 return 1;
 	} else {
+                /*no cards to take*/
                 if (empty(table, MAX_NB_CARDS_TABLE)) 
                         p->score.points++;
+                        
                 current_card = EMPTY;
                 return 0;        
         }
@@ -187,6 +204,8 @@ static short get_index_ai(player *p, card table[], short *index_tab)
 	unsigned short tmp_gain, gain = 0;
 	short best_card_index = -1;
 	*index_tab = -1;
+        
+        /*let's choose the best card (the best gain)*/
 	for (i=0; i < MAX_NB_CARDS_HAND; i++) {
 		card_num tmp = p->hand[i].value;
 		if (tmp != EMPTY) 
@@ -210,7 +229,8 @@ void update_state(player p, card table[])
 {
 	card_num selected_hand = get_sel_hand_val(p);
 	card_num selected_table = table[p.sel_table].value;
-	if ((selected_table == EMPTY) && 
+	
+        if ((selected_table == EMPTY) && 
 		(exist(table, MAX_NB_CARDS_TABLE, selected_hand) == -1))
 		state = PUT_CARD;
 	else if ((selected_table != EMPTY) &&
@@ -222,12 +242,12 @@ void update_state(player p, card table[])
 
 void player_turn(player *p, card table[]) 
 {
-	
 	card_num selected_hand = get_sel_hand_val(*p);
 	card_num selected_table = table[p->sel_table].value;
         
-	short y = (p->type == USER)? 450 : 15;	
+	short y = PLAYER_YPOS(p->type);	
         
+        /*what will the player do, depending on the states*/
         switch (state) {
         case NO_VALID_INPUT:       
                 if ((p->sel_hand != -1) && (p->sel_table != -1))
@@ -237,6 +257,8 @@ void player_turn(player *p, card table[])
         case PUT_CARD:
                 if (pause(PAUSE_FRAMES_PLAYERS) && (p->type == COMPUTER))
                         break;
+                        
+                /*moving the card from hand to table*/
                 if (p->type == USER)
 			table[p->sel_table].surf = get_sel_hand_surf(*p);
 		else
@@ -246,6 +268,8 @@ void player_turn(player *p, card table[])
 		dropped_card = selected_hand;
 		set_card(&p->hand[p->sel_hand], EMPTY, -1, y, 0);
                 p->nb_cards_in_hand--;
+                
+                /*no further actions*/
                 state = END_ACTIONS;
         break;
         
@@ -258,6 +282,7 @@ void player_turn(player *p, card table[])
 		dropped_card = EMPTY;
 		last_card_taker = p;
                 
+                /*removing both cards from hand/table */
                 set_card(&p->hand[p->sel_hand], EMPTY, -1, y, 0);
                 SDL_FreeSurface(table[p->sel_table].surf);
 		set_card(&table[p->sel_table], EMPTY, -1, -1, 0);
@@ -265,6 +290,8 @@ void player_turn(player *p, card table[])
                 p->nb_cards_in_hand--;
                 
                 card_num tmp = selected_hand % 10;
+                
+                /*take the rest of the cards if possible*/
                 if (tmp != 9) {
                         state = GET_CARDS;
                         current_card = tmp + 1;
@@ -351,6 +378,7 @@ static void handle_bonus(player *p1, player *p2)
 	if ((p1->bonus_type == NONE) && (p2->bonus_type == NONE))
 		return;
 	
+        /*check the Readme file for points calculation*/
 	if (p1->bonus_type > p2->bonus_type)
 		p1->score.points += (p1->bonus_type == RONDA)? 1:5;
 	else if (p1->bonus_type < p2->bonus_type)
@@ -381,8 +409,8 @@ void main_game_update()
         
         if (user->sel_hand != -1) {
                 selection_pos = malloc(sizeof(SDL_Rect));
-                selection_pos->x = (90+40)*user->sel_hand + 150;
-                selection_pos->y = 450;
+                selection_pos->x = PLAYER_XPOS(user->sel_hand);
+                selection_pos->y = PLAYER_YPOS(USER);
         } else {
                 free(selection_pos);
                 selection_pos = NULL;
@@ -402,11 +430,14 @@ void main_game_update()
 		if (round_end()) {
 			SDL_Delay(800);
 			handle_bonus(user, comp);
+                        
+                        /*setting new round*/
 			player_distribute(card_list, user, &nb_cards_remaining);
 			player_distribute(card_list, comp, &nb_cards_remaining);
                         
                         dropped_card = EMPTY;
-			set_bonus(user, comp);
+			set_bonus(user);
+                        set_bonus(comp);
 		}
 	
 		if (current_player == USER)

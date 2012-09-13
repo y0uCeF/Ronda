@@ -3,6 +3,16 @@
 
 #include "define.h"
 
+#define CARD_WIDTH 90
+#define INNER_SPACE_PLAYER 40
+#define PLAYER_X 150
+#define COMPUTER_Y 15
+#define USER_Y 450
+#define PLAYER_XPOS(index) (CARD_WIDTH + INNER_SPACE_PLAYER) * index \
+                + PLAYER_X
+
+#define PLAYER_YPOS(type) (type == USER)? USER_Y : COMPUTER_Y
+
 /* types definition */
 typedef enum {USER, COMPUTER} type_t;
 

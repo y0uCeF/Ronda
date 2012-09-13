@@ -317,7 +317,8 @@ static void main_game_user_turn()
 
 static void main_game_computer_turn()
 {
-        if (comp->sel_hand == -1 || comp->sel_table == -1)
+        if ((comp->sel_hand == -1 || comp->sel_table == -1) &&
+                (state == NO_VALID_INPUT))
                 set_computer_choice(comp, table);
         
         player_turn(comp, table);

@@ -158,19 +158,26 @@ static bool take_card(player *p, card table[])
 static unsigned short get_gain(card_num c, card table[])
 {
 	unsigned short i = 0, count = 0;
-	unsigned short res = 1;
-	if (c%10 != 9) {
+        /*res: the more cards/points the player can gain, 
+                the more is the variable's value */
+	unsigned short res = 1; 
+        
+        /*how many cards can the player can get*/
+	if (c % 10 != 9) {
 		short index = exist(table, MAX_NB_CARDS_TABLE, c);
-		while ((index != -1) && (i<= 9-c%10)) {
+		while ((index != -1) && (i <= (9 - c%10))) {
 			count++;
+                        i++;
 			index = exist(table, MAX_NB_CARDS_TABLE, c+count);
 		}
 	}
-	if (c == dropped_card) 
-		res++;
-        if (count >= 3)
-		res++;
         
+        res += count;
+        
+        /*we make sure this is a better gain than in taking 2 cards*/
+        if (c == dropped_card)
+                res += 2; 
+
         return res;
 }
 

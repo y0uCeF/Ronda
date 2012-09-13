@@ -90,5 +90,6 @@ void game_exit()
 void game_free() 
 {
 	SDL_FreeSurface(screen);
+        free(s);
 	SDL_Quit();
 }

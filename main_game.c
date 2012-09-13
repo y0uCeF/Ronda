@@ -481,6 +481,12 @@ void main_game_free()
 	
 	player_free(user);
 	player_free(comp);
+        
+        
+        free(selection);
+        free(selection_pos);
+        free(c_data);
+        free(last_card_taker);
 }
 
 game_state_t* set_state_main_game()

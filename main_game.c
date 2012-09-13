@@ -326,7 +326,7 @@ static void main_game_computer_turn()
 static inline bool round_end()
 {
 	return (user->nb_cards_in_hand == 0) &&
-		(comp->nb_cards_in_hand == 0);
+		(comp->nb_cards_in_hand == 0) && (state == NO_VALID_INPUT);
 }
 
 static inline bool game_end()

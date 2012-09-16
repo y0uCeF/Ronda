@@ -1,50 +1,31 @@
 #include <SDL/SDL.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL/SDL_image.h>
 
 #include "menu.h"
 #include "game_state.h"
 #include "main_game.h"
 #include "define.h"
 
-#define FONT_SIZE 20
-#define FONT_NAME "georgiai.ttf"
+#define SELECTOR_YES_X 225
+#define SELECTOR_YES_Y 270
+#define SELECTOR_NO_X 225
+#define SELECTOR_NO_Y 310
 
-
-static SDL_Surface *question;
-static SDL_Surface *stay;
-static SDL_Surface *leave;
-static SDL_Rect question_pos;
-static SDL_Rect stay_pos;
-static SDL_Rect leave_pos;
+static SDL_Surface *menu = NULL;
+static SDL_Surface *selector = NULL;
+static SDL_Rect selector_pos;
+static enum {NO, YES} entry;;
 
 extern stack s;
 
-static void set_text_surf(SDL_Surface **surf, char* text)
-{
-	TTF_Font* font = TTF_OpenFont(FONT_NAME, FONT_SIZE);
-	SDL_Color foreground = {255, 255, 255};
-	SDL_Color background = {0, 0, 0};
-	
-	*surf = TTF_RenderText_Shaded(font, text, foreground, background);
-	
-	TTF_CloseFont(font);	
-}
-
 void menu_init()
 {
-	TTF_Init();
-	
-	set_text_surf(&question, "What are you willing to do?");
-	set_text_surf(&stay, "(S)tay.");
-	set_text_surf(&leave, "(L)eave.");
-	
-	if(question == NULL) printf("question is the problem\n");
-	question_pos.x = 230;
-	question_pos.y = 170;
-	stay_pos.x = 320;
-	stay_pos.y = 210;
-	leave_pos.x = 320;
-	leave_pos.y = 240;
+	menu = IMG_Load("menu.png");
+        selector = IMG_Load("selector.png");
+        
+        entry = YES;
+        selector_pos.x = SELECTOR_YES_X;
+        selector_pos.y = SELECTOR_YES_Y;
 }
 
 void menu_handle_input()
@@ -54,23 +35,32 @@ void menu_handle_input()
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_QUIT:
-				top(s).free();
-				pop(&s);
+                        top(s).free();
+			pop(&s);
 		break;	
 		
 		case SDL_KEYDOWN:
 			switch(event.key.keysym.sym){
-			case SDLK_l:
-				top(s).free();
-				pop(&s);
+                        
+                        case SDLK_UP:
+                                entry = YES;
+                        break;
+                        
+                        case SDLK_DOWN:
+                                entry = NO;
+                        break;
+                        
+                        case SDLK_RETURN:
+                              	if (entry == YES) {
+                                        top(s).free();
+                                        pop(&s);
+                                } else {
+                                        tmp = set_state_main_game();
+                                        push(&s, *tmp);
+                                        top(s).init(); 
+                                }
 			break;
-			
-			case SDLK_s:
-                                tmp = set_state_main_game();
-                                push(&s, *tmp);
-                                top(s).init();
-			break;	
-			
+                                
 			case SDLK_ESCAPE:
                                 tmp = set_state_main_game();
                                 push(&s, *tmp);
@@ -90,18 +80,20 @@ void menu_handle_input()
 
 void menu_update()
 {
-	
+	if (entry == NO) {
+                selector_pos.x = SELECTOR_NO_X;
+                selector_pos.y = SELECTOR_NO_Y;
+        } else {
+                selector_pos.x = SELECTOR_YES_X;
+                selector_pos.y = SELECTOR_YES_Y;
+        }
 }
 
 bool menu_render(SDL_Surface *screen)
 {
-	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
-	
-	if(SDL_BlitSurface(question, NULL, screen, &question_pos) == -1)
+	if(SDL_BlitSurface(menu, NULL, screen, NULL) == -1)
 		return 0;
-	if(SDL_BlitSurface(stay, NULL, screen, &stay_pos) == -1)
-		return 0;
-	if(SDL_BlitSurface(leave, NULL, screen, &leave_pos) == -1)
+	if(SDL_BlitSurface(selector, NULL, screen, &selector_pos) == -1)
 		return 0;
 	
 	SDL_Flip(screen);
@@ -111,11 +103,8 @@ bool menu_render(SDL_Surface *screen)
 
 void menu_free()
 {
-	SDL_FreeSurface(question);
-	SDL_FreeSurface(stay);
-	SDL_FreeSurface(leave);
-	
-	TTF_Quit();
+	SDL_FreeSurface(menu);
+	SDL_FreeSurface(selector);
 }
 
 game_state_t* set_state_menu()

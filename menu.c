@@ -14,7 +14,8 @@
 static SDL_Surface *menu = NULL;
 static SDL_Surface *selector = NULL;
 static SDL_Rect selector_pos;
-static enum {NO, YES} entry;;
+static enum {NO, YES} entry;
+static bool call_menu ;
 
 extern stack s;
 
@@ -23,6 +24,7 @@ void menu_init()
 	menu = IMG_Load("menu.png");
         selector = IMG_Load("selector.png");
         
+        call_menu = 0;
         entry = YES;
         selector_pos.x = SELECTOR_YES_X;
         selector_pos.y = SELECTOR_YES_Y;
@@ -31,7 +33,8 @@ void menu_init()
 void menu_handle_input()
 {
 	SDL_Event event;
-        game_state_t *tmp = NULL;
+        
+        
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_QUIT:
@@ -55,16 +58,12 @@ void menu_handle_input()
                                         top(s).free();
                                         pop(&s);
                                 } else {
-                                        tmp = set_state_main_game();
-                                        push(&s, *tmp);
-                                        top(s).init(); 
+                                        call_menu = 1;
                                 }
 			break;
                                 
 			case SDLK_ESCAPE:
-                                tmp = set_state_main_game();
-                                push(&s, *tmp);
-                                top(s).init();
+                                call_menu = 1;
 			break;	
 			
 			default:
@@ -80,6 +79,11 @@ void menu_handle_input()
 
 void menu_update()
 {
+        if (call_menu) {
+                game_state_t *tmp = set_state_main_game();
+                push(&s, *tmp);
+        }
+        
 	if (entry == NO) {
                 selector_pos.x = SELECTOR_NO_X;
                 selector_pos.y = SELECTOR_NO_Y;

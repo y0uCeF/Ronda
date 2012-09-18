@@ -472,6 +472,8 @@ void main_game_free()
 	
 	SDL_FreeSurface(empty_card);
 	SDL_FreeSurface(back_card);
+        SDL_FreeSurface(selection);
+
 	for (i=0;i < MAX_NB_CARDS_TABLE;i++) {
 		if((table[i].surf != NULL) && (table[i].value != EMPTY))
 			SDL_FreeSurface(table[i].surf);
@@ -481,12 +483,9 @@ void main_game_free()
 	
 	player_free(user);
 	player_free(comp);
-        
-        
-        free(selection);
-        free(selection_pos);
+
         free(c_data);
-        free(last_card_taker);
+
 }
 
 game_state_t* set_state_main_game()

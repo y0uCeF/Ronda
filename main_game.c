@@ -405,16 +405,6 @@ void main_game_update()
         if((c_data->selected_card_table != -1) && (user->sel_hand != -1))
                 user->sel_table = c_data->selected_card_table;
         
-        
-        if (user->sel_hand != -1) {
-                selection_pos = malloc(sizeof(SDL_Rect));
-                selection_pos->x = PLAYER_XPOS(user->sel_hand);
-                selection_pos->y = PLAYER_YPOS(USER);
-        } else {
-                free(selection_pos);
-                selection_pos = NULL;
-        }
-        
 	if (game_end()) {
 		if (nb_cards(table, MAX_NB_CARDS_TABLE) != 0)
 			take_all_cards(last_card_taker, table);
@@ -444,6 +434,15 @@ void main_game_update()
                 else 
 			main_game_computer_turn();
 	}
+        
+        if (user->sel_hand != -1) {
+                selection_pos = malloc(sizeof(SDL_Rect));
+                selection_pos->x = PLAYER_XPOS(user->sel_hand);
+                selection_pos->y = PLAYER_YPOS(USER);
+        } else {
+                free(selection_pos);
+                selection_pos = NULL;
+        }
 }
 		
 bool main_game_render(SDL_Surface *screen)

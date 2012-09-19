@@ -9,8 +9,6 @@
 #define USER_BOX_Y 470
 #define COMPUTER_BOX_Y 40
 #define PLAYER_BOX_Y(type) (type == USER)? USER_BOX_Y:COMPUTER_BOX_Y
-#define SCORE_BOX_X 130
-#define SCORE_BOX_Y 90
 #define USER_SCORE_Y 485
 #define COMPUTER_SCORE_Y 55
 #define PLAYER_SCORE_Y(type) (type == USER)? USER_SCORE_Y:COMPUTER_SCORE_Y
@@ -38,8 +36,8 @@ player* player_init(type_t t)
 	p->sel_table = -1;
 	p->bonus_card = -1;
 	p->bonus_type = NONE;
-	p->score_box=SDL_CreateRGBSurface(SDL_HWSURFACE, SCORE_BOX_X, 
-                                SCORE_BOX_Y, 32,  0, 0, 0, 0);
+	
+        p->score_box = IMG_Load("scorebox.png");
 	return p;	
 }
 
@@ -97,13 +95,13 @@ static void player_show_score(player *p, SDL_Surface *scr)
 bool player_render(player *p, SDL_Surface *scr)
 {
 	unsigned short i;
-	SDL_FillRect(p->score_box, NULL, SDL_MapRGB(p->score_box->format, 35, 50, 20));
 	
 	for (i=0; i < MAX_NB_CARDS_HAND; i++)
 		if (SDL_BlitSurface(p->hand[i].surf, NULL, scr, p->hand[i].position) == -1) 
 			return 0; 
 	if(SDL_BlitSurface(p->score_box, NULL, scr, &p->pos_score_box) == -1) 
 		return 0;
+
         player_show_score(p, scr);
                 	
 	return 1;

@@ -40,6 +40,7 @@ static type_t current_player;
 static int nb_frames = 0;
 static SDL_Surface *selection;  /*highlight the selected card*/
 static SDL_Rect *selection_pos = NULL;
+static SDL_Surface *bg = NULL;
 static controller_data *c_data = NULL;
 
 static card_num dropped_card = EMPTY;  /* last card dropped */
@@ -89,6 +90,7 @@ void main_game_init()
 	empty_card = IMG_Load("cards/blank.gif");
 	back_card = IMG_Load("cards/back.gif");
 	selection = IMG_Load("cards/selection.png");
+        bg = IMG_Load("bg.png");
         
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
 		table[i].value=EMPTY;
@@ -447,7 +449,10 @@ void main_game_update()
 bool main_game_render(SDL_Surface *screen)
 {
 	unsigned short i;
-	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 53, 131, 68));
+	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
+	
+        if (SDL_BlitSurface(bg, NULL, screen, NULL) == -1) 
+			return 0;
 	
 	if (!player_render(user, screen)) 
 		return 0;
@@ -473,7 +478,8 @@ void main_game_free()
 	SDL_FreeSurface(empty_card);
 	SDL_FreeSurface(back_card);
         SDL_FreeSurface(selection);
-
+        SDL_FreeSurface(bg);
+        
 	for (i=0;i < MAX_NB_CARDS_TABLE;i++) {
 		if((table[i].surf != NULL) && (table[i].value != EMPTY))
 			SDL_FreeSurface(table[i].surf);

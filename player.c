@@ -37,7 +37,7 @@ player* player_init(type_t t)
 	p->bonus_card = -1;
 	p->bonus_type = NONE;
 	
-        p->score_box = IMG_Load("scorebox.png");
+        p->score_box = IMG_Load("data/scorebox.png");
 	return p;	
 }
 
@@ -86,10 +86,10 @@ static void player_show_score(player *p, SDL_Surface *scr)
         char s[13] = "";
         int y = PLAYER_SCORE_Y(p->type);
         sprintf(s, "cards   : %d", p->score.gained_cards);
-        show_text(scr, "georgiai.ttf", s, 18, PLAYER_SCORE_X, y);
+        show_text(scr, "data/georgiai.ttf", s, 18, PLAYER_SCORE_X, y);
         
         sprintf(s, "points : %d", p->score.points);
-        show_text(scr, "georgiai.ttf", s, 18, PLAYER_SCORE_X, y + 35);
+        show_text(scr, "data/georgiai.ttf", s, 18, PLAYER_SCORE_X, y + 35);
 }
 
 bool player_render(player *p, SDL_Surface *scr)

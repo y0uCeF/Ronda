@@ -22,8 +22,8 @@ extern stack s;
 
 void menu_init()
 {
-	menu = IMG_Load("menu.png");
-        selector = IMG_Load("selector.png");
+	menu = IMG_Load("data/menu.png");
+        selector = IMG_Load("data/selector.png");
         
         call_menu = 0;
         entry = YES;

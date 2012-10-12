@@ -73,10 +73,10 @@ unsigned short nb_cards(card tab[], unsigned short size)
 char* get_file(card_num n) 
 {
 	char num[3]="";
-	char* file = calloc(16, sizeof(char));
+	char* file = calloc(21, sizeof(char));
 	num[0]=(char) (n/10+ (char) '0');
 	num[1]=(char) (n%10+ (char) '0');
-	strcat(file, "cards/");
+	strcat(file, "data/cards/");
 	strcat(file, num);
 	strcat(file, ".gif");
 	return file;

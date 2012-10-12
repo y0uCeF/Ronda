@@ -87,10 +87,10 @@ void main_game_init()
 	unsigned short i;
         card_num j;
 	
-	empty_card = IMG_Load("cards/blank.gif");
-	back_card = IMG_Load("cards/back.gif");
-	selection = IMG_Load("cards/selection.png");
-        bg = IMG_Load("bg.png");
+	empty_card = IMG_Load("data/cards/blank.gif");
+	back_card = IMG_Load("data/cards/back.gif");
+	selection = IMG_Load("data/cards/selection.png");
+        bg = IMG_Load("data/bg.png");
         
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
 		table[i].value=EMPTY;

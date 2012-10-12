@@ -27,7 +27,7 @@ void game_update();
 bool game_render();
 
 /*
- * pop all the states inside the stack 
+ * pop all the states from the stack 
  */
 void game_exit();
   

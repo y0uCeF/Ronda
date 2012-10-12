@@ -3,6 +3,7 @@
 
 #include "menu.h"
 #include "game_state.h"
+#include "game.h"
 #include "main_game.h"
 #include "define.h"
 
@@ -38,8 +39,7 @@ void menu_handle_input()
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_QUIT:
-                        top(s).free();
-			pop(&s);
+                        game_exit();
 		break;	
 		
 		case SDL_KEYDOWN:

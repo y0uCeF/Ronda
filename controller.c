@@ -7,6 +7,7 @@
 static inline void set_default_values(controller_data *c_data)
 {
         c_data->call_menu = 0;
+        c_data->exit = 0;
         c_data->selected_card_hand = -1;
         c_data->selected_card_table = -1;
 }
@@ -122,7 +123,7 @@ void controller_data_update(controller_data *c_data)
         
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT)
-			c_data->call_menu = 1;
+			c_data->exit = 1;
 		else if (event.type == SDL_KEYDOWN)
 			treat_keyboard_event(event, c_data);
 		else if (event.type == SDL_MOUSEBUTTONUP)

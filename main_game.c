@@ -396,13 +396,15 @@ static void handle_bonus(player *p1, player *p2)
 
 void main_game_update()
 {
-        if(c_data->call_menu == 1)
+        if (c_data->exit)
+                game_exit();
+        if (c_data->call_menu == 1)
                 call_menu_state();
                 
-        if(c_data->selected_card_hand != -1)
+        if (c_data->selected_card_hand != -1)
                 user->sel_hand = c_data->selected_card_hand;
                 
-        if((c_data->selected_card_table != -1) && (user->sel_hand != -1))
+        if ((c_data->selected_card_table != -1) && (user->sel_hand != -1))
                 user->sel_table = c_data->selected_card_table;
         
 	if (game_end()) {
@@ -439,6 +441,8 @@ void main_game_update()
                 selection_pos = malloc(sizeof(SDL_Rect));
                 selection_pos->x = PLAYER_XPOS(user->sel_hand);
                 selection_pos->y = PLAYER_YPOS(USER);
+                selection_pos->x -= 2;
+                selection_pos->y -= 2;
         } else {
                 free(selection_pos);
                 selection_pos = NULL;

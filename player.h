@@ -59,6 +59,11 @@ bool ronda(player *p);
 bool tringla(player *p);
 
 /*
+ * sets bonus type to the player
+ */ 
+void set_bonus(player *p);
+
+/*
  * initializes player data
  */ 
 player* player_init(type_t t);

@@ -162,3 +162,11 @@ bool tringla(player *p)
 	return equal(p->hand[0].value, p->hand[1].value) &&
 		equal(p->hand[0].value, p->hand[2].value);
 }
+
+void set_bonus(player *p)
+{
+	if(tringla(p))
+		p->bonus_type = TRINGLA;
+	else if (ronda(p))
+		p->bonus_type = RONDA;
+}

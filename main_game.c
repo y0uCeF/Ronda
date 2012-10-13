@@ -441,8 +441,8 @@ void main_game_update()
                 selection_pos = malloc(sizeof(SDL_Rect));
                 selection_pos->x = PLAYER_XPOS(user->sel_hand);
                 selection_pos->y = PLAYER_YPOS(USER);
-                selection_pos->x -= 2;
-                selection_pos->y -= 2;
+                selection_pos->x -= 5;
+                selection_pos->y -= 5;
         } else {
                 free(selection_pos);
                 selection_pos = NULL;

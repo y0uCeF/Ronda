@@ -56,4 +56,9 @@ bool sdl_error();
  * sets card attributes given in parameters
  */ 
 bool set_card(card *c, card_num num, short posx, short posy, bool back);
+
+/*
+ * checks if max_frames has passed
+ */
+bool passed(short max_frames, int *nb_frames);  
 #endif

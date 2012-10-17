@@ -113,3 +113,14 @@ bool set_card(card *c, card_num num, short xpos, short ypos, bool back)
 		return sdl_error("file not found");
 	return 1;	
 }
+
+bool passed(short max_frames, int *nb_frames)
+{
+        if (*nb_frames < max_frames) {
+		(*nb_frames)++;
+                return 0;
+        } else {
+                *nb_frames = 0;
+                return 1;
+        }
+}

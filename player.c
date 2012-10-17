@@ -5,6 +5,7 @@
 #include "player.h"
 #include "common.h"
 
+/* score constants */
 #define PLAYER_BOX_X 600
 #define USER_BOX_Y 470
 #define COMPUTER_BOX_Y 40
@@ -13,6 +14,16 @@
 #define COMPUTER_SCORE_Y 55
 #define PLAYER_SCORE_Y(type) (type == USER)? USER_SCORE_Y:COMPUTER_SCORE_Y
 #define PLAYER_SCORE_X 620
+
+/* bonus coordinates and constants */
+#define USER_BONUS_Y 420
+#define COMPUTER_BONUS_Y 150
+#define PLAYER_BONUS_Y(type) (type == USER)? USER_BONUS_Y:COMPUTER_BONUS_Y
+#define PLAYER_BONUS_X 600
+  
+#define BONUS_SHOW_TIME 100
+
+static int nb_frames = 0;
 
 player* player_init(type_t t) 
 {
@@ -36,6 +47,9 @@ player* player_init(type_t t)
 	p->sel_table = -1;
 	p->bonus_card = -1;
 	p->bonus_type = NONE;
+        p->extra_bonus = NO_EXTRA;
+        p->bonus_surf = NULL;
+        p->bonus_shown = 0;
 	
         p->score_box = IMG_Load("data/scorebox.png");
 	return p;	
@@ -68,28 +82,72 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
         return 1;
 }
 
-static void show_text(SDL_Surface *screen, char *font_name, char *text, int size, 
-                        int x, int y)
+static SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
+                                short g, short b)
 {
         TTF_Font* font = TTF_OpenFont(font_name, size);
-	SDL_Color foreground = {255, 255, 255};
+	SDL_Color foreground = {r, g, b};
 	
 	SDL_Surface *surf = TTF_RenderText_Blended(font, text, foreground);
-	
-        SDL_Rect pos = {x, y};
-        SDL_BlitSurface(surf, NULL, screen, &pos);
-	TTF_CloseFont(font);	
+        
+        TTF_CloseFont(font);
+        return surf;
 }
 
 static void player_show_score(player *p, SDL_Surface *scr)
 {
         char s[13] = "";
         int y = PLAYER_SCORE_Y(p->type);
-        sprintf(s, "cards   : %d", p->score.gained_cards);
-        show_text(scr, "data/georgiai.ttf", s, 18, PLAYER_SCORE_X, y);
         
+        /* gained cards number */
+        sprintf(s, "cards   : %d", p->score.gained_cards);
+        SDL_Surface *surf = set_text_surf("data/georgiai.ttf", 18, s, 255, 255, 255);
+        SDL_Rect pos = {PLAYER_SCORE_X, y};
+        SDL_BlitSurface(surf, NULL, scr, &pos);
+        SDL_FreeSurface(surf);
+        
+        /* points */
+        y += 35;
         sprintf(s, "points : %d", p->score.points);
-        show_text(scr, "data/georgiai.ttf", s, 18, PLAYER_SCORE_X, y + 35);
+        surf = set_text_surf("data/georgiai.ttf", 18, s, 255, 255, 255);
+        pos.x = PLAYER_SCORE_X;
+        pos.y = y;
+        SDL_BlitSurface(surf, NULL, scr, &pos);
+        SDL_FreeSurface(surf);
+}
+
+static void player_show_bonus(player *p, SDL_Surface *scr)
+{
+        char *s = calloc(8, sizeof(char));
+        int y = PLAYER_BONUS_Y(p->type);
+        
+        /* bonus type? */
+        if (p->bonus_type == RONDA)
+                strcat(s, "Ronda");
+        else if (p->bonus_type == TRINGLA)
+                strcat(s, "Tringla");
+        else if (p->extra_bonus == ESTE)
+                strcat(s, "Este");
+        else if (p->extra_bonus == MISSA)
+                strcat(s, "Missa");
+        else
+                return;
+        
+        /* displaying bonus for 100 frames */
+        if (p->bonus_shown)
+                goto end;
+        
+        if (!passed(BONUS_SHOW_TIME, &nb_frames)) {
+                p->bonus_surf = set_text_surf("data/georgiai.ttf", 20, s, 255, 255, 255);
+                SDL_Rect pos = {PLAYER_BONUS_X + (130 - p->bonus_surf->w)/2 , y};
+                SDL_BlitSurface(p->bonus_surf, NULL, scr, &pos);
+                SDL_FreeSurface(p->bonus_surf);
+        }
+        else {
+                p->bonus_shown = 1;
+        }
+        
+end:    free(s);
 }
 
 bool player_render(player *p, SDL_Surface *scr)
@@ -103,6 +161,8 @@ bool player_render(player *p, SDL_Surface *scr)
 		return 0;
 
         player_show_score(p, scr);
+        
+        player_show_bonus(p, scr);
                 	
 	return 1;
 }
@@ -165,8 +225,12 @@ bool tringla(player *p)
 
 void set_bonus(player *p)
 {
+        p->bonus_shown = 0;
 	if(tringla(p))
 		p->bonus_type = TRINGLA;
 	else if (ronda(p))
 		p->bonus_type = RONDA;
+        else
+                p->bonus_shown = 1;
+                
 }

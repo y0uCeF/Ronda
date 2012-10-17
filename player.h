@@ -17,7 +17,6 @@
 typedef enum {USER, COMPUTER} type_t;
 
 typedef struct {
-	/* SDL_Surface* box; */
 	unsigned short gained_cards;
 	unsigned short points;
 } score_t;
@@ -33,7 +32,10 @@ typedef struct player {
     short sel_hand;
     short sel_table;
     enum {NONE, RONDA, TRINGLA} bonus_type; /*Ronda or Tringla */
-    short bonus_card;   
+    enum {NO_EXTRA , ESTE, MISSA} extra_bonus; /*Este or Missa*/
+    SDL_Surface *bonus_surf; /*stores the bonus text*/
+    short bonus_card; /*the card concerned with the Ronda/Tringla*/
+    bool bonus_shown; /*tells whether the bonus has been displayed or not*/
 } player;
 
 /* functions definition */

@@ -20,23 +20,14 @@ player_state_type state = NO_VALID_INPUT; /*player turn states*/
 card_num dropped_card = EMPTY;  /* last card dropped */
 player *last_card_taker = NULL;
 
-static bool pause(short max_frames)
-{
-        if (nb_frames < max_frames) {
-		nb_frames++;
-                return 1;
-        } else {
-                nb_frames = 0;
-                return 0;
-        }
-}
+
 
 static bool take_card(player *p, card table[]) 
 {	
 	int index = exist(table, MAX_NB_CARDS_TABLE, current_card);
 	if(index != -1) {
-                if(!pause(PAUSE_FRAMES_CARDS)) {
-                        /*the cards exists and it's time*/
+                if(passed(PAUSE_FRAMES_CARDS, &nb_frames)) {
+                        /*the card exists and it's time*/
                         SDL_FreeSurface(table[index].surf);
                         set_card(&table[index], EMPTY, -1, -1, 0);
                         p->score.gained_cards++;
@@ -46,8 +37,11 @@ static bool take_card(player *p, card table[])
                 return 1;
 	} else {
                 /*no cards to take*/
-                if (empty(table, MAX_NB_CARDS_TABLE)) 
+                if (empty(table, MAX_NB_CARDS_TABLE)) {
                         p->score.points++;
+                        p->extra_bonus = MISSA;
+                        p->bonus_shown = 0;
+                }
                         
                 current_card = EMPTY;
                 return 0;        
@@ -84,7 +78,7 @@ void player_turn(player *p, card table[])
         break;
         
         case PUT_CARD:
-                if (pause(PAUSE_FRAMES_PLAYERS) && (p->type == COMPUTER))
+                if (!passed(PAUSE_FRAMES_PLAYERS, &nb_frames) && (p->type == COMPUTER))
                         break;
                         
                 /*moving the card from hand to table*/
@@ -103,10 +97,13 @@ void player_turn(player *p, card table[])
         break;
         
         case GET_FIRST_CARD:
-                if (pause(PAUSE_FRAMES_PLAYERS) && (p->type == COMPUTER))
+                if (!passed(PAUSE_FRAMES_PLAYERS, &nb_frames) && (p->type == COMPUTER))
                         break;
-                if(selected_table == dropped_card) 
+                if(selected_table == dropped_card) {
 			p->score.points++;
+                        p->extra_bonus = ESTE;
+                        p->bonus_shown = 0;
+                }
                         
 		dropped_card = EMPTY;
 		last_card_taker = p;

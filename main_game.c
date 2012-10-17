@@ -191,7 +191,7 @@ void main_game_update()
 			main_game_computer_turn();
 	}
         
-        if (user->sel_hand != -1) {
+        if ((user->sel_hand != -1) && (get_sel_hand_val(*user) != EMPTY)) {
                 selection_pos = malloc(sizeof(SDL_Rect));
                 selection_pos->x = PLAYER_XPOS(user->sel_hand);
                 selection_pos->y = PLAYER_YPOS(USER);

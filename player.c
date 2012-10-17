@@ -122,20 +122,23 @@ static void player_show_bonus(player *p, SDL_Surface *scr)
         int y = PLAYER_BONUS_Y(p->type);
         
         /* bonus type? */
-        if (p->bonus_type == RONDA)
-                strcat(s, "Ronda");
-        else if (p->bonus_type == TRINGLA)
-                strcat(s, "Tringla");
-        else if (p->extra_bonus == ESTE)
+        if (p->extra_bonus == ESTE)
                 strcat(s, "Este");
         else if (p->extra_bonus == MISSA)
                 strcat(s, "Missa");
+        else if (p->bonus_type == RONDA)
+                strcat(s, "Ronda");
+        else if (p->bonus_type == TRINGLA)
+                strcat(s, "Tringla");
         else
                 return;
         
         /* displaying bonus for 100 frames */
-        if (p->bonus_shown)
+        if (p->bonus_shown) {
+                p->bonus_type = NONE;
+                p->extra_bonus = NO_EXTRA;
                 goto end;
+        }
         
         if (!passed(BONUS_SHOW_TIME, &nb_frames)) {
                 p->bonus_surf = set_text_surf("data/georgiai.ttf", 20, s, 255, 255, 255);

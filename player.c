@@ -135,7 +135,6 @@ static void player_show_bonus(player *p, SDL_Surface *scr)
         
         /* displaying bonus for 100 frames */
         if (p->bonus_shown) {
-                p->bonus_type = NONE;
                 p->extra_bonus = NO_EXTRA;
                 goto end;
         }

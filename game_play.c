@@ -122,6 +122,11 @@ void player_turn(player *p, card table[])
                         state = GET_CARDS;
                         current_card = tmp + 1;
                 } else {
+			if (empty(table, MAX_NB_CARDS_TABLE)) {
+				p->score.points++;
+				p->extra_bonus = MISSA;
+				p->bonus_shown = 0;
+			}
                         state = END_ACTIONS;
                 }
         break;

@@ -4,6 +4,12 @@
 #include "define.h"
 #include "game_state.h"
 
+/* Constants */
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+
+#define MIDDLE_X(w) WINDOW_WIDTH/2 - w/2
+
 /* functions definition */
 
 /* 

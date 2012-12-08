@@ -61,4 +61,10 @@ bool set_card(card *c, card_num num, short posx, short posy, bool back);
  * checks if max_frames has passed
  */
 bool passed(short max_frames, int *nb_frames);  
+
+/*
+ * returns text surface
+ */
+SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
+                                short g, short b);
 #endif

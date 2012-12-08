@@ -1,5 +1,6 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <SDL/SDL_ttf.h>
 
 #include "common.h"
 
@@ -123,4 +124,16 @@ bool passed(short max_frames, int *nb_frames)
                 *nb_frames = 0;
                 return 1;
         }
+}
+
+SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
+                                short g, short b)
+{
+        TTF_Font* font = TTF_OpenFont(font_name, size);
+	SDL_Color foreground = {r, g, b};
+	
+	SDL_Surface *surf = TTF_RenderText_Blended(font, text, foreground);
+        
+        TTF_CloseFont(font);
+        return surf;
 }

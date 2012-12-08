@@ -4,14 +4,11 @@
 
 #include "game.h"
 #include "main_game.h"
-#include "menu.h"
+#include "winner.h"
 #include "game_state.h"
 #include "common.h"
 
-
 /* Constants definition */
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 600
 #define FPS 30
 #define FRAME_RATE 1000/FPS
         
@@ -39,11 +36,9 @@ static bool env_init()
 void game_init() 
 {
 	s = NULL;
-        game_state_t *tmp = set_state_menu();
+        game_state_t *tmp = set_state_main_game();
 	push(&s, *tmp);
-        free(tmp);
-	tmp = set_state_main_game();
-	push(&s, *tmp);
+       
 	if (!env_init()) 
 		return;
 	

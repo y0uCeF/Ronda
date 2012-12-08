@@ -82,18 +82,6 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
         return 1;
 }
 
-static SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
-                                short g, short b)
-{
-        TTF_Font* font = TTF_OpenFont(font_name, size);
-	SDL_Color foreground = {r, g, b};
-	
-	SDL_Surface *surf = TTF_RenderText_Blended(font, text, foreground);
-        
-        TTF_CloseFont(font);
-        return surf;
-}
-
 static void player_show_score(player *p, SDL_Surface *scr)
 {
         char s[13] = "";
@@ -235,4 +223,10 @@ void set_bonus(player *p)
         else
                 p->bonus_shown = 1;
                 
+}
+
+void set_final_score(player *p)
+{
+	if (p->score.gained_cards >20)
+		p->score.points += p->score.gained_cards - 20;
 }

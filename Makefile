@@ -2,7 +2,7 @@
 CC = gcc
 CFLAGS = -c -Wall
 LDFLAGS =
-SOURCES = common.c player.c game_state.c menu.c controller.c game_play.c \
+SOURCES = common.c player.c game_state.c winner.c controller.c game_play.c \
 main_game.c game.c main.c 
 OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = ronda

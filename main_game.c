@@ -7,7 +7,7 @@
 #include "common.h"
 #include "game_state.h"
 #include "controller.h"
-#include "menu.h"
+#include "winner.h"
 #include "game.h"
 
 
@@ -41,6 +41,7 @@ static controller_data *c_data = NULL;
 
 /*global data*/
 type_t current_player;
+type_t winner;
 
 static bool table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
@@ -117,12 +118,6 @@ void main_game_handle_input()
         controller_data_update(c_data);
 }
 
-static void call_menu_state()
-{
-	pop(&s);
-        top(s).init();
-}
-
 static void main_game_user_turn()
 {
         player_turn(user, table);
@@ -152,8 +147,6 @@ void main_game_update()
 {
         if (c_data->exit)
                 game_exit();
-        if (c_data->call_menu == 1)
-                call_menu_state();
                 
         if (c_data->selected_card_hand != -1)
                 user->sel_hand = c_data->selected_card_hand;
@@ -168,8 +161,15 @@ void main_game_update()
                 SDL_Delay(800);
                 game_render();
 		SDL_Delay(1500);		
-				
-		game_exit();
+		
+		set_final_score(user);
+		set_final_score(comp);
+		
+		winner = (user->score.points > comp->score.points)? USER:COMPUTER;
+		
+		game_state_t *tmp = set_state_winner();
+		push(&s, *tmp);
+		top(s).init();
 	
 	} else {
 		if (round_end()) {

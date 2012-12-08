@@ -4,7 +4,6 @@
 #include "define.h"
 
 typedef struct {
-        bool call_menu;
         bool exit;
         int selected_card_hand;
         int selected_card_table;

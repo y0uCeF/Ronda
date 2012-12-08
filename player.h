@@ -66,6 +66,10 @@ bool tringla(player *p);
 void set_bonus(player *p);
 
 /*
+ * sets player's final points
+ */
+ void set_final_score(player *p);
+/*
  * initializes player data
  */ 
 player* player_init(type_t t);

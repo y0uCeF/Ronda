@@ -36,6 +36,7 @@ typedef struct player {
     SDL_Surface *bonus_surf; /*stores the bonus text*/
     short bonus_card; /*the card concerned with the Ronda/Tringla*/
     bool bonus_shown; /*tells whether the bonus has been displayed or not*/
+    int bonus_show_frames;
 } player;
 
 /* functions definition */

@@ -23,8 +23,6 @@
   
 #define BONUS_SHOW_TIME 100
 
-static int nb_frames = 0;
-
 player* player_init(type_t t) 
 {
 	unsigned short i;
@@ -50,6 +48,7 @@ player* player_init(type_t t)
         p->extra_bonus = NO_EXTRA;
         p->bonus_surf = NULL;
         p->bonus_shown = 0;
+        p->bonus_show_frames = 0;
 	
         p->score_box = IMG_Load("data/scorebox.png");
 	return p;	
@@ -127,7 +126,7 @@ static void player_show_bonus(player *p, SDL_Surface *scr)
                 goto end;
         }
         
-        if (!passed(BONUS_SHOW_TIME, &nb_frames)) {
+        if (!passed(BONUS_SHOW_TIME, &p->bonus_show_frames)) {
                 p->bonus_surf = set_text_surf("data/georgiai.ttf", 20, s, 255, 255, 255);
                 SDL_Rect pos = {PLAYER_BONUS_X + (130 - p->bonus_surf->w)/2 , y};
                 SDL_BlitSurface(p->bonus_surf, NULL, scr, &pos);

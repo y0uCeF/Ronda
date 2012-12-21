@@ -9,21 +9,27 @@
 #include "main_game.h"
 #include "define.h"
 
-#define SELECTOR_NEW_GAME_X 220
-#define SELECTOR_NEW_GAME_Y 270
-#define SELECTOR_EXIT_GAME_X 220
-#define SELECTOR_EXIT_GAME_Y 320
-#define WINNER_MSG_Y 90
+#define SELECTOR_NEW_GAME_X 375
+#define SELECTOR_NEW_GAME_Y 370
+#define SELECTOR_EXIT_GAME_X 375
+#define SELECTOR_EXIT_GAME_Y 420
+#define WINNER_MSG_Y 150
+#define WINNER_MSG_X(w) (MIDDLE_X(w) - 100)
+#define USER_SCORE_X 50
+#define COMPUTER_SCORE_X(w) (WINDOW_WIDTH - 50 - w)
+#define PLAYER_SCORE_Y 20 
 
+score_t user_score = {0,0};
+score_t computer_score = {0,0};
 
 static SDL_Surface *winner_surf = NULL;
 static SDL_Surface *selector = NULL;
 static SDL_Rect selector_pos;
 static enum {NEW_GAME, EXIT_GAME} entry;
 static bool new_game ;
+static enum{USER_WINS, COMPUTER_WINS, DRAWN} game_result;
 
 extern stack s;
-extern type_t winner;
 
 void winner_init()
 {
@@ -35,6 +41,17 @@ void winner_init()
         entry = NEW_GAME;
         selector_pos.x = SELECTOR_NEW_GAME_X;
         selector_pos.y = SELECTOR_NEW_GAME_Y;
+        
+        if(user_score.points > computer_score.points)
+			game_result = USER_WINS;
+		else if (user_score.points < computer_score.points)
+			game_result = COMPUTER_WINS;
+		else if (user_score.gained_cards > computer_score.gained_cards)
+			game_result = USER_WINS;
+		else if (user_score.gained_cards < computer_score.gained_cards)
+			game_result = COMPUTER_WINS;
+		else
+			game_result = DRAWN;
 }
 
 void winner_handle_input()
@@ -97,14 +114,39 @@ void winner_update()
         }
 }
 
-void show_winner_msg(SDL_Surface *scr)
+static void show_winner_msg(SDL_Surface *scr)
 {
 	char buf[27] = "";
-	sprintf(buf, (winner == USER)? "Congratulations, You Win" : "Sorry You Loose");
+	if(game_result == USER_WINS)
+		sprintf(buf, "Congratulations, You Win");
+	else if (game_result == COMPUTER_WINS)
+		sprintf(buf, "Sorry, You Loose");
+	else
+		sprintf(buf, "Drawn");
+	
 	SDL_Surface *surf = set_text_surf("data/urw-bookman-l.ttf", 36, buf, 255, 255, 255);
-	SDL_Rect pos = {MIDDLE_X(surf->w), WINNER_MSG_Y};
+	SDL_Rect pos = {WINNER_MSG_X(surf->w), WINNER_MSG_Y};
 	SDL_BlitSurface(surf, NULL, scr, &pos);
-        SDL_FreeSurface(surf);
+    SDL_FreeSurface(surf);
+}
+
+static void show_final_score(SDL_Surface *scr)
+{
+	char buf[20] = "";
+	SDL_Rect pos;
+	sprintf(buf, "Your score : %d", user_score.points);
+    SDL_Surface *surf = set_text_surf("data/georgiai.ttf", 24, buf, 255, 255, 255);
+    pos.x = USER_SCORE_X;
+    pos.y = PLAYER_SCORE_Y;
+    SDL_BlitSurface(surf, NULL, scr, &pos);
+    SDL_FreeSurface(surf);
+    
+    sprintf(buf, "Computer score : %d", computer_score.points);
+    surf = set_text_surf("data/georgiai.ttf", 24, buf, 255, 255, 255);
+    pos.x = COMPUTER_SCORE_X(surf->w);
+    pos.y = PLAYER_SCORE_Y;
+    SDL_BlitSurface(surf, NULL, scr, &pos);
+    SDL_FreeSurface(surf);
 }
 
 bool winner_render(SDL_Surface *screen)
@@ -114,6 +156,7 @@ bool winner_render(SDL_Surface *screen)
 	if(SDL_BlitSurface(selector, NULL, screen, &selector_pos) == -1)
 		return 0;
 	
+	show_final_score(screen);
 	show_winner_msg(screen);
 	
 	SDL_Flip(screen);

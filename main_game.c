@@ -28,6 +28,8 @@ extern stack s;
 extern player_state_type state;
 extern player *last_card_taker;
 extern card_num dropped_card;
+extern score_t user_score;
+extern score_t computer_score;
 
 /*local data*/
 static player *user, *comp;
@@ -41,7 +43,6 @@ static controller_data *c_data = NULL;
 
 /*global data*/
 type_t current_player;
-type_t winner;
 
 static bool table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
@@ -165,7 +166,8 @@ void main_game_update()
 		set_final_score(user);
 		set_final_score(comp);
 		
-		winner = (user->score.points > comp->score.points)? USER:COMPUTER;
+		user_score = user->score;
+		computer_score = comp->score;
 		
 		game_state_t *tmp = set_state_winner();
 		push(&s, *tmp);

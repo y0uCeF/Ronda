@@ -1,5 +1,5 @@
-#ifndef MENU_H
-#define MENU_H
+#ifndef WINNER_H
+#define WINNER_H
 
 #include <SDL/SDL.h>
 #include "define.h"

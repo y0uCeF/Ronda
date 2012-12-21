@@ -36,7 +36,7 @@ static bool env_init()
 void game_init() 
 {
 	s = NULL;
-        game_state_t *tmp = set_state_main_game();
+    game_state_t *tmp = set_state_main_game();
 	push(&s, *tmp);
        
 	if (!env_init()) 

@@ -135,14 +135,10 @@ static void show_final_score(SDL_Surface *scr)
 	char buf[20] = "";
 	SDL_Rect pos;
 	sprintf(buf, "Your score : %d", user_score.points);
-    SDL_Surface *surf = set_text_surf("data/georgiai.ttf", 24, buf, 255, 255, 255);
-    pos.x = USER_SCORE_X;
-    pos.y = PLAYER_SCORE_Y;
-    SDL_BlitSurface(surf, NULL, scr, &pos);
-    SDL_FreeSurface(surf);
+	show_white_text("data/georgiai.ttf", 24, buf, USER_SCORE_X, PLAYER_SCORE_Y, scr);
     
     sprintf(buf, "Computer score : %d", computer_score.points);
-    surf = set_text_surf("data/georgiai.ttf", 24, buf, 255, 255, 255);
+    SDL_Surface *surf = set_text_surf("data/georgiai.ttf", 24, buf, 255, 255, 255);
     pos.x = COMPUTER_SCORE_X(surf->w);
     pos.y = PLAYER_SCORE_Y;
     SDL_BlitSurface(surf, NULL, scr, &pos);

@@ -14,6 +14,9 @@ inline bool between(unsigned short x, unsigned short a, unsigned short b);
  */ 
 inline bool equal(int a, int b);
 
+/*
+ * returns a random number between a and b
+ */ 
 inline int rand_a_b(int a, int b);
 
 /*
@@ -67,4 +70,16 @@ bool passed(short max_frames, int *nb_frames);
  */
 SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
                                 short g, short b);
+
+/*
+ * displays text "txt" on the screen, position specified by posx, posy
+ */
+void show_text(char *font, short size, char *txt, short posx, short posy, 
+			short r, short g, short b, SDL_Surface *scr); 
+
+/*
+ * displays text set in "txt" in white color using show_text()
+ */ 
+inline void show_white_text(char *font, short size, char *txt, short posx, short posy, 
+		SDL_Surface *scr);
 #endif

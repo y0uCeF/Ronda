@@ -88,19 +88,12 @@ static void player_show_score(player *p, SDL_Surface *scr)
         
         /* gained cards number */
         sprintf(s, "cards   : %d", p->score.gained_cards);
-        SDL_Surface *surf = set_text_surf("data/georgiai.ttf", 18, s, 255, 255, 255);
-        SDL_Rect pos = {PLAYER_SCORE_X, y};
-        SDL_BlitSurface(surf, NULL, scr, &pos);
-        SDL_FreeSurface(surf);
+        show_white_text("data/georgiai.ttf", 18, s, PLAYER_SCORE_X, y, scr);
         
         /* points */
         y += 35;
         sprintf(s, "points : %d", p->score.points);
-        surf = set_text_surf("data/georgiai.ttf", 18, s, 255, 255, 255);
-        pos.x = PLAYER_SCORE_X;
-        pos.y = y;
-        SDL_BlitSurface(surf, NULL, scr, &pos);
-        SDL_FreeSurface(surf);
+        show_white_text("data/georgiai.ttf", 18, s, PLAYER_SCORE_X, y, scr);
 }
 
 static void player_show_bonus(player *p, SDL_Surface *scr)

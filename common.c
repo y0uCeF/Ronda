@@ -137,3 +137,18 @@ SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
         TTF_CloseFont(font);
         return surf;
 }
+
+void show_text(char *font, short size, char *txt, short posx, short posy, 
+			short r, short g, short b, SDL_Surface *scr)
+{
+	SDL_Rect pos = {posx, posy};
+	SDL_Surface *surf = set_text_surf(font, size, txt, r, g, b);
+	SDL_BlitSurface(surf, NULL, scr, &pos);
+    SDL_FreeSurface(surf);	
+}
+
+inline void show_white_text(char *font, short size, char *txt, short posx, short posy, 
+		SDL_Surface *scr)
+{
+	show_text(font, size, txt, posx, posy, 255, 255, 255, scr);
+}

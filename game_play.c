@@ -163,7 +163,7 @@ static unsigned short get_gain(card_num c, card table[])
 	res += count;
 
 	/*we make sure this is a better gain than in taking 2 cards*/
-	if (c == dropped_card)
+	if (equal(c, dropped_card))
 		res += 2; 
 
 	return res;

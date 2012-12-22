@@ -51,15 +51,17 @@ static bool table_distribute(card_num card_list[],card table[],
 	unsigned short xpos, ypos;
 	
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
-                /*making sure the card doesn't exist already*/
-		while (exist(table, i, card_list[*nb_cards_remaining-j-1]) != -1) {
-			swap(&card_list[*nb_cards_remaining-j-1], &card_list[*nb_cards_remaining-j-k-1]);
-			k++;
-		}
+		
 		xpos = TABLE_XPOS(i);
 		ypos = TABLE_YPOS(i);
-                /*the first 4 cards are in the 1st, 3rd, 5th and 7th position*/
-		if ((i==0) || (i==2) || (i==4) || (i==6)) {
+        
+        /*the first 4 cards are in the 1st, 3rd, 5th and 7th position*/
+        if ((i==0) || (i==2) || (i==4) || (i==6)) {
+			/*making sure the card doesn't exist already*/
+			while (exist(table, i, card_list[*nb_cards_remaining-j-1]) != -1) {
+				swap(&card_list[*nb_cards_remaining-j-1], &card_list[*nb_cards_remaining-j-k-1]);
+				k++;
+			}
 			set_card(&table[i], card_list[*nb_cards_remaining-j-1], xpos, ypos, 0);
 			j++;
 		} else {
@@ -78,7 +80,7 @@ void main_game_init()
 	empty_card = IMG_Load("data/cards/blank.gif");
 	back_card = IMG_Load("data/cards/back.gif");
 	selection = IMG_Load("data/cards/selection.png");
-        bg = IMG_Load("data/bg.png");
+    bg = IMG_Load("data/bg.png");
         
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
 		table[i].value=EMPTY;
@@ -87,17 +89,17 @@ void main_game_init()
 	}
 	
 	/*filling the list with cards*/
-        for(i =0, j = COIN1; j <= CUP12; j++, i++) 
+    for(i =0, j = COIN1; j <= CUP12; j++, i++) 
 		card_list[i] = j;
 	
-        /*mixing the cards*/
+    /*mixing the cards*/
 	mix(card_list, NB_CARDS);
 	
-        /*initializing users*/
+    /*initializing users*/
 	user = player_init(USER);
 	comp = player_init(COMPUTER);
         
-        c_data = controller_data_init();
+    c_data = controller_data_init();
 	nb_cards_remaining = NB_CARDS; 
 	current_player = USER;
 	
@@ -109,9 +111,9 @@ void main_game_init()
 	if(!player_distribute(card_list, comp, &nb_cards_remaining)) 
 		return;
 	
-        /*setting bonus for the first round*/
+    /*setting bonus for the first round*/
 	set_bonus(user);
-        set_bonus(comp);
+    set_bonus(comp);
 }
 
 void main_game_handle_input()
@@ -126,7 +128,7 @@ static void main_game_user_turn()
 
 static void main_game_computer_turn()
 {
-        if ((comp->sel_hand == -1 || comp->sel_table == -1) &&
+	if ((comp->sel_hand == -1 || comp->sel_table == -1) &&
                 (state == NO_VALID_INPUT))
                 set_computer_choice(comp, table);
         
@@ -146,21 +148,21 @@ static inline bool game_end()
 
 void main_game_update()
 {
-        if (c_data->exit)
-                game_exit();
+	if (c_data->exit)
+		game_exit();
                 
-        if (c_data->selected_card_hand != -1)
-                user->sel_hand = c_data->selected_card_hand;
+	if (c_data->selected_card_hand != -1)
+		user->sel_hand = c_data->selected_card_hand;
                 
-        if ((c_data->selected_card_table != -1) && (user->sel_hand != -1))
-                user->sel_table = c_data->selected_card_table;
+	if ((c_data->selected_card_table != -1) && (user->sel_hand != -1))
+		user->sel_table = c_data->selected_card_table;
         
 	if (game_end()) {
 		if (nb_cards(table, MAX_NB_CARDS_TABLE) != 0)
 			take_all_cards(last_card_taker, table);
 		handle_bonus(user, comp);
-                SDL_Delay(800);
-                game_render();
+		SDL_Delay(800);
+		game_render();
 		SDL_Delay(1500);		
 		
 		set_final_score(user);
@@ -169,6 +171,7 @@ void main_game_update()
 		user_score = user->score;
 		computer_score = comp->score;
 		
+		/* switch to winner state */
 		game_state_t *tmp = set_state_winner();
 		push(&s, *tmp);
 		top(s).init();
@@ -178,31 +181,31 @@ void main_game_update()
 			SDL_Delay(800);
 			handle_bonus(user, comp);
                         
-                        /*setting new round*/
+			/*setting new round*/
 			player_distribute(card_list, user, &nb_cards_remaining);
 			player_distribute(card_list, comp, &nb_cards_remaining);
                         
-                        dropped_card = EMPTY;
+			dropped_card = EMPTY;
 			set_bonus(user);
-                        set_bonus(comp);
+			set_bonus(comp);
 		}
 	
 		if (current_player == USER)
 			main_game_user_turn();
-                else 
+		else 
 			main_game_computer_turn();
 	}
         
-        if ((user->sel_hand != -1) && (get_sel_hand_val(*user) != EMPTY)) {
-                selection_pos = malloc(sizeof(SDL_Rect));
-                selection_pos->x = PLAYER_XPOS(user->sel_hand);
-                selection_pos->y = PLAYER_YPOS(USER);
-                selection_pos->x -= 5;
-                selection_pos->y -= 5;
-        } else {
-                free(selection_pos);
-                selection_pos = NULL;
-        }
+	if ((user->sel_hand != -1) && (get_sel_hand_val(*user) != EMPTY)) {
+			selection_pos = malloc(sizeof(SDL_Rect));
+			selection_pos->x = PLAYER_XPOS(user->sel_hand);
+			selection_pos->y = PLAYER_YPOS(USER);
+			selection_pos->x -= 5;
+			selection_pos->y -= 5;
+	} else {
+			free(selection_pos);
+			selection_pos = NULL;
+	}
 }
 		
 bool main_game_render(SDL_Surface *screen)
@@ -210,8 +213,8 @@ bool main_game_render(SDL_Surface *screen)
 	unsigned short i;
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 	
-        if (SDL_BlitSurface(bg, NULL, screen, NULL) == -1) 
-			return 0;
+	if (SDL_BlitSurface(bg, NULL, screen, NULL) == -1) 
+		return 0;
 	
 	if (!player_render(user, screen)) 
 		return 0;
@@ -223,8 +226,8 @@ bool main_game_render(SDL_Surface *screen)
 			return 0;
 	
         if (selection_pos != NULL)
-                if (SDL_BlitSurface(selection, NULL, screen, selection_pos) == -1) 
-			return 0;
+			if (SDL_BlitSurface(selection, NULL, screen, selection_pos) == -1) 
+				return 0;
 	
 	SDL_Flip(screen);
 	return 1;
@@ -236,8 +239,8 @@ void main_game_free()
 	
 	SDL_FreeSurface(empty_card);
 	SDL_FreeSurface(back_card);
-        SDL_FreeSurface(selection);
-        SDL_FreeSurface(bg);
+    SDL_FreeSurface(selection);
+    SDL_FreeSurface(bg);
         
 	for (i=0;i < MAX_NB_CARDS_TABLE;i++) {
 		if((table[i].surf != NULL) && (table[i].value != EMPTY))
@@ -249,7 +252,7 @@ void main_game_free()
 	player_free(user);
 	player_free(comp);
 
-        free(c_data);
+    free(c_data);
 
 }
 

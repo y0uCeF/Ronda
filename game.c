@@ -11,7 +11,7 @@
 /* Constants definition */
 #define FPS 30
 #define FRAME_RATE 1000/FPS
-        
+
 static SDL_Surface *screen = NULL;
 stack s;
 static int oldTime = 0;
@@ -36,15 +36,15 @@ static bool env_init()
 void game_init() 
 {
 	s = NULL;
-    game_state_t *tmp = set_state_main_game();
+	game_state_t *tmp = set_state_main_game();
 	push(&s, *tmp);
-       
+
 	if (!env_init()) 
 		return;
 	
 	top(s).init();
-        free(tmp);
-}	
+	free(tmp);
+}
 
 void game_handle_input()
 {
@@ -79,12 +79,12 @@ void game_exit()
 	while(!stack_empty(s)) {
 		top(s).free();
 		pop(&s);
-	}	
+	}
 }
 
 void game_free() 
 {
 	SDL_FreeSurface(screen);
-        free(s);
+	free(s);
 	SDL_Quit();
 }

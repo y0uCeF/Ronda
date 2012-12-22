@@ -69,7 +69,7 @@ bool passed(short max_frames, int *nb_frames);
  * returns text surface
  */
 SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
-                                short g, short b);
+								short g, short b);
 
 /*
  * displays text "txt" on the screen, position specified by posx, posy

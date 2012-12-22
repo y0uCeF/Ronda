@@ -6,18 +6,18 @@
 
 static inline void set_default_values(controller_data *c_data)
 {
-        c_data->exit = 0;
-        c_data->selected_card_hand = -1;
-        c_data->selected_card_table = -1;
+	c_data->exit = 0;
+	c_data->selected_card_hand = -1;
+	c_data->selected_card_table = -1;
 }
 
 controller_data* controller_data_init()
 {
-        controller_data *c_data = malloc(sizeof(controller_data));
-        
-        set_default_values(c_data);
-        
-        return c_data;
+	controller_data *c_data = malloc(sizeof(controller_data));
+
+	set_default_values(c_data);
+
+	return c_data;
 }
 
 static bool valid_card_hand(int x, int y)
@@ -25,7 +25,7 @@ static bool valid_card_hand(int x, int y)
 	bool res = 0;
 	if (between(y, 450, 585))
 		res = between(x,150, 240) || between(x, 280,370) ||
-			between(x,410, 500);	
+				between(x,410, 500);
 	return res;
 }
 
@@ -50,7 +50,8 @@ static short get_selected_hand(int x)
 		return 1;
 	else if (between(x,410, 500)) 
 		return 2;
-	else return -1;
+	else 
+		return -1;
 }
 
 /*
@@ -75,7 +76,8 @@ static short get_selected_table(int x, int y)
 			c=temp;
 		else if (between(y, 305, 440)) 
 			c=temp+5;
-		else c = -1;	
+		else 
+			c = -1;	
 		return c;
 	}
 	else return -1;	
@@ -83,18 +85,18 @@ static short get_selected_table(int x, int y)
 
 static void treat_mouse_click_event(SDL_Event event, controller_data* c_data)
 {
-        int x = event.button.x;
-        int y = event.button.y;	
-        
+	int x = event.button.x;
+	int y = event.button.y;	
+
 	switch(event.button.button) {
 	case SDL_BUTTON_LEFT:
-                if (valid_card_hand(x, y)) 
-                        c_data->selected_card_hand = get_selected_hand(x);	
-                else if (valid_card_table(x, y))
-                        c_data->selected_card_table = get_selected_table(x, y);
-                
+		if (valid_card_hand(x, y)) 
+			c_data->selected_card_hand = get_selected_hand(x);	
+		else if (valid_card_table(x, y))
+			c_data->selected_card_table = get_selected_table(x, y);
+
 	break;
-						
+	
 	default:
 	break;
 	}
@@ -103,13 +105,13 @@ static void treat_mouse_click_event(SDL_Event event, controller_data* c_data)
 void controller_data_update(controller_data *c_data)
 {
 	SDL_Event event;
-        
-        set_default_values(c_data);
-        
+
+	set_default_values(c_data);
+
 	while (SDL_PollEvent(&event)) {
 		if (event.type == SDL_QUIT)
 			c_data->exit = 1;
 		else if (event.type == SDL_MOUSEBUTTONUP)
 			treat_mouse_click_event(event, c_data);
-	}		
+	}
 }

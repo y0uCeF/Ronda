@@ -27,14 +27,14 @@ player* player_init(type_t t)
 {
 	unsigned short i;
 	player *p = malloc(sizeof(player));
-        
-        TTF_Init();
+
+	TTF_Init();
 	for (i = 0; i < MAX_NB_CARDS_HAND; i++) {
 		p->hand[i].value = EMPTY;
 		p->hand[i].surf = NULL;
 		p->hand[i].position = NULL;
 	}
-        	
+
 	p->nb_cards_in_hand = 0;
 	p->score.gained_cards = 0;
 	p->score.points = 0;
@@ -45,12 +45,12 @@ player* player_init(type_t t)
 	p->sel_table = -1;
 	p->bonus_card = -1;
 	p->bonus_type = NONE;
-        p->extra_bonus = NO_EXTRA;
-        p->bonus_surf = NULL;
-        p->bonus_shown = 0;
-        p->bonus_show_frames = 0;
+	p->extra_bonus = NO_EXTRA;
+	p->bonus_surf = NULL;
+	p->bonus_shown = 0;
+	p->bonus_show_frames = 0;
 	
-        p->score_box = IMG_Load("data/scorebox.png");
+	p->score_box = IMG_Load("data/scorebox.png");
 	return p;	
 }
 
@@ -64,7 +64,7 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
 	for(i=0; i<MAX_NB_CARDS_HAND;i++) {
 		posx = PLAYER_XPOS(i);
 		
-		if (p->type == USER) {			
+		if (p->type == USER) {
 			posy = 450;
 			back = 0;
 		} else {
@@ -78,58 +78,58 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
 	}
         
 	*nb_cards_remaining -= i;
-        return 1;
+	return 1;
 }
 
 static void player_show_score(player *p, SDL_Surface *scr)
 {
-        char s[13] = "";
-        int y = PLAYER_SCORE_Y(p->type);
-        
-        /* gained cards number */
-        sprintf(s, "cards   : %d", p->score.gained_cards);
-        show_white_text("data/georgiai.ttf", 18, s, PLAYER_SCORE_X, y, scr);
-        
-        /* points */
-        y += 35;
-        sprintf(s, "points : %d", p->score.points);
-        show_white_text("data/georgiai.ttf", 18, s, PLAYER_SCORE_X, y, scr);
+	char s[13] = "";
+	int y = PLAYER_SCORE_Y(p->type);
+
+	/* gained cards number */
+	sprintf(s, "cards   : %d", p->score.gained_cards);
+	show_white_text("data/georgiai.ttf", 18, s, PLAYER_SCORE_X, y, scr);
+
+	/* points */
+	y += 35;
+	sprintf(s, "points : %d", p->score.points);
+	show_white_text("data/georgiai.ttf", 18, s, PLAYER_SCORE_X, y, scr);
 }
 
 static void player_show_bonus(player *p, SDL_Surface *scr)
 {
-        char *s = calloc(8, sizeof(char));
-        int y = PLAYER_BONUS_Y(p->type);
+	char *s = calloc(8, sizeof(char));
+	int y = PLAYER_BONUS_Y(p->type);
         
-        /* bonus type? */
-        if (p->extra_bonus == ESTE)
-                strcat(s, "Este");
-        else if (p->extra_bonus == MISSA)
-                strcat(s, "Missa");
-        else if (p->bonus_type == RONDA)
-                strcat(s, "Ronda");
-        else if (p->bonus_type == TRINGLA)
-                strcat(s, "Tringla");
-        else
-                return;
+	/* bonus type? */
+	if (p->extra_bonus == ESTE)
+		strcat(s, "Este");
+	else if (p->extra_bonus == MISSA)
+		strcat(s, "Missa");
+	else if (p->bonus_type == RONDA)
+		strcat(s, "Ronda");
+	else if (p->bonus_type == TRINGLA)
+		strcat(s, "Tringla");
+	else
+		return;
+
+	/* displaying bonus for 100 frames */
+	if (p->bonus_shown) {
+		p->extra_bonus = NO_EXTRA;
+		goto end;
+	}
         
-        /* displaying bonus for 100 frames */
-        if (p->bonus_shown) {
-                p->extra_bonus = NO_EXTRA;
-                goto end;
-        }
-        
-        if (!passed(BONUS_SHOW_TIME, &p->bonus_show_frames)) {
-                p->bonus_surf = set_text_surf("data/georgiai.ttf", 20, s, 255, 255, 255);
-                SDL_Rect pos = {PLAYER_BONUS_X + (130 - p->bonus_surf->w)/2 , y};
-                SDL_BlitSurface(p->bonus_surf, NULL, scr, &pos);
-                SDL_FreeSurface(p->bonus_surf);
-        }
-        else {
-                p->bonus_shown = 1;
-        }
-        
-end:    free(s);
+	if (!passed(BONUS_SHOW_TIME, &p->bonus_show_frames)) {
+		p->bonus_surf = set_text_surf("data/georgiai.ttf", 20, s, 255, 255, 255);
+		SDL_Rect pos = {PLAYER_BONUS_X + (130 - p->bonus_surf->w)/2 , y};
+		SDL_BlitSurface(p->bonus_surf, NULL, scr, &pos);
+		SDL_FreeSurface(p->bonus_surf);
+	}
+	else {
+		p->bonus_shown = 1;
+	}
+
+end:free(s);
 }
 
 bool player_render(player *p, SDL_Surface *scr)
@@ -142,10 +142,10 @@ bool player_render(player *p, SDL_Surface *scr)
 	if(SDL_BlitSurface(p->score_box, NULL, scr, &p->pos_score_box) == -1) 
 		return 0;
 
-        player_show_score(p, scr);
-        
-        player_show_bonus(p, scr);
-                	
+	player_show_score(p, scr);
+
+	player_show_bonus(p, scr);
+
 	return 1;
 }
 
@@ -154,7 +154,7 @@ void player_free(player *p)
 	unsigned short i;
 	for (i=0; i < p->nb_cards_in_hand;i++) {
 		if((p->hand[i].surf != NULL) && (p->hand[i].value != EMPTY)
-			&& (p->type != COMPUTER))	
+				&& (p->type != COMPUTER))	
 			SDL_FreeSurface(p->hand[i].surf); 
 		if(p->hand[i].position != NULL) 
 			free(p->hand[i].position);
@@ -162,7 +162,7 @@ void player_free(player *p)
 	if(p->score_box != NULL) 
 		SDL_FreeSurface(p->score_box);
 	free(p);
-        TTF_Quit();	
+	TTF_Quit();
 }
 
 inline card_num get_sel_hand_val(player p)
@@ -170,7 +170,7 @@ inline card_num get_sel_hand_val(player p)
 	if (p.sel_hand != -1)
 		return p.hand[p.sel_hand].value;
 	else 
-		return -1;	
+		return -1;
 }
 
 inline SDL_Surface* get_sel_hand_surf(player p)
@@ -179,7 +179,7 @@ inline SDL_Surface* get_sel_hand_surf(player p)
 		return p.hand[p.sel_hand].surf;
 	else
 		return NULL;
-}		
+}
 
 bool ronda(player *p)
 {
@@ -207,14 +207,13 @@ bool tringla(player *p)
 
 void set_bonus(player *p)
 {
-        p->bonus_shown = 0;
+	p->bonus_shown = 0;
 	if(tringla(p))
 		p->bonus_type = TRINGLA;
 	else if (ronda(p))
 		p->bonus_type = RONDA;
-        else
-                p->bonus_shown = 1;
-                
+	else
+		p->bonus_shown = 1;
 }
 
 void set_final_score(player *p)

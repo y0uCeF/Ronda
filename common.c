@@ -14,7 +14,7 @@ inline int rand_a_b(int a, int b)
 
 inline bool between(unsigned short x, unsigned short a, unsigned short b) 
 {
-	return 	((x >= a) && ( x<= b));
+	return ((x >= a) && ( x<= b));
 }
 
 inline bool equal(card_num a, card_num b) 
@@ -49,8 +49,8 @@ short exist(card tab[], unsigned short size, card_num value)
 	short i;
 	for (i=0; i < size; i++) 
 		if((tab[i].value != EMPTY) && equal(tab[i].value, value)) 
-				return i;
-    return -1;
+			return i;
+	return -1;
 }
 
 bool empty(card tab[], unsigned short size) 
@@ -58,7 +58,7 @@ bool empty(card tab[], unsigned short size)
 	unsigned short i;
 	for (i=0; i < size; i++) 
 		if (tab[i].value != -1) 
-                        return 0;
+			return 0;
 	return 1;
 }
 
@@ -80,6 +80,7 @@ char* get_file(card_num n)
 	strcat(file, "data/cards/");
 	strcat(file, num);
 	strcat(file, ".gif");
+	
 	return file;
 }
 
@@ -117,25 +118,25 @@ bool set_card(card *c, card_num num, short xpos, short ypos, bool back)
 
 bool passed(short max_frames, int *nb_frames)
 {
-        if (*nb_frames < max_frames) {
-		(*nb_frames)++;
-                return 0;
-        } else {
-                *nb_frames = 0;
-                return 1;
-        }
+	if (*nb_frames < max_frames) {
+	(*nb_frames)++;
+		return 0;
+	} else {
+		*nb_frames = 0;
+		return 1;
+	}
 }
 
 SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
-                                short g, short b)
+								short g, short b)
 {
-        TTF_Font* font = TTF_OpenFont(font_name, size);
+	TTF_Font* font = TTF_OpenFont(font_name, size);
 	SDL_Color foreground = {r, g, b};
 	
 	SDL_Surface *surf = TTF_RenderText_Blended(font, text, foreground);
         
-        TTF_CloseFont(font);
-        return surf;
+	TTF_CloseFont(font);
+	return surf;
 }
 
 void show_text(char *font, short size, char *txt, short posx, short posy, 
@@ -144,11 +145,11 @@ void show_text(char *font, short size, char *txt, short posx, short posy,
 	SDL_Rect pos = {posx, posy};
 	SDL_Surface *surf = set_text_surf(font, size, txt, r, g, b);
 	SDL_BlitSurface(surf, NULL, scr, &pos);
-    SDL_FreeSurface(surf);	
+	SDL_FreeSurface(surf);
 }
 
-inline void show_white_text(char *font, short size, char *txt, short posx, short posy, 
-		SDL_Surface *scr)
+inline void show_white_text(char *font, short size, char *txt, short posx, 
+		short posy, SDL_Surface *scr)
 {
 	show_text(font, size, txt, posx, posy, 255, 255, 255, scr);
 }

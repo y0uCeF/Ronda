@@ -34,84 +34,84 @@ extern stack s;
 void winner_init()
 {
 	winner_surf = IMG_Load("data/winner.png");
-        selector = IMG_Load("data/selector.png");
-        
-        TTF_Init();
-        new_game = 0;
-        entry = NEW_GAME;
-        selector_pos.x = SELECTOR_NEW_GAME_X;
-        selector_pos.y = SELECTOR_NEW_GAME_Y;
-        
-        if(user_score.points > computer_score.points)
-			game_result = USER_WINS;
-		else if (user_score.points < computer_score.points)
-			game_result = COMPUTER_WINS;
-		else if (user_score.gained_cards > computer_score.gained_cards)
-			game_result = USER_WINS;
-		else if (user_score.gained_cards < computer_score.gained_cards)
-			game_result = COMPUTER_WINS;
-		else
-			game_result = DRAWN;
+	selector = IMG_Load("data/selector.png");
+
+	TTF_Init();
+	new_game = 0;
+	entry = NEW_GAME;
+	selector_pos.x = SELECTOR_NEW_GAME_X;
+	selector_pos.y = SELECTOR_NEW_GAME_Y;
+
+	if(user_score.points > computer_score.points)
+		game_result = USER_WINS;
+	else if (user_score.points < computer_score.points)
+		game_result = COMPUTER_WINS;
+	else if (user_score.gained_cards > computer_score.gained_cards)
+		game_result = USER_WINS;
+	else if (user_score.gained_cards < computer_score.gained_cards)
+		game_result = COMPUTER_WINS;
+	else
+		game_result = DRAWN;
 }
 
 void winner_handle_input()
 {
 	SDL_Event event;
-        
-        
+
+
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_QUIT:
-                        game_exit();
-		break;	
+			game_exit();
+		break;
 		
 		case SDL_KEYDOWN:
 			switch(event.key.keysym.sym){
+
+				case SDLK_UP:
+					entry = NEW_GAME;
+				break;
                         
-                        case SDLK_UP:
-                                entry = NEW_GAME;
-                        break;
-                        
-                        case SDLK_DOWN:
-                                entry = EXIT_GAME;
-                        break;
-                        
-                        case SDLK_RETURN:
-                              	if (entry == EXIT_GAME)
-                                        game_exit();
-                                else
-                                        new_game = 1;
-			break;
+				case SDLK_DOWN:
+					entry = EXIT_GAME;
+				break;
+
+				case SDLK_RETURN:
+					if (entry == EXIT_GAME)
+						game_exit();
+					else
+						new_game = 1;
+				break;
 			
-			default:
-			break;
+				default:
+				break;
 			}	
 		break;
-		
+
 		default:
 		break;
 		}
-	}		
+	}
 }
 
 void winner_update()
 {
-        if (new_game) {
-		/*remove winner state*/
-                top(s).free(); 
-                pop(&s);
+	if (new_game) {
+	/*remove winner state*/
+		top(s).free(); 
+		pop(&s);
 		/*re-init main_game state*/
-                top(s).free();
-                top(s).init();
-        }
-        
+		top(s).free();
+		top(s).init();
+	}
+
 	if (entry == EXIT_GAME) {
-                selector_pos.x = SELECTOR_EXIT_GAME_X;
-                selector_pos.y = SELECTOR_EXIT_GAME_Y;
-        } else {
-                selector_pos.x = SELECTOR_NEW_GAME_X;
-                selector_pos.y = SELECTOR_NEW_GAME_Y;
-        }
+		selector_pos.x = SELECTOR_EXIT_GAME_X;
+		selector_pos.y = SELECTOR_EXIT_GAME_Y;
+	} else {
+		selector_pos.x = SELECTOR_NEW_GAME_X;
+		selector_pos.y = SELECTOR_NEW_GAME_Y;
+	}
 }
 
 static void show_winner_msg(SDL_Surface *scr)
@@ -123,11 +123,11 @@ static void show_winner_msg(SDL_Surface *scr)
 		sprintf(buf, "Sorry, You Loose");
 	else
 		sprintf(buf, "Drawn");
-	
+
 	SDL_Surface *surf = set_text_surf("data/urw-bookman-l.ttf", 36, buf, 255, 255, 255);
 	SDL_Rect pos = {WINNER_MSG_X(surf->w), WINNER_MSG_Y};
 	SDL_BlitSurface(surf, NULL, scr, &pos);
-    SDL_FreeSurface(surf);
+	SDL_FreeSurface(surf);
 }
 
 static void show_final_score(SDL_Surface *scr)
@@ -136,13 +136,13 @@ static void show_final_score(SDL_Surface *scr)
 	SDL_Rect pos;
 	sprintf(buf, "Your score : %d", user_score.points);
 	show_white_text("data/georgiai.ttf", 24, buf, USER_SCORE_X, PLAYER_SCORE_Y, scr);
-    
-    sprintf(buf, "Computer score : %d", computer_score.points);
-    SDL_Surface *surf = set_text_surf("data/georgiai.ttf", 24, buf, 255, 255, 255);
-    pos.x = COMPUTER_SCORE_X(surf->w);
-    pos.y = PLAYER_SCORE_Y;
-    SDL_BlitSurface(surf, NULL, scr, &pos);
-    SDL_FreeSurface(surf);
+
+	sprintf(buf, "Computer score : %d", computer_score.points);
+	SDL_Surface *surf = set_text_surf("data/georgiai.ttf", 24, buf, 255, 255, 255);
+	pos.x = COMPUTER_SCORE_X(surf->w);
+	pos.y = PLAYER_SCORE_Y;
+	SDL_BlitSurface(surf, NULL, scr, &pos);
+	SDL_FreeSurface(surf);
 }
 
 bool winner_render(SDL_Surface *screen)

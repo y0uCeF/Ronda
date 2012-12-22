@@ -68,13 +68,11 @@ void player_turn(player *p, card table[])
 	card_num selected_hand = get_sel_hand_val(*p);
 	card_num selected_table = table[p->sel_table].value;
 
-	short y = PLAYER_YPOS(p->type);	
-
 	/*what will the player do, depending on the states*/
 	switch (state) {
 	case NO_VALID_INPUT:       
 		if ((p->sel_hand != -1) && (p->sel_table != -1))
-				update_state(*p, table);
+			update_state(*p, table);
 	break;
 
 	case PUT_CARD:
@@ -89,7 +87,7 @@ void player_turn(player *p, card table[])
 		
 		table[p->sel_table].value = selected_hand;
 		dropped_card = selected_hand;
-		set_card(&p->hand[p->sel_hand], EMPTY, -1, y, 0);
+		set_card(&p->hand[p->sel_hand], EMPTY, -1, -1, 0);
 		p->nb_cards_in_hand--;
 
 		/*no further actions*/
@@ -99,6 +97,7 @@ void player_turn(player *p, card table[])
 	case GET_FIRST_CARD:
 		if (!passed(PAUSE_FRAMES_PLAYERS, &nb_frames) && (p->type == COMPUTER))
 			break;
+		
 		if(selected_table == dropped_card) {
 			p->score.points++;
 			p->extra_bonus = ESTE;
@@ -109,7 +108,7 @@ void player_turn(player *p, card table[])
 		last_card_taker = p;
 
 		/*removing both cards from hand/table */
-		set_card(&p->hand[p->sel_hand], EMPTY, -1, y, 0);
+		set_card(&p->hand[p->sel_hand], EMPTY, -1, -1, 0);
 		SDL_FreeSurface(table[p->sel_table].surf);
 		set_card(&table[p->sel_table], EMPTY, -1, -1, 0);
 		p->score.gained_cards += 2;
@@ -147,17 +146,16 @@ void player_turn(player *p, card table[])
 
 static unsigned short get_gain(card_num c, card table[])
 {
-	unsigned short i = 0, count = 0;
-	/*res: the more cards/points the player can gain, 
+	unsigned short count = 0;
+	/*res: the more cards/points the player can gain,
 		the more is the variable's value */
-	unsigned short res = 1; 
+	unsigned short res = 1;
 
 	/*how many cards can the player can get*/
 	if (c % 10 != 9) {
 		short index = exist(table, MAX_NB_CARDS_TABLE, c);
-		while ((index != -1) && (i <= (9 - c%10))) {
+		while ((index != -1) && (count <= (9 - c%10))) {
 			count++;
-			i++;
 			index = exist(table, MAX_NB_CARDS_TABLE, c+count);
 		}
 	}

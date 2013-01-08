@@ -78,7 +78,7 @@ void main_game_init()
 
 	empty_card = IMG_Load("data/cards/blank.gif");
 	back_card = IMG_Load("data/cards/back.gif");
-	selection = IMG_Load("data/cards/selection.png");
+	selection = IMG_Load("data/selection.png");
 	bg = IMG_Load("data/bg.png");
 
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {

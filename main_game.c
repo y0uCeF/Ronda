@@ -111,8 +111,8 @@ void main_game_init()
 		return;
 	
     /*setting bonus for the first round*/
-	set_bonus(user);
-	set_bonus(comp);
+	set_card_bonus(user);
+	set_card_bonus(comp);
 }
 
 void main_game_handle_input()
@@ -120,7 +120,7 @@ void main_game_handle_input()
 	controller_data_update(c_data);
 }
 
-static void main_game_user_turn()
+inline static void main_game_user_turn()
 {
 	player_turn(user, table);
 }
@@ -134,21 +134,23 @@ static void main_game_computer_turn()
 	player_turn(comp, table);
 }
 
-static inline bool round_end()
+inline static bool round_end()
 {
 	return (user->nb_cards_in_hand == 0) &&
 			(comp->nb_cards_in_hand == 0) && (state == NO_VALID_INPUT);
 }
 
-static inline bool game_end()
+inline static bool game_end()
 {
 	return (nb_cards_remaining == 0) && round_end();
 }
 
 void main_game_update()
 {
-	if (c_data->exit)
+	if (c_data->exit) {
 		game_exit();
+		return;
+	}
 
 	if (c_data->selected_card_hand != -1)
 		user->sel_hand = c_data->selected_card_hand;
@@ -185,10 +187,13 @@ void main_game_update()
 			player_distribute(card_list, comp, &nb_cards_remaining);
 
 			dropped_card = EMPTY;
-			set_bonus(user);
-			set_bonus(comp);
+			set_card_bonus(user);
+			set_card_bonus(comp);
 		}
-
+		
+		player_update_bonus(user);
+		player_update_bonus(comp);
+		
 		if (current_player == USER)
 			main_game_user_turn();
 		else 
@@ -219,7 +224,7 @@ bool main_game_render(SDL_Surface *screen)
 		return 0;
 	if (!player_render(comp, screen))
 		return 0;			
-	
+
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) 
 		if (SDL_BlitSurface(table[i].surf, NULL, screen, table[i].position) == -1) 
 			return 0;

@@ -39,8 +39,7 @@ static bool take_card(player *p, card table[])
 		/*no cards to take*/
 		if (empty(table, MAX_NB_CARDS_TABLE)) {
 			p->score.points++;
-			p->extra_bonus = MISSA;
-			p->bonus_shown = 0;
+			add_bonus(p, MISSA, -1);
 		}
 
 		current_card = EMPTY;
@@ -70,7 +69,7 @@ void player_turn(player *p, card table[])
 
 	/*what will the player do, depending on the states*/
 	switch (state) {
-	case NO_VALID_INPUT:       
+	case NO_VALID_INPUT:
 		if ((p->sel_hand != -1) && (p->sel_table != -1))
 			update_state(*p, table);
 	break;
@@ -100,8 +99,7 @@ void player_turn(player *p, card table[])
 		
 		if(selected_table == dropped_card) {
 			p->score.points++;
-			p->extra_bonus = ESTE;
-			p->bonus_shown = 0;
+			add_bonus(p, ESTE, selected_table);
 		}
 
 		dropped_card = EMPTY;
@@ -115,7 +113,7 @@ void player_turn(player *p, card table[])
 		p->nb_cards_in_hand--;
 
 		card_num tmp = selected_hand % 10;
-					
+		
 		/*take the rest of the cards if possible*/
 		if (tmp != 9) {
 			state = GET_CARDS;
@@ -123,8 +121,7 @@ void player_turn(player *p, card table[])
 		} else {
 			if (empty(table, MAX_NB_CARDS_TABLE)) {
 				p->score.points++;
-				p->extra_bonus = MISSA;
-				p->bonus_shown = 0;
+				add_bonus(p, MISSA, -1);
 			}
 			state = END_ACTIONS;
 		}
@@ -135,7 +132,7 @@ void player_turn(player *p, card table[])
 		if (!take_card(p, table)) 
 			state = END_ACTIONS;
 	break;
-        
+	
 	case END_ACTIONS:
 		current_player = !p->type;
 		p->sel_hand = p->sel_table = -1;
@@ -231,22 +228,22 @@ void take_all_cards(player *p, card table[])
 
 void handle_bonus(player *p1, player *p2)
 {
-	if ((p1->bonus_type == NONE) && (p2->bonus_type == NONE))
+	if ((p1->card_bonus.type == NONE) && (p2->card_bonus.type == NONE))
 		return;
 	
 	/*check the Readme file for points calculation*/
-	if (p1->bonus_type > p2->bonus_type)
-		p1->score.points += (p1->bonus_type == RONDA)? 1:5;
-	else if (p1->bonus_type < p2->bonus_type)
-		p2->score.points += (p2->bonus_type == RONDA)? 1:5;
-	else if (p1->bonus_card > p2->bonus_card)
-		p1->score.points += (p1->bonus_type == RONDA)? 2:5;
-	else if (p1->bonus_card < p2->bonus_card)
-		p2->score.points += (p2->bonus_type == RONDA)? 2:5;
+	if (p1->card_bonus.type > p2->card_bonus.type)
+		p1->score.points += (p1->card_bonus.type == RONDA)? 1:5;
+	else if (p1->card_bonus.type < p2->card_bonus.type)
+		p2->score.points += (p2->card_bonus.type == RONDA)? 1:5;
+	else if (p1->card_bonus.bonus_card > p2->card_bonus.bonus_card)
+		p1->score.points += (p2->card_bonus.type == RONDA)? 2:5;
+	else if (p1->card_bonus.bonus_card < p2->card_bonus.bonus_card)
+		p2->score.points += (p2->card_bonus.type == RONDA)? 2:5;
 		
-	p1->bonus_card = -1;
-	p1->bonus_type = NONE;
-	p2->bonus_card = -1;
-	p2->bonus_type = NONE;
+	p1->card_bonus.bonus_card = -1;
+	p1->card_bonus.type = NONE;
+	p2->card_bonus.bonus_card = -1;
+	p2->card_bonus.type = NONE;
 	
 }

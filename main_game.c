@@ -161,7 +161,7 @@ void main_game_update()
 	if (game_end()) {
 		if (nb_cards(table, MAX_NB_CARDS_TABLE) != 0)
 			take_all_cards(last_card_taker, table);
-		handle_bonus(user, comp);
+		handle_bonus(&user->score, &user->card_bonus, &comp->score, &comp->card_bonus);
 		SDL_Delay(800);
 		game_render();
 		SDL_Delay(1500);
@@ -180,7 +180,7 @@ void main_game_update()
 	} else {
 		if (round_end()) {
 			SDL_Delay(800);
-			handle_bonus(user, comp);
+			handle_bonus(&user->score, &user->card_bonus, &comp->score, &comp->card_bonus);
 
 			/*setting new round*/
 			player_distribute(card_list, user, &nb_cards_remaining);

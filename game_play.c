@@ -226,24 +226,28 @@ void take_all_cards(player *p, card table[])
 		}	
 }
 
-void handle_bonus(player *p1, player *p2)
+void handle_bonus(score_t *p1_score, bonus_t *p1_bonus, score_t *p2_score, bonus_t *p2_bonus)
 {
-	if ((p1->card_bonus.type == NONE) && (p2->card_bonus.type == NONE))
+	if ((p1_bonus->type == NONE) && (p2_bonus->type == NONE))
 		return;
 	
-	/*check the Readme file for points calculation*/
-	if (p1->card_bonus.type > p2->card_bonus.type)
-		p1->score.points += (p1->card_bonus.type == RONDA)? 1:5;
-	else if (p1->card_bonus.type < p2->card_bonus.type)
-		p2->score.points += (p2->card_bonus.type == RONDA)? 1:5;
-	else if (p1->card_bonus.bonus_card > p2->card_bonus.bonus_card)
-		p1->score.points += (p2->card_bonus.type == RONDA)? 2:5;
-	else if (p1->card_bonus.bonus_card < p2->card_bonus.bonus_card)
-		p2->score.points += (p2->card_bonus.type == RONDA)? 2:5;
-		
-	p1->card_bonus.bonus_card = -1;
-	p1->card_bonus.type = NONE;
-	p2->card_bonus.bonus_card = -1;
-	p2->card_bonus.type = NONE;
+	/*check the HowToPlay file for points calculation*/
+	if (p1_bonus->type > p2_bonus->type)
+		p1_score->points += ((p1_bonus->type == RONDA)? 1:5) +
+			((p2_bonus->type == NONE)? 0:1);
+	else if (p1_bonus->type < p2_bonus->type)
+		p2_score->points += ((p2_bonus->type == RONDA)? 1:5) +
+			((p1_bonus->type == NONE)? 0:1);
+	else if (p1_bonus->bonus_card > p2_bonus->bonus_card)
+		p1_score->points += (p1_bonus->type == RONDA)? 2:10;
+	else if (p1_bonus->bonus_card < p2_bonus->bonus_card)
+		p2_score->points += (p2_bonus->type == RONDA)? 2:10;
+	else 
+		p1_score->points = p2_score->points = (p1_bonus->type == RONDA)? 1:5;
+	
+	p1_bonus->bonus_card = -1;
+	p1_bonus->type = NONE;
+	p2_bonus->bonus_card = -1;
+	p2_bonus->type = NONE;
 	
 }

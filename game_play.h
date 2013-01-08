@@ -25,5 +25,5 @@ void take_all_cards(player *p, card table[]);
 /*
  * calculates points regarding bonus
  */ 
-void handle_bonus(player *p1, player *p2);
+void handle_bonus(score_t *p1_score, bonus_t *p1_bonus, score_t *p2_score, bonus_t *p2_bonus);
 #endif

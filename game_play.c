@@ -39,7 +39,7 @@ static bool take_card(player *p, card table[])
 		/*no cards to take*/
 		if (empty(table, MAX_NB_CARDS_TABLE)) {
 			p->score.points++;
-			add_bonus(p, MISSA, -1);
+			add_bonus(p, MESA, -1);
 		}
 
 		current_card = EMPTY;
@@ -121,7 +121,7 @@ void player_turn(player *p, card table[])
 		} else {
 			if (empty(table, MAX_NB_CARDS_TABLE)) {
 				p->score.points++;
-				add_bonus(p, MISSA, -1);
+				add_bonus(p, MESA, -1);
 			}
 			state = END_ACTIONS;
 		}

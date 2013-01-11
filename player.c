@@ -101,7 +101,7 @@ void add_bonus(player *p, bonus_type_t type, short c)
 		bonus_init(&b, type, c);
 		b.bonus_shown = 0;
 		p->card_bonus = b;
-	} else if(type == ESTE || type == MISSA) {
+	} else if(type == ESTE || type == MESA) {
 		int i;
 		for (i = 0; i < MAX_BONUS && p->action_bonus[i] != NULL ; i++);
 		p->action_bonus[i] = malloc(sizeof(bonus_t));
@@ -184,8 +184,8 @@ static void player_show_bonus(player *p, SDL_Surface *scr)
 				s = calloc(6, sizeof(char));
 				if(p->action_bonus[i]->type == ESTE)
 					strcat(s, "Este");
-				else if (p->action_bonus[i]->type == MISSA)
-					strcat(s, "Missa");
+				else if (p->action_bonus[i]->type == MESA)
+					strcat(s, "Mesa");
 			}
 			
 			display_bonus(p->action_bonus[i], s, y, scr);

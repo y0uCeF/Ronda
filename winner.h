@@ -5,6 +5,7 @@
 #include "define.h"
 #include "game_state.h"
 
+
 void winner_init();
 
 void winner_handle_input();

@@ -74,7 +74,7 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
 	unsigned short posx, posy;
 	bool back;
 
-	for(i=0; i<MAX_NB_CARDS_HAND;i++) {
+	for (i=0; i<MAX_NB_CARDS_HAND;i++) {
 		posx = PLAYER_XPOS(i);
 		
 		if (p->type == USER) {
@@ -96,12 +96,12 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
 
 void add_bonus(player *p, bonus_type_t type, short c)
 {
-	if(type == RONDA || type == TRINGLA) {
+	if (type == RONDA || type == TRINGLA) {
 		bonus_t b;
 		bonus_init(&b, type, c);
 		b.bonus_shown = 0;
 		p->card_bonus = b;
-	} else if(type == ESTE || type == MISSA) {
+	} else if (type == ESTE || type == MISSA) {
 		int i;
 		for (i = 0; i < MAX_BONUS && p->action_bonus[i] != NULL ; i++);
 		p->action_bonus[i] = malloc(sizeof(bonus_t));
@@ -113,8 +113,8 @@ void add_bonus(player *p, bonus_type_t type, short c)
 void player_update_bonus(player *p)
 {
 	int i;
-	for(i = 0; i < MAX_BONUS ; i++) {
-		if(p->action_bonus[i] != NULL)
+	for (i = 0; i < MAX_BONUS ; i++) {
+		if (p->action_bonus[i] != NULL)
 			if (p->action_bonus[i]->bonus_shown){
 				free(p->action_bonus[i]);
 				p->action_bonus[i] = NULL;
@@ -140,7 +140,7 @@ static void player_show_score(player *p, SDL_Surface *scr)
 static void display_bonus(bonus_t *b, char *s, short ypos, SDL_Surface *scr)
 {
 	if (!passed(BONUS_SHOW_TIME, &b->show_frames)) {
-		if(s != NULL)
+		if (s != NULL)
 			b->surf = set_text_surf("data/georgiai.ttf", 20, s, 255, 255, 255);
 		SDL_Rect pos = {PLAYER_BONUS_X + (130 - b->surf->w)/2 , ypos};
 		SDL_BlitSurface(b->surf, NULL, scr, &pos);
@@ -157,11 +157,11 @@ static void player_show_bonus(player *p, SDL_Surface *scr)
 	int y = PLAYER_BONUS_Y(p->type);
 	int diff = (p->type == USER)? -30 : 45;
 	
-	if(!p->card_bonus.bonus_shown) {
+	if (!p->card_bonus.bonus_shown) {
 		char *s = NULL;
-		if(!p->card_bonus.surf) {
+		if (!p->card_bonus.surf) {
 			s = calloc(8, sizeof(char));
-			if(p->card_bonus.type == RONDA)
+			if (p->card_bonus.type == RONDA)
 				strcat(s, "Ronda");
 			else if (p->card_bonus.type == TRINGLA)
 				strcat(s, "Tringla");
@@ -169,27 +169,27 @@ static void player_show_bonus(player *p, SDL_Surface *scr)
 
 		display_bonus(&p->card_bonus, s, y, scr);
 		y += diff;
-		if(s == NULL)
+		if (s == NULL)
 			free(s);
 	}
 	
 	int i;
 	for (i = 0; i < MAX_BONUS; i++, y += diff) {
-		if(p->action_bonus[i] == NULL) 
+		if (p->action_bonus[i] == NULL) 
 			continue;
 
-		if(!p->action_bonus[i]->bonus_shown) {
+		if (!p->action_bonus[i]->bonus_shown) {
 			char *s = NULL;
-			if(!p->action_bonus[i]->surf) {
+			if (!p->action_bonus[i]->surf) {
 				s = calloc(6, sizeof(char));
-				if(p->action_bonus[i]->type == ESTE)
+				if (p->action_bonus[i]->type == ESTE)
 					strcat(s, "Este");
 				else if (p->action_bonus[i]->type == MISSA)
 					strcat(s, "Missa");
 			}
 			
 			display_bonus(p->action_bonus[i], s, y, scr);
-			if(s == NULL)
+			if (s == NULL)
 				free(s);
 		}		
 	}
@@ -203,7 +203,7 @@ bool player_render(player *p, SDL_Surface *scr)
 	for (i=0; i < MAX_NB_CARDS_HAND; i++)
 		if (SDL_BlitSurface(p->hand[i].surf, NULL, scr, p->hand[i].position) == -1) 
 			return 0; 
-	if(SDL_BlitSurface(p->score_box, NULL, scr, &p->pos_score_box) == -1) 
+	if (SDL_BlitSurface(p->score_box, NULL, scr, &p->pos_score_box) == -1) 
 		return 0;
 
 	player_show_score(p, scr);
@@ -217,13 +217,13 @@ void player_free(player *p)
 {
 	unsigned short i = 0;
 	for (i = 0; i < p->nb_cards_in_hand; i++) {
-		if((p->hand[i].surf != NULL) && (p->hand[i].value != EMPTY)
+		if ((p->hand[i].surf != NULL) && (p->hand[i].value != EMPTY)
 				&& (p->type != COMPUTER))
 			SDL_FreeSurface(p->hand[i].surf); 
-		if(p->hand[i].position != NULL) 
+		if (p->hand[i].position != NULL) 
 			free(p->hand[i].position);
 	}
-	if(p->score_box != NULL) 
+	if (p->score_box != NULL) 
 		SDL_FreeSurface(p->score_box);
 	free(p);
 	TTF_Quit();
@@ -247,7 +247,7 @@ inline SDL_Surface* get_sel_hand_surf(player p)
 
 bool ronda(player *p, card_num *c)
 {
-	if(equal(p->hand[0].value, p->hand[1].value)) 
+	if (equal(p->hand[0].value, p->hand[1].value)) 
 		*c = p->hand[0].value % 10;
 	else if (equal(p->hand[0].value, p->hand[2].value))
 		*c = p->hand[0].value % 10;
@@ -273,7 +273,7 @@ void set_card_bonus(player *p)
 {
 	card_num c = EMPTY;
 	
-	if(tringla(p, &c))
+	if (tringla(p, &c))
 		add_bonus(p, TRINGLA, c);
 	else if (ronda(p, &c))
 		add_bonus(p, RONDA, c);

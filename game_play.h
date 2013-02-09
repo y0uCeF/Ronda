@@ -7,6 +7,7 @@ typedef enum {
         NO_VALID_INPUT, PUT_CARD, GET_FIRST_CARD, GET_CARDS, END_ACTIONS
 } player_state_type;
 
+
 /*
  * executes a player turn
  */ 

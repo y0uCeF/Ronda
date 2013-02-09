@@ -6,6 +6,10 @@
 #include "player.h"
 #include "define.h"
 
+
+extern score_t user_score;
+extern score_t computer_score;
+
 /* functions definition */
 
 /* 

@@ -1,7 +1,6 @@
 #include "game.h"
 #include "game_state.h"
 
-extern stack s;
 
 int main() 
 {
@@ -10,7 +9,7 @@ int main()
 	while (!stack_empty(s)) {
 		game_handle_input();
 		game_update();
-		if(!game_render())
+		if (!game_render())
 			return 1; 
 	}
 	

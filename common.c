@@ -7,28 +7,13 @@
 SDL_Surface *back_card = NULL;
 SDL_Surface *empty_card = NULL;
 
-inline int rand_a_b(int a, int b)
-{
-	return rand() % (b - a) + a;
-}
-
-inline bool between(unsigned short x, unsigned short a, unsigned short b) 
-{
-	return ((x >= a) && ( x<= b));
-}
-
-inline bool equal(card_num a, card_num b) 
-{
-	return ((a % 10) == (b % 10));
-}
-
 void mix(card_num array[], unsigned short size)
 {
 	int i=0;
 	int random_number=0;
 	int tmp=0;
 
-	for(i = 0; i < size; i++) {
+	for (i = 0; i < size; i++) {
 		random_number=rand_a_b(0, size);
 		 
 		tmp = array[i];
@@ -48,7 +33,7 @@ short exist(card tab[], unsigned short size, card_num value)
 {
 	short i;
 	for (i=0; i < size; i++) 
-		if((tab[i].value != EMPTY) && equal(tab[i].value, value)) 
+		if ((tab[i].value != EMPTY) && equal(tab[i].value, value)) 
 			return i;
 	return -1;
 }
@@ -94,7 +79,7 @@ bool set_card(card *c, card_num num, short xpos, short ypos, bool back)
 {
 	c->value=num;
 	
-	if(((xpos != -1) || (ypos != -1)) && (!c->position))
+	if (((xpos != -1) || (ypos != -1)) && (!c->position))
 		c->position=malloc(sizeof(SDL_Rect));
 	
 	if (xpos != -1)
@@ -111,7 +96,7 @@ bool set_card(card *c, card_num num, short xpos, short ypos, bool back)
 		c->surf = IMG_Load(file);
 	}
 	
-	if(c->surf == NULL) 
+	if (c->surf == NULL) 
 		return sdl_error("file not found");
 	return 1;	
 }

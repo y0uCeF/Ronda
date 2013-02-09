@@ -13,7 +13,7 @@
 #define FRAME_RATE 1000/FPS
 
 static SDL_Surface *screen = NULL;
-stack s;
+stack s = NULL;
 static int oldTime = 0;
 
 static bool env_init() 
@@ -68,15 +68,15 @@ void game_update()
 
 bool game_render() 
 {
-	if(!stack_empty(s))
-		if(!top(s).render(screen))
+	if (!stack_empty(s))
+		if (!top(s).render(screen))
 			return 0;
 	return 1;		
 }
 
 void game_exit()
 {
-	while(!stack_empty(s)) {
+	while (!stack_empty(s)) {
 		top(s).free();
 		pop(&s);
 	}

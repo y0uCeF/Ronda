@@ -5,19 +5,16 @@
 
 
 /*
- * checks if  a <= x <= b
- */
-inline bool between(unsigned short x, unsigned short a, unsigned short b);
+ * some useful macros
+ */ 	
 
-/*
- * checks of a == b
- */ 
-inline bool equal(int a, int b);
+#define rand_a_b(a, b) (rand() % ((b) - (a)) + (a))
+#define between(x, a, b) (((x) >= (a)) && ((x) <= (b)))
+#define equal(a, b) (((a) % 10) == ((b) % 10))
 
-/*
- * returns a random number between a and b
- */ 
-inline int rand_a_b(int a, int b);
+
+extern SDL_Surface *back_card;// = NULL;
+extern SDL_Surface *empty_card;// = NULL;
 
 /*
  * mixes cards in array
@@ -27,7 +24,6 @@ void mix(card_num array[], unsigned short size);
 /*
  * swaps contents of a and b
  */ 
-
 void swap(card_num *a, card_num *b);
 
 /*

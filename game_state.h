@@ -3,6 +3,7 @@
 
 #include <SDL/SDL.h>
 #include "define.h"
+
 typedef struct {
 	void (*init)();
 	void (*handle_input)();
@@ -16,6 +17,8 @@ typedef struct elm {
 	struct elm *prev;
 } elm;
 typedef elm* stack;
+
+extern stack s;
 
 short stack_empty(stack s);
 

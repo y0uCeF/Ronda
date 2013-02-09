@@ -22,14 +22,12 @@
 #define TABLE_YPOS(index) (index <= 4)? TABLE_FIRSTROW:TABLE_SECONDROW
 
 /*extern data*/
-extern SDL_Surface *empty_card;
-extern SDL_Surface *back_card;
-extern stack s;
 extern player_state_type state;
 extern player *last_card_taker;
 extern card_num dropped_card;
-extern score_t user_score;
-extern score_t computer_score;
+
+score_t user_score = {0,0};
+score_t computer_score = {0,0};
 
 /*local data*/
 static player *user, *comp;
@@ -88,7 +86,7 @@ void main_game_init()
 	}
 
 	/*filling the list with cards*/
-	for(i =0, j = COIN1; j <= CUP12; j++, i++) 
+	for (i =0, j = COIN1; j <= CUP12; j++, i++) 
 		card_list[i] = j;
 
 	/*mixing the cards*/
@@ -103,11 +101,11 @@ void main_game_init()
 	current_player = USER;
 
 	/*distributing cards*/
-	if(!table_distribute(card_list, table, &nb_cards_remaining)) 
+	if (!table_distribute(card_list, table, &nb_cards_remaining)) 
 		return;
-	if(!player_distribute(card_list, user, &nb_cards_remaining)) 
+	if (!player_distribute(card_list, user, &nb_cards_remaining)) 
 		return;
-	if(!player_distribute(card_list, comp, &nb_cards_remaining)) 
+	if (!player_distribute(card_list, comp, &nb_cards_remaining)) 
 		return;
 	
     /*setting bonus for the first round*/
@@ -247,9 +245,9 @@ void main_game_free()
 	SDL_FreeSurface(bg);
 
 	for (i=0;i < MAX_NB_CARDS_TABLE;i++) {
-		if((table[i].surf != NULL) && (table[i].value != EMPTY))
+		if ((table[i].surf != NULL) && (table[i].value != EMPTY))
 			SDL_FreeSurface(table[i].surf);
-		if(table[i].position != NULL) 
+		if (table[i].position != NULL) 
 			free(table[i].position);
 	}
 	

@@ -62,11 +62,11 @@ static short get_selected_table(int x, int y)
 	short temp=-1, c=0;
 	if (between(x, 40, 130)) 
 		temp=0;
-	else if(between(x, 145, 235)) 
+	else if (between(x, 145, 235)) 
 		temp=1;
 	else if (between(x, 250, 340)) 
 		temp=2;
-	else if(between(x, 355, 445)) 
+	else if (between(x, 355, 445)) 
 		temp=3;
 	else if (between(x, 460, 550)) 
 		temp=4;
@@ -88,7 +88,7 @@ static void treat_mouse_click_event(SDL_Event event, controller_data* c_data)
 	int x = event.button.x;
 	int y = event.button.y;	
 
-	switch(event.button.button) {
+	switch (event.button.button) {
 	case SDL_BUTTON_LEFT:
 		if (valid_card_hand(x, y)) 
 			c_data->selected_card_hand = get_selected_hand(x);	

@@ -25,8 +25,8 @@ player *last_card_taker = NULL;
 static bool take_card(player *p, card table[]) 
 {	
 	int index = exist(table, MAX_NB_CARDS_TABLE, current_card);
-	if(index != -1) {
-		if(passed(PAUSE_FRAMES_CARDS, &nb_frames)) {
+	if (index != -1) {
+		if (passed(PAUSE_FRAMES_CARDS, &nb_frames)) {
 			/*the card exists and it's time*/
 			SDL_FreeSurface(table[index].surf);
 			set_card(&table[index], EMPTY, -1, -1, 0);
@@ -97,7 +97,7 @@ void player_turn(player *p, card table[])
 		if (!passed(PAUSE_FRAMES_PLAYERS, &nb_frames) && (p->type == COMPUTER))
 			break;
 		
-		if(selected_table == dropped_card) {
+		if (selected_table == dropped_card) {
 			p->score.points++;
 			add_bonus(p, ESTE, selected_table);
 		}

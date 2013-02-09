@@ -19,17 +19,12 @@
 #define COMPUTER_SCORE_X(w) (WINDOW_WIDTH - 50 - w)
 #define PLAYER_SCORE_Y 20 
 
-score_t user_score = {0,0};
-score_t computer_score = {0,0};
-
 static SDL_Surface *winner_surf = NULL;
 static SDL_Surface *selector = NULL;
 static SDL_Rect selector_pos;
 static enum {NEW_GAME, EXIT_GAME} entry;
 static bool new_game ;
 static enum{USER_WINS, COMPUTER_WINS, DRAWN} game_result;
-
-extern stack s;
 
 void winner_init()
 {
@@ -42,7 +37,7 @@ void winner_init()
 	selector_pos.x = SELECTOR_NEW_GAME_X;
 	selector_pos.y = SELECTOR_NEW_GAME_Y;
 
-	if(user_score.points > computer_score.points)
+	if (user_score.points > computer_score.points)
 		game_result = USER_WINS;
 	else if (user_score.points < computer_score.points)
 		game_result = COMPUTER_WINS;
@@ -66,7 +61,7 @@ void winner_handle_input()
 		break;
 		
 		case SDL_KEYDOWN:
-			switch(event.key.keysym.sym){
+			switch (event.key.keysym.sym){
 
 				case SDLK_UP:
 					entry = NEW_GAME;
@@ -117,7 +112,7 @@ void winner_update()
 static void show_winner_msg(SDL_Surface *scr)
 {
 	char buf[27] = "";
-	if(game_result == USER_WINS)
+	if (game_result == USER_WINS)
 		sprintf(buf, "Congratulations, You Win");
 	else if (game_result == COMPUTER_WINS)
 		sprintf(buf, "Sorry, You Loose");
@@ -147,9 +142,9 @@ static void show_final_score(SDL_Surface *scr)
 
 bool winner_render(SDL_Surface *screen)
 {
-	if(SDL_BlitSurface(winner_surf, NULL, screen, NULL) == -1)
+	if (SDL_BlitSurface(winner_surf, NULL, screen, NULL) == -1)
 		return 0;
-	if(SDL_BlitSurface(selector, NULL, screen, &selector_pos) == -1)
+	if (SDL_BlitSurface(selector, NULL, screen, &selector_pos) == -1)
 		return 0;
 	
 	show_final_score(screen);

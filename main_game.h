@@ -30,7 +30,7 @@ void main_game_update();
 /*
  * draws everything on the screen
  */ 
-bool main_game_render(SDL_Surface *screen);
+void main_game_render(SDL_Surface *screen);
 
 /*
  * frees memory held by the game state

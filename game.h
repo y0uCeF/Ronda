@@ -30,12 +30,12 @@ void game_update();
 /*
  * renders the current state
  */ 
-bool game_render();
+void game_render();
 
 /*
- * pop all the states from the stack 
+ * pop all the states from the stack and exit
  */
-void game_exit();
+void game_exit(int status);
   
 /*
  * freeing the memory of the current state

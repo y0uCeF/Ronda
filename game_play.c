@@ -21,14 +21,13 @@ card_num dropped_card = EMPTY;  /* last card dropped */
 player *last_card_taker = NULL;
 
 
-
 static bool take_card(player *p, card table[]) 
-{	
+{
 	int index = exist(table, MAX_NB_CARDS_TABLE, current_card);
 	if (index != -1) {
 		if (passed(PAUSE_FRAMES_CARDS, &nb_frames)) {
 			/*the card exists and it's time*/
-			SDL_FreeSurface(table[index].surf);
+			free_surface(table[index].surf);
 			set_card(&table[index], EMPTY, -1, -1, 0);
 			p->score.gained_cards++;
 			if (current_card != 9)
@@ -51,7 +50,7 @@ void update_state(player p, card table[])
 {
 	card_num selected_hand = get_sel_hand_val(p);
 	card_num selected_table = table[p.sel_table].value;
-	
+
 	if ((selected_table == EMPTY) && 
 		(exist(table, MAX_NB_CARDS_TABLE, selected_hand) == -1))
 		state = PUT_CARD;
@@ -82,8 +81,8 @@ void player_turn(player *p, card table[])
 		if (p->type == USER)
 			table[p->sel_table].surf = get_sel_hand_surf(*p);
 		else
-			table[p->sel_table].surf = IMG_Load(get_file(selected_hand));
-		
+			table[p->sel_table].surf = load_image(get_file(selected_hand), __FILE__, __LINE__);
+
 		table[p->sel_table].value = selected_hand;
 		dropped_card = selected_hand;
 		set_card(&p->hand[p->sel_hand], EMPTY, -1, -1, 0);
@@ -96,7 +95,7 @@ void player_turn(player *p, card table[])
 	case GET_FIRST_CARD:
 		if (!passed(PAUSE_FRAMES_PLAYERS, &nb_frames) && (p->type == COMPUTER))
 			break;
-		
+
 		if (selected_table == dropped_card) {
 			p->score.points++;
 			add_bonus(p, ESTE, selected_table);
@@ -107,13 +106,13 @@ void player_turn(player *p, card table[])
 
 		/*removing both cards from hand/table */
 		set_card(&p->hand[p->sel_hand], EMPTY, -1, -1, 0);
-		SDL_FreeSurface(table[p->sel_table].surf);
+		free_surface(table[p->sel_table].surf);
 		set_card(&table[p->sel_table], EMPTY, -1, -1, 0);
 		p->score.gained_cards += 2;
 		p->nb_cards_in_hand--;
 
 		card_num tmp = selected_hand % 10;
-		
+
 		/*take the rest of the cards if possible*/
 		if (tmp != 9) {
 			state = GET_CARDS;
@@ -132,7 +131,7 @@ void player_turn(player *p, card table[])
 		if (!take_card(p, table)) 
 			state = END_ACTIONS;
 	break;
-	
+
 	case END_ACTIONS:
 		current_player = !p->type;
 		p->sel_hand = p->sel_table = -1;
@@ -148,7 +147,7 @@ static unsigned short get_gain(card_num c, card table[])
 		the more is the variable's value */
 	unsigned short res = 1;
 
-	/*how many cards can the player can get*/
+	/*how many cards can the player get*/
 	if (c % 10 != 9) {
 		short index = exist(table, MAX_NB_CARDS_TABLE, c);
 		while ((index != -1) && (count <= (9 - c%10))) {
@@ -176,20 +175,23 @@ static short get_index_ai(player *p, card table[], short *index_tab)
 	/*let's choose the best card (the best gain)*/
 	for (i=0; i < MAX_NB_CARDS_HAND; i++) {
 		card_num tmp = p->hand[i].value;
-		if (tmp != EMPTY) 
-			for (j=0; j < MAX_NB_CARDS_TABLE; j++) {
-				if (equal(tmp, table[j].value)) {
-					tmp_gain = get_gain(tmp, table);
-					if (gain < tmp_gain) {
-						gain = tmp_gain;
-						best_card_index = i;
-						*index_tab = j;
-					}
-				}
+		if (tmp == EMPTY)
+			continue;
+
+		for (j=0; j < MAX_NB_CARDS_TABLE; j++) {
+			if (!equal(tmp, table[j].value))
+				continue;
+
+			tmp_gain = get_gain(tmp, table);
+			if (gain < tmp_gain) {
+				gain = tmp_gain;
+				best_card_index = i;
+				*index_tab = j;
 			}
-		
+		}
+
 	}
-	
+
 	return best_card_index;
 }
 
@@ -197,19 +199,19 @@ void set_computer_choice(player *p, card table[])
 {
 	short index_tab;
 	short index_hand = get_index_ai(p, table, &index_tab);
-	
+
 	if (index_hand == -1) {
 		short i = rand_a_b(0, 3);
 		while (p->hand[i].value == EMPTY)
 			i = rand_a_b(0, 3);
-		index_hand = i;	
+		index_hand = i;
 	}
-	
+
 	if (index_tab == -1) {
 		short i = rand_a_b(0, 10);
 		while (table[i].value != EMPTY)
 			i = rand_a_b(0, 10);
-		index_tab = i;	
+		index_tab = i;
 	}
 	p->sel_hand = index_hand;
 	p->sel_table = index_tab;
@@ -220,18 +222,18 @@ void take_all_cards(player *p, card table[])
 	unsigned short i;
 	for (i = 0; i < MAX_NB_CARDS_TABLE; ++i) 
 		if (table[i].value != EMPTY){
-			SDL_FreeSurface(table[i].surf);
+			free_surface(table[i].surf);
 			set_card(&table[i], EMPTY, -1, -1, 0);
 			p->score.gained_cards++;
-		}	
+		}
 }
 
 void handle_bonus(score_t *p1_score, bonus_t *p1_bonus, score_t *p2_score, bonus_t *p2_bonus)
 {
 	if ((p1_bonus->type == NONE) && (p2_bonus->type == NONE))
 		return;
-	
-	/*check the HowToPlay file for points calculation*/
+
+	/*check "HowToPlay" for points calculation*/
 	if (p1_bonus->type > p2_bonus->type)
 		p1_score->points += ((p1_bonus->type == RONDA)? 1:5) +
 			((p2_bonus->type == NONE)? 0:1);
@@ -244,10 +246,10 @@ void handle_bonus(score_t *p1_score, bonus_t *p1_bonus, score_t *p2_score, bonus
 		p2_score->points += (p2_bonus->type == RONDA)? 2:10;
 	else 
 		p1_score->points = p2_score->points = (p1_bonus->type == RONDA)? 1:5;
-	
+
 	p1_bonus->bonus_card = -1;
 	p1_bonus->type = NONE;
 	p2_bonus->bonus_card = -1;
 	p2_bonus->type = NONE;
-	
+
 }

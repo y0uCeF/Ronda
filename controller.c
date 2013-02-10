@@ -13,7 +13,7 @@ static inline void set_default_values(controller_data *c_data)
 
 controller_data* controller_data_init()
 {
-	controller_data *c_data = malloc(sizeof(controller_data));
+	controller_data *c_data = try_malloc(sizeof(controller_data));
 
 	set_default_values(c_data);
 
@@ -61,42 +61,42 @@ static short get_selected_table(int x, int y)
 {
 	short temp=-1, c=0;
 	if (between(x, 40, 130)) 
-		temp=0;
+		temp = 0;
 	else if (between(x, 145, 235)) 
-		temp=1;
+		temp = 1;
 	else if (between(x, 250, 340)) 
-		temp=2;
+		temp = 2;
 	else if (between(x, 355, 445)) 
-		temp=3;
+		temp = 3;
 	else if (between(x, 460, 550)) 
-		temp=4;
-	
+		temp = 4;
+
 	if (temp != -1) { 
-		if (between(y, 160, 295))	
-			c=temp;
+		if (between(y, 160, 295))
+			c = temp;
 		else if (between(y, 305, 440)) 
-			c=temp+5;
+			c = temp+5;
 		else 
-			c = -1;	
+			c = -1;
 		return c;
 	}
-	else return -1;	
+	else return -1;
 }
 
 static void treat_mouse_click_event(SDL_Event event, controller_data* c_data)
 {
 	int x = event.button.x;
-	int y = event.button.y;	
+	int y = event.button.y;
 
 	switch (event.button.button) {
 	case SDL_BUTTON_LEFT:
 		if (valid_card_hand(x, y)) 
-			c_data->selected_card_hand = get_selected_hand(x);	
+			c_data->selected_card_hand = get_selected_hand(x);
 		else if (valid_card_table(x, y))
 			c_data->selected_card_table = get_selected_table(x, y);
 
 	break;
-	
+
 	default:
 	break;
 	}

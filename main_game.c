@@ -10,7 +10,7 @@
 #include "winner.h"
 #include "game.h"
 
-
+/* constants */
 #define INNER_SPACE_TABLE 15
 #define TABLE_X 40
 #define TABLE_FIRSTROW 160
@@ -26,8 +26,11 @@ extern player_state_type state;
 extern player *last_card_taker;
 extern card_num dropped_card;
 
+/* global data */
 score_t user_score = {0,0};
 score_t computer_score = {0,0};
+type_t current_player;
+
 
 /*local data*/
 static player *user, *comp;
@@ -39,10 +42,8 @@ static SDL_Rect *selection_pos = NULL;
 static SDL_Surface *bg = NULL;
 static controller_data *c_data = NULL;
 
-/*global data*/
-type_t current_player;
 
-static bool table_distribute(card_num card_list[],card table[], 
+static void table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
 {
 	unsigned short i, k = 0, j = 0;    
@@ -66,7 +67,6 @@ static bool table_distribute(card_num card_list[],card table[],
 		}
 	}
 	*nb_cards_remaining -= j; 
-	return 1;
 }
 
 void main_game_init()
@@ -74,10 +74,10 @@ void main_game_init()
 	unsigned short i;
 	card_num j;
 
-	empty_card = IMG_Load("data/cards/blank.gif");
-	back_card = IMG_Load("data/cards/back.gif");
-	selection = IMG_Load("data/selection.png");
-	bg = IMG_Load("data/bg.png");
+	empty_card = load_image("data/cards/blank.gif", __FILE__, __LINE__);
+	back_card = load_image("data/cards/back.gif", __FILE__, __LINE__);
+	selection = load_image("data/selection.png", __FILE__, __LINE__);
+	bg = load_image("data/bg.png", __FILE__, __LINE__);
 
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
 		table[i].value=EMPTY;
@@ -101,14 +101,11 @@ void main_game_init()
 	current_player = USER;
 
 	/*distributing cards*/
-	if (!table_distribute(card_list, table, &nb_cards_remaining)) 
-		return;
-	if (!player_distribute(card_list, user, &nb_cards_remaining)) 
-		return;
-	if (!player_distribute(card_list, comp, &nb_cards_remaining)) 
-		return;
-	
-    /*setting bonus for the first round*/
+	table_distribute(card_list, table, &nb_cards_remaining);
+	player_distribute(card_list, user, &nb_cards_remaining);
+	player_distribute(card_list, comp, &nb_cards_remaining);
+
+	/*setting bonus for the first round*/
 	set_card_bonus(user);
 	set_card_bonus(comp);
 }
@@ -146,7 +143,7 @@ inline static bool game_end()
 void main_game_update()
 {
 	if (c_data->exit) {
-		game_exit();
+		game_exit(EXIT_SUCCESS);
 		return;
 	}
 
@@ -175,7 +172,7 @@ void main_game_update()
 		push(&s, *tmp);
 		top(s).init();
 
-	} else {
+	} else { /* not game end */
 		if (round_end()) {
 			SDL_Delay(800);
 			handle_bonus(&user->score, &user->card_bonus, &comp->score, &comp->card_bonus);
@@ -188,10 +185,10 @@ void main_game_update()
 			set_card_bonus(user);
 			set_card_bonus(comp);
 		}
-		
+
 		player_update_bonus(user);
 		player_update_bonus(comp);
-		
+
 		if (current_player == USER)
 			main_game_user_turn();
 		else 
@@ -199,72 +196,69 @@ void main_game_update()
 	}
 
 	if ((user->sel_hand != -1) && (get_sel_hand_val(*user) != EMPTY)) {
-		selection_pos = malloc(sizeof(SDL_Rect));
+		selection_pos = try_malloc(sizeof(SDL_Rect));
 		selection_pos->x = PLAYER_XPOS(user->sel_hand);
 		selection_pos->y = PLAYER_YPOS(USER);
 		selection_pos->x -= 5;
 		selection_pos->y -= 5;
 	} else {
-		free(selection_pos);
-		selection_pos = NULL;
+		try_free(selection_pos);
 	}
 }
 
-bool main_game_render(SDL_Surface *screen)
+void main_game_render(SDL_Surface *screen)
 {
 	unsigned short i;
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 
 	if (SDL_BlitSurface(bg, NULL, screen, NULL) == -1) 
-		return 0;
-	
-	if (!player_render(user, screen)) 
-		return 0;
-	if (!player_render(comp, screen))
-		return 0;			
+		sdl_error("Blit screen fail", __FILE__, __LINE__);
+
+	player_render(user, screen); 
+
+	player_render(comp, screen);
 
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) 
 		if (SDL_BlitSurface(table[i].surf, NULL, screen, table[i].position) == -1) 
-			return 0;
-	
+			sdl_error("Blit table card fail", __FILE__,__LINE__);
+
 	if (selection_pos != NULL)
 		if (SDL_BlitSurface(selection, NULL, screen, selection_pos) == -1) 
-			return 0;
-	
+			sdl_error("Blit selection fail", __FILE__,__LINE__);
+
 	SDL_Flip(screen);
-	return 1;
 }
 
 void main_game_free()
 {
 	unsigned short i;
-	
-	SDL_FreeSurface(empty_card);
-	SDL_FreeSurface(back_card);
-	SDL_FreeSurface(selection);
-	SDL_FreeSurface(bg);
+
+	free_surface(empty_card);
+	free_surface(back_card);
+	free_surface(selection);
+	free_surface(bg);
 
 	for (i=0;i < MAX_NB_CARDS_TABLE;i++) {
-		if ((table[i].surf != NULL) && (table[i].value != EMPTY))
-			SDL_FreeSurface(table[i].surf);
-		if (table[i].position != NULL) 
-			free(table[i].position);
+		if (table[i].value != EMPTY)
+			free_surface(table[i].surf);
+ 
+		try_free(table[i].position);
 	}
-	
+
 	player_free(user);
 	player_free(comp);
 
-	free(c_data);
+	try_free(c_data);
 }
 
 game_state_t* set_state_main_game()
 {
-	game_state_t *gs = malloc(sizeof(game_state_t));
+	game_state_t *gs = try_malloc(sizeof(game_state_t));
 	gs->init = main_game_init;
 	gs->handle_input = main_game_handle_input;
 	gs->update = main_game_update;
 	gs->render = main_game_render;
 	gs->free = main_game_free;
-	
+
 	return gs;
 }

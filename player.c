@@ -40,9 +40,11 @@ inline static void bonus_init_empty(bonus_t *bonus)
 player* player_init(type_t t) 
 {
 	unsigned short i;
-	player *p = malloc(sizeof(player));
+	player *p = try_malloc(sizeof(player));
 
-	TTF_Init();
+	if (TTF_Init() == -1)
+		sdl_ttf_error("Initialisation failed", __FILE__, __LINE__);
+
 	for (i = 0; i < MAX_NB_CARDS_HAND; i++) {
 		p->hand[i].value = EMPTY;
 		p->hand[i].surf = NULL;
@@ -57,18 +59,18 @@ player* player_init(type_t t)
 	p->pos_score_box.y = PLAYER_BOX_Y(t);
 	p->sel_hand = -1;
 	p->sel_table = -1;
-	
+
 	bonus_init_empty(&p->card_bonus);
 	for (i = 0; i < MAX_BONUS; i++)
 		p->action_bonus[i] = NULL;
-	
-	
-	p->score_box = IMG_Load("data/scorebox.png");
+
+
+	p->score_box = load_image("data/scorebox.png", __FILE__, __LINE__);
 	return p;
 }
 
 
-bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_remaining) 
+void player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_remaining) 
 {
 	unsigned short i;
 	unsigned short posx, posy;
@@ -76,7 +78,7 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
 
 	for (i=0; i<MAX_NB_CARDS_HAND;i++) {
 		posx = PLAYER_XPOS(i);
-		
+
 		if (p->type == USER) {
 			posy = 450;
 			back = 0;
@@ -84,14 +86,13 @@ bool player_distribute(card_num card_list[],player *p, unsigned short *nb_cards_
 			posy = 15;
 			back = 1;
 		}
-		
+
 		set_card(&p->hand[i], card_list[*nb_cards_remaining-1-i], posx, posy, back);
 
 		p->nb_cards_in_hand++;
 	}
 
 	*nb_cards_remaining -= i;
-	return 1;
 }
 
 void add_bonus(player *p, bonus_type_t type, short c)
@@ -104,7 +105,7 @@ void add_bonus(player *p, bonus_type_t type, short c)
 	} else if (type == ESTE || type == MISSA) {
 		int i;
 		for (i = 0; i < MAX_BONUS && p->action_bonus[i] != NULL ; i++);
-		p->action_bonus[i] = malloc(sizeof(bonus_t));
+		p->action_bonus[i] = try_malloc(sizeof(bonus_t));
 		bonus_init(p->action_bonus[i], type, c);
 		p->action_bonus[i]->bonus_shown = 0;
 	}
@@ -116,7 +117,7 @@ void player_update_bonus(player *p)
 	for (i = 0; i < MAX_BONUS ; i++) {
 		if (p->action_bonus[i] != NULL)
 			if (p->action_bonus[i]->bonus_shown){
-				free(p->action_bonus[i]);
+				try_free(p->action_bonus[i]);
 				p->action_bonus[i] = NULL;
 			}
 	}
@@ -143,12 +144,13 @@ static void display_bonus(bonus_t *b, char *s, short ypos, SDL_Surface *scr)
 		if (s != NULL)
 			b->surf = set_text_surf("data/georgiai.ttf", 20, s, 255, 255, 255);
 		SDL_Rect pos = {PLAYER_BONUS_X + (130 - b->surf->w)/2 , ypos};
-		SDL_BlitSurface(b->surf, NULL, scr, &pos);
+		if (SDL_BlitSurface(b->surf, NULL, scr, &pos) == -1)
+			sdl_error("Blit text bonus fail", __FILE__, __LINE__);
 		return;
 	}
-	
+
 	b->bonus_shown = 1;
-	SDL_FreeSurface(b->surf);
+	free_surface(b->surf);
 	b->surf = NULL;
 }
 
@@ -156,11 +158,11 @@ static void player_show_bonus(player *p, SDL_Surface *scr)
 {
 	int y = PLAYER_BONUS_Y(p->type);
 	int diff = (p->type == USER)? -30 : 45;
-	
+
 	if (!p->card_bonus.bonus_shown) {
 		char *s = NULL;
 		if (!p->card_bonus.surf) {
-			s = calloc(8, sizeof(char));
+			s = try_calloc(8, sizeof(char));
 			if (p->card_bonus.type == RONDA)
 				strcat(s, "Ronda");
 			else if (p->card_bonus.type == TRINGLA)
@@ -172,7 +174,7 @@ static void player_show_bonus(player *p, SDL_Surface *scr)
 		if (s == NULL)
 			free(s);
 	}
-	
+
 	int i;
 	for (i = 0; i < MAX_BONUS; i++, y += diff) {
 		if (p->action_bonus[i] == NULL) 
@@ -181,55 +183,55 @@ static void player_show_bonus(player *p, SDL_Surface *scr)
 		if (!p->action_bonus[i]->bonus_shown) {
 			char *s = NULL;
 			if (!p->action_bonus[i]->surf) {
-				s = calloc(6, sizeof(char));
+				s = try_calloc(6, sizeof(char));
 				if (p->action_bonus[i]->type == ESTE)
 					strcat(s, "Este");
 				else if (p->action_bonus[i]->type == MISSA)
 					strcat(s, "Missa");
 			}
-			
+
 			display_bonus(p->action_bonus[i], s, y, scr);
-			if (s == NULL)
-				free(s);
-		}		
+
+			try_free(s);
+		}
 	}
-	
+
 }
 
-bool player_render(player *p, SDL_Surface *scr)
+void player_render(player *p, SDL_Surface *scr)
 {
 	unsigned short i;
-	
+
 	for (i=0; i < MAX_NB_CARDS_HAND; i++)
 		if (SDL_BlitSurface(p->hand[i].surf, NULL, scr, p->hand[i].position) == -1) 
-			return 0; 
+			sdl_error("Blit card fail", __FILE__, __LINE__); 
 	if (SDL_BlitSurface(p->score_box, NULL, scr, &p->pos_score_box) == -1) 
-		return 0;
+		sdl_error("Blit score_box fail", __FILE__, __LINE__);
 
 	player_show_score(p, scr);
 
 	player_show_bonus(p, scr);
-
-	return 1;
 }
 
 void player_free(player *p)
 {
+	if (!p)
+		return;
+
 	unsigned short i = 0;
 	for (i = 0; i < p->nb_cards_in_hand; i++) {
-		if ((p->hand[i].surf != NULL) && (p->hand[i].value != EMPTY)
-				&& (p->type != COMPUTER))
-			SDL_FreeSurface(p->hand[i].surf); 
-		if (p->hand[i].position != NULL) 
-			free(p->hand[i].position);
+		if ((p->hand[i].value != EMPTY)	&& (p->type != COMPUTER))
+			free_surface(p->hand[i].surf); 
+ 
+		try_free(p->hand[i].position);
 	}
-	if (p->score_box != NULL) 
-		SDL_FreeSurface(p->score_box);
-	free(p);
+
+	free_surface(p->score_box);
+	try_free(p);
 	TTF_Quit();
 }
 
-inline card_num get_sel_hand_val(player p)
+card_num get_sel_hand_val(player p)
 {
 	if (p.sel_hand != -1)
 		return p.hand[p.sel_hand].value;
@@ -253,7 +255,7 @@ bool ronda(player *p, card_num *c)
 		*c = p->hand[0].value % 10;
 	else if (equal(p->hand[1].value, p->hand[2].value))
 		*c = p->hand[1].value % 10;
-		
+
 	return 	equal(p->hand[0].value, p->hand[1].value) ||
 		equal(p->hand[0].value, p->hand[2].value) ||
 		equal(p->hand[1].value, p->hand[2].value);
@@ -264,7 +266,7 @@ bool tringla(player *p, card_num *c)
 	if (equal(p->hand[0].value, p->hand[1].value) &&
 		equal(p->hand[0].value, p->hand[2].value))
 		*c = p->hand[0].value % 10;
-		
+
 	return equal(p->hand[0].value, p->hand[1].value) &&
 		equal(p->hand[0].value, p->hand[2].value);
 }
@@ -272,7 +274,7 @@ bool tringla(player *p, card_num *c)
 void set_card_bonus(player *p)
 {
 	card_num c = EMPTY;
-	
+
 	if (tringla(p, &c))
 		add_bonus(p, TRINGLA, c);
 	else if (ronda(p, &c))

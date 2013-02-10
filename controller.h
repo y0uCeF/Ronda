@@ -3,10 +3,12 @@
 
 #include "define.h"
 
+/* controller data structure */
+  
 typedef struct {
-        bool exit;
-        int selected_card_hand;
-        int selected_card_table;
+	bool exit;
+	int selected_card_hand;
+	int selected_card_table;
 } controller_data;
 
 /*
@@ -18,4 +20,5 @@ controller_data* controller_data_init();
  * updates the data based on input results
  */
 void controller_data_update(controller_data *c_data);
+
 #endif

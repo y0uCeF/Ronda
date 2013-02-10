@@ -94,11 +94,14 @@ SDL_Surface *load_image(char *path, char *file, int line)
 
 char* get_card_file(card_num n) 
 {
+#define CARD_FILE_SIZE 5
 	char num[3]="";
-	char* file = try_calloc(21, sizeof(char));
+	unsigned short len = strlen(CARDS_DIR) + 1;
+	len += CARD_FILE_SIZE;
+	char* file = try_calloc(len, sizeof(char));
 	num[0]=(char) (n/10+ (char) '0');
 	num[1]=(char) (n%10+ (char) '0');
-	strcat(file, "data/cards/");
+	strcat(file, CARDS_DIR);
 	strcat(file, num);
 	strcat(file, ".gif");
 

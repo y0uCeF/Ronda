@@ -11,15 +11,20 @@
 #include "game.h"
 
 /* constants */
-#define INNER_SPACE_TABLE 15
-#define TABLE_X 40
-#define TABLE_FIRSTROW 160
-#define TABLE_SECONDROW 305
+#define INNER_SPACE_TABLE  15
+#define TABLE_X            40
+#define TABLE_FIRSTROW     160
+#define TABLE_SECONDROW    305
 
 #define TABLE_XPOS(index) (CARD_WIDTH + INNER_SPACE_TABLE) * (index % 5) \
 				+ TABLE_X
 
 #define TABLE_YPOS(index) (index <= 4)? TABLE_FIRSTROW:TABLE_SECONDROW
+
+#define BLANK_CARD_FILE  CARDS_DIR"blank.gif"
+#define BACK_CARD_FILE   CARDS_DIR"back.gif"
+#define SELECTION_FILE   GFX_DIR"selection.png"
+#define BG_FILE          GFX_DIR"bg.png"
 
 /*extern data*/
 extern player_state_type state;
@@ -98,10 +103,10 @@ void main_game_init()
 	unsigned short i;
 	card_num j;
 
-	empty_card = load_image("data/cards/blank.gif", __FILE__, __LINE__);
-	back_card = load_image("data/cards/back.gif", __FILE__, __LINE__);
-	selection = load_image("data/selection.png", __FILE__, __LINE__);
-	bg = load_image("data/bg.png", __FILE__, __LINE__);
+	empty_card = load_image(BLANK_CARD_FILE, __FILE__, __LINE__);
+	back_card = load_image(BACK_CARD_FILE, __FILE__, __LINE__);
+	selection = load_image(SELECTION_FILE, __FILE__, __LINE__);
+	bg = load_image(BG_FILE, __FILE__, __LINE__);
 
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
 		table[i].value=EMPTY;

@@ -8,10 +8,12 @@ OBJECTS = $(SOURCES:.c=.o)
 EXECUTABLE = ronda
 INCLUDE = -I/usr/include/SDL
 
-debug: CFLAGS += -D_DEBUG -g
-debug: all
+all: exec
 
-all: $(SOURCES) $(EXECUTABLE)
+debug: CFLAGS += -D_DEBUG -g
+debug: exec
+
+exec: $(SOURCES) $(EXECUTABLE)
 	
 $(EXECUTABLE): $(OBJECTS) 
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ -lSDL -lSDL_image -lSDL_ttf

@@ -10,16 +10,21 @@
 #include "define.h"
 
 /* constants */
-#define SELECTOR_NEW_GAME_X 375
-#define SELECTOR_NEW_GAME_Y 370
-#define SELECTOR_EXIT_GAME_X 375
-#define SELECTOR_EXIT_GAME_Y 420
-#define WINNER_MSG_Y 150
-#define WINNER_MSG_X(w) (MIDDLE_X(w) - 100)
-#define USER_SCORE_X 50
-#define COMPUTER_SCORE_X(w) (WINDOW_WIDTH - 50 - w)
-#define PLAYER_SCORE_Y 20 
+#define SELECTOR_NEW_GAME_X   375
+#define SELECTOR_NEW_GAME_Y   370
+#define SELECTOR_EXIT_GAME_X  375
+#define SELECTOR_EXIT_GAME_Y  420
+#define WINNER_MSG_Y          150
+#define WINNER_MSG_X(w)       (MIDDLE_X(w) - 100)
+#define USER_SCORE_X          50
+#define COMPUTER_SCORE_X(w)   (WINDOW_WIDTH - 50 - w)
+#define PLAYER_SCORE_Y        20 
 
+/* file paths */
+#define WINNER_BG_FILE  GFX_DIR "winner.png"
+#define SELECTOR_FILE   GFX_DIR "selector.png"
+#define GEORGIA_I_FILE  FONTS_DIR "georgiai.ttf"
+#define URW_FONT_FILE   FONTS_DIR "urw-bookman-l.ttf"
 /* static data */
 static SDL_Surface *winner_surf = NULL;
 static SDL_Surface *selector = NULL;
@@ -31,8 +36,8 @@ static enum{USER_WINS, COMPUTER_WINS, DRAWN} game_result;
 
 void winner_init()
 {
-	winner_surf = load_image("data/winner.png", __FILE__, __LINE__);
-	selector = load_image("data/selector.png", __FILE__, __LINE__);
+	winner_surf = load_image(WINNER_BG_FILE, __FILE__, __LINE__);
+	selector = load_image(SELECTOR_FILE, __FILE__, __LINE__);
 
 	if (TTF_Init() == -1)
 		sdl_ttf_error("Initialisation failed", __FILE__, __LINE__);
@@ -122,7 +127,7 @@ static void show_winner_msg(SDL_Surface *scr)
 	else
 		sprintf(buf, "Drawn");
 
-	SDL_Surface *surf = set_text_surf("data/urw-bookman-l.ttf", 36, buf, 255, 255, 255);
+	SDL_Surface *surf = set_text_surf(URW_FONT_FILE, 36, buf, 255, 255, 255);
 	SDL_Rect pos = {WINNER_MSG_X(surf->w), WINNER_MSG_Y};
 	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
 		sdl_error("Blit win message fail", __FILE__, __LINE__);
@@ -134,10 +139,10 @@ static void show_final_score(SDL_Surface *scr)
 	char buf[20] = "";
 	SDL_Rect pos;
 	sprintf(buf, "Your score : %d", user_score.points);
-	show_white_text("data/georgiai.ttf", 24, buf, USER_SCORE_X, PLAYER_SCORE_Y, scr);
+	show_white_text(GEORGIA_I_FILE, 24, buf, USER_SCORE_X, PLAYER_SCORE_Y, scr);
 
 	sprintf(buf, "Computer score : %d", computer_score.points);
-	SDL_Surface *surf = set_text_surf("data/georgiai.ttf", 24, buf, 255, 255, 255);
+	SDL_Surface *surf = set_text_surf(GEORGIA_I_FILE, 24, buf, 255, 255, 255);
 	pos.x = COMPUTER_SCORE_X(surf->w);
 	pos.y = PLAYER_SCORE_Y;
 	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)

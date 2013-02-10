@@ -6,22 +6,27 @@
 #include "common.h"
 
 /* score constants */
-#define PLAYER_BOX_X 600
-#define USER_BOX_Y 470
-#define COMPUTER_BOX_Y 40
-#define PLAYER_BOX_Y(type) (type == USER)? USER_BOX_Y:COMPUTER_BOX_Y
-#define USER_SCORE_Y 485
-#define COMPUTER_SCORE_Y 55
+#define PLAYER_BOX_X         600
+#define USER_BOX_Y           470
+#define COMPUTER_BOX_Y       40
+#define PLAYER_BOX_Y(type)   (type == USER)? USER_BOX_Y:COMPUTER_BOX_Y
+#define USER_SCORE_Y         485
+#define COMPUTER_SCORE_Y     55
 #define PLAYER_SCORE_Y(type) (type == USER)? USER_SCORE_Y:COMPUTER_SCORE_Y
-#define PLAYER_SCORE_X 620
+#define PLAYER_SCORE_X       620
 
 /* bonus coordinates and constants */
-#define USER_BONUS_Y 420
-#define COMPUTER_BONUS_Y 150
+#define USER_BONUS_Y         420
+#define COMPUTER_BONUS_Y     150
 #define PLAYER_BONUS_Y(type) (type == USER)? USER_BONUS_Y:COMPUTER_BONUS_Y
-#define PLAYER_BONUS_X 600
+#define PLAYER_BONUS_X       600
 
-#define BONUS_SHOW_TIME 100
+/* file paths for fonts and images */
+#define SCOREBOX_FILE   GFX_DIR "scorebox.png"
+#define GEORGIA_I_FILE   FONTS_DIR "georgiai.ttf"
+
+
+#define BONUS_SHOW_TIME      100
 
 static void bonus_init(bonus_t *bonus, bonus_type_t type, short c)
 {
@@ -64,8 +69,7 @@ player* player_init(type_t t)
 	for (i = 0; i < MAX_BONUS; i++)
 		p->action_bonus[i] = NULL;
 
-
-	p->score_box = load_image("data/scorebox.png", __FILE__, __LINE__);
+	p->score_box = load_image(SCOREBOX_FILE, __FILE__, __LINE__);
 	return p;
 }
 
@@ -130,19 +134,19 @@ static void player_show_score(player *p, SDL_Surface *scr)
 
 	/* gained cards number */
 	sprintf(s, "cards   : %d", p->score.gained_cards);
-	show_white_text("data/georgiai.ttf", 18, s, PLAYER_SCORE_X, y, scr);
+	show_white_text(GEORGIA_I_FILE, 18, s, PLAYER_SCORE_X, y, scr);
 
 	/* points */
 	y += 35;
 	sprintf(s, "points : %d", p->score.points);
-	show_white_text("data/georgiai.ttf", 18, s, PLAYER_SCORE_X, y, scr);
+	show_white_text(GEORGIA_I_FILE, 18, s, PLAYER_SCORE_X, y, scr);
 }
 
 static void display_bonus(bonus_t *b, char *s, short ypos, SDL_Surface *scr)
 {
 	if (!passed(BONUS_SHOW_TIME, &b->show_frames)) {
 		if (s != NULL)
-			b->surf = set_text_surf("data/georgiai.ttf", 20, s, 255, 255, 255);
+			b->surf = set_text_surf(GEORGIA_I_FILE, 20, s, 255, 255, 255);
 		SDL_Rect pos = {PLAYER_BONUS_X + (130 - b->surf->w)/2 , ypos};
 		if (SDL_BlitSurface(b->surf, NULL, scr, &pos) == -1)
 			sdl_error("Blit text bonus fail", __FILE__, __LINE__);

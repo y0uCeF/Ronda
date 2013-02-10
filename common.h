@@ -59,11 +59,6 @@ void *realloc_(void *ptr, size_t size, char *file, int line);
 /* other general functions */
 
 /*
- * mixes cards in array
- */
-void mix(card_num array[], unsigned short size);
-
-/*
  * swaps contents of a and b
  */
 void swap(card_num *a, card_num *b);
@@ -79,14 +74,9 @@ short exist(card tab[], unsigned short size, card_num value);
 bool empty(card tab[], unsigned short size);
 
 /*
- * counts cards in tab
- */
-unsigned short nb_cards(card tab[], unsigned short size);
-
-/*
  * returns path to file representing the card n
  */
-char* get_file(card_num n);
+char* get_card_file(card_num n);
 
 /*
  * reports error in stderr and terminates the program

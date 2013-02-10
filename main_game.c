@@ -43,6 +43,30 @@ static SDL_Surface *bg = NULL;
 static controller_data *c_data = NULL;
 
 
+static unsigned short nb_cards(card tab[], unsigned short size) 
+{
+	unsigned short i, cpt=0;
+	for (i=0; i < size; i++) 
+		if (tab[i].value != EMPTY) 
+			cpt++;
+	return cpt;
+}
+
+static void mix(card_num array[], unsigned short size)
+{
+	int i=0;
+	int random_number=0;
+	int tmp=0;
+
+	for (i = 0; i < size; i++) {
+		random_number=rand_a_b(0, size);
+		 
+		tmp = array[i];
+		array[i] = array[random_number];
+		array[random_number] = tmp;
+	}
+}
+
 static void table_distribute(card_num card_list[],card table[], 
 			unsigned short *nb_cards_remaining) 
 {

@@ -12,21 +12,6 @@
 SDL_Surface *back_card = NULL;
 SDL_Surface *empty_card = NULL;
 
-void mix(card_num array[], unsigned short size)
-{
-	int i=0;
-	int random_number=0;
-	int tmp=0;
-
-	for (i = 0; i < size; i++) {
-		random_number=rand_a_b(0, size);
-		 
-		tmp = array[i];
-		array[i] = array[random_number];
-		array[random_number] = tmp;
-	}
-}
-
 void swap(card_num *a, card_num *b) 
 {
 	int tmp = *a;
@@ -50,15 +35,6 @@ bool empty(card tab[], unsigned short size)
 		if (tab[i].value != -1) 
 			return 0;
 	return 1;
-}
-
-unsigned short nb_cards(card tab[], unsigned short size) 
-{
-	unsigned short i, cpt=0;
-	for (i=0; i < size; i++) 
-		if (tab[i].value != EMPTY) 
-			cpt++;
-	return cpt;
 }
 
 void error(char *file, int line, char *format, ...)
@@ -116,7 +92,7 @@ SDL_Surface *load_image(char *path, char *file, int line)
 	return tmp;
 }
 
-char* get_file(card_num n) 
+char* get_card_file(card_num n) 
 {
 	char num[3]="";
 	char* file = try_calloc(21, sizeof(char));
@@ -146,7 +122,7 @@ void set_card(card *c, card_num num, short xpos, short ypos, bool back)
 	} else if (back){
 		c->surf = back_card;
 	} else {
-		char *file = get_file(num);
+		char *file = get_card_file(num);
 		c->surf = load_image(file, __FILE__, __LINE__);
 	}
 

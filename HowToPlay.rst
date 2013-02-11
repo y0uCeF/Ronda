@@ -32,41 +32,41 @@ _________
 
 * Each player (in his turn) has 2 options:
 
-    1. He can capture a card from the table by using one similar card from his hand and keep taking cards incrementally starting from that number.
+ 1. He can capture a card from the table by using one similar card from his hand and keep taking cards incrementally starting from that number.
 
-    Example:
-    player has : 3, 4, 7 
-    table contains : 5, 4, 7, 10, 11
-    The player forms a pair with his "7" and the "7" on the table and takes it's successors 10 and 11 (remember there are no 8 and 9).
+Example:
+player has : 3, 4, 7 
+table contains : 5, 4, 7, 10, 11
+The player forms a pair with his "7" and the "7" on the table and takes it's successors 10 and 11 (remember there are no 8 and 9).
 
-    2. He can put a card on the table when he can't capture any card.
+ 2. He can put a card on the table when he can't capture any card.
 
 * The player can also gain points by doing one of this acts:
-   
-   - Mesa : when a player takes all the cards on the table (except when it's the final deal and the player is the last one)
-   
-   - Este : when a player takes the last card dropped by his opponent (check Points_ section)
+
+- Mesa : when a player takes all the cards on the table (except when it's the final deal and the player is the last one)
+
+- Este : when a player takes the last card dropped by his opponent (check Points_ section)
 
 * When in the last deal, and after the last turn. If there still are cards on the table, the last player who captured a card takes them.
-    
+
 Points
 ______
 
 A player can get points when : 
 
-  | - He announced Ronda and the opponent didn't : 1 point
-  | - Both players announced Ronda with equal rank : 1 point
-  | - Both players announced Ronda and he has the bigger number : 2 points
-  |
-  | - He announced Tringla and the opponent didn't : 5 point
-  | - Both players announced Tringla with equal rank : 1 point
-  | - Both players announced Tringla and he has the bigger number : 10 points
-  |
-  | - He announced Tringla and the opponent announced Ronda : 6 points
-  | 
-  | - He makes an Este : 1 point
-  |  
-  | - When the game ends, all the cards above the 20th are counted as points
+|- He announced Ronda and the opponent didn't : 1 point
+|- Both players announced Ronda with equal rank : 1 point
+|- Both players announced Ronda and he has the bigger number : 2 points
+|
+|- He announced Tringla and the opponent didn't : 5 point
+|- Both players announced Tringla with equal rank : 1 point
+|- Both players announced Tringla and he has the bigger number : 10 points
+|
+|- He announced Tringla and the opponent announced Ronda : 6 points
+|
+|- He makes an Este : 1 point
+|
+|- When the game ends, all the cards above the 20th are counted as points
 
 Control
 _______

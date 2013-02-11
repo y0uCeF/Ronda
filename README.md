@@ -12,34 +12,38 @@ cards from 1 to 7 plus : 10 (Sota/Jack), 11 (Caballo/Horse) and 12 (Rey/King).
 
 License: GPLv2
 
-You can get the latest sources from the git repository:
-	```sh
-	git clone git://github.com/y0uCeF/Ronda.git
-	```
+You can get the latest sources from the git repository:  
+
+```
+git clone git://github.com/y0uCeF/Ronda.git
+```
 
 Building Ronda
 --------------
 
 This was only tested on *Linux*,  
-Ronda requires *SDL-1.2*, *SDL_image* and *SDL_ttf* to be installed in your
+Ronda requires *SDL-1.2+*, *SDL_image* and *SDL_ttf* to be installed in your
 system. You can get them from [here](http://libsdl.org/).
-Once you got the requirements you can run :
-	```sh
-	make
-	make install
-	```
+Once you got the requirements you can run :  
+
+```
+make
+make install
+```
 
 In case you want to run Ronda *in-place* without installit it, then
-running :
-	```sh
-	make 'INPLACE=y'
-	```
+running :  
+
+```
+make 'INPLACE=y'
+```
 should work perfectly.
 
-You can uninstall Ronda by running
-	```sh
-	make uninstall
-	```
+You can uninstall Ronda by running  
+
+```
+make uninstall
+```
 
 How to play
 -----------

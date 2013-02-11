@@ -6,14 +6,16 @@
 /* 
  * some constants definitions
  */
-	#define NB_CARDS 40
-	#define NB_CARDS_TABLE 4
-	#define MAX_NB_CARDS_TABLE 10
-	#define MAX_NB_CARDS_HAND 3
-	#define DATA_DIR "data/"
-	#define CARDS_DIR DATA_DIR "cards/"
-	#define FONTS_DIR DATA_DIR "fonts/"
-	#define GFX_DIR DATA_DIR "gfx/"
+#define NB_CARDS           40
+#define NB_CARDS_TABLE     4
+#define MAX_NB_CARDS_TABLE 10
+#define MAX_NB_CARDS_HAND  3
+#ifndef DATA_DIR
+	#define DATA_DIR   "data/"
+#endif
+#define CARDS_DIR DATA_DIR "cards/"
+#define FONTS_DIR DATA_DIR "fonts/"
+#define GFX_DIR DATA_DIR   "gfx/"
 
 /*
  * Definition of common data structures 

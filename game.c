@@ -27,7 +27,7 @@ static void env_init()
 
 	SDL_Surface *icon = SDL_LoadBMP(ICON_FILE);
 	if(!icon)
-		fprintf(stderr, "%s\n", SDL_GetError());
+		fprintf(stderr, "Unable to load icon : %s\n", SDL_GetError());
 	else
 		SDL_WM_SetIcon(icon, NULL);
 

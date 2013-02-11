@@ -23,7 +23,7 @@ typedef struct {
 } score_t;
 
 
-typedef enum {NONE, RONDA, TRINGLA, ESTE, MISSA} bonus_type_t;
+typedef enum {NONE, RONDA, TRINGLA, ESTE, MESA} bonus_type_t;
 
 typedef struct {
 	bonus_type_t type;

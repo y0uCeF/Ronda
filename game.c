@@ -9,8 +9,9 @@
 #include "common.h"
 
 /* Constants definition */
-#define FPS 30
-#define FRAME_RATE 1000/FPS
+#define FPS         30
+#define FRAME_RATE  1000/FPS
+#define ICON_FILE   GFX_DIR "icon.bmp"
 
 /* static Data */
 static SDL_Surface *screen = NULL;
@@ -23,6 +24,13 @@ static void env_init()
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) 
 		sdl_error("Unable to init SDL", __FILE__, __LINE__);
 	putenv("SDL_VIDEO_CENTERED=1");
+
+	SDL_Surface *icon = SDL_LoadBMP(ICON_FILE);
+	if(!icon)
+		fprintf(stderr, "%s\n", SDL_GetError());
+	else
+		SDL_WM_SetIcon(icon, NULL);
+
 	screen = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32,  
 				SDL_DOUBLEBUF | SDL_HWSURFACE );
 	if (screen == NULL) 
@@ -30,7 +38,7 @@ static void env_init()
 	if (SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 53, 131, 68)) == -1) 
 		sdl_error("Setting screen failed", __FILE__, __LINE__);
 
-	SDL_WM_SetCaption("Ronda - alpha", NULL);
+	SDL_WM_SetCaption("Ronda", NULL);
 }
 
 void game_init() 

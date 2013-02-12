@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=0.1
+Name[en_US]=Ronda
+Name=Ronda
+Comment[en_US]=Ronda card game
+Comment=Ronda card game
+Exec=ronda
+Icon=/usr/share/pixmaps/ronda.png
+Categories=Game;
+StartupNotify=true
+Terminal=false
+

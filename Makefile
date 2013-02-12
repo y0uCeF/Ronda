@@ -49,9 +49,8 @@ install:
 	install -m755 data/fonts/* $(FONTSDIR)
 	install -d -m755 $(CARDSDIR)
 	install -m755 data/cards/* $(CARDSDIR)
-	sed -i "s|Icon=|Icon=$(ICONDIR)/ronda.png|" data/ronda.desktop
 	install -D -m755 data/ronda.desktop $(DESKTOPDIR)/ronda.desktop
-	install -D -m775 data/gfx/ronda.png $(ICONDIR)/ronda.png
+	install -D -m775 data/ronda.png $(ICONDIR)/ronda.png
 
 
 uninstall:

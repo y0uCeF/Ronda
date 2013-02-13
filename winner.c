@@ -12,19 +12,26 @@
 /* constants */
 #define SELECTOR_NEW_GAME_X   375
 #define SELECTOR_NEW_GAME_Y   370
+#define NEW_GAME_X            (SELECTOR_NEW_GAME_X + 30)  
+#define NEW_GAME_Y            (SELECTOR_NEW_GAME_Y - 6)
 #define SELECTOR_EXIT_GAME_X  375
 #define SELECTOR_EXIT_GAME_Y  420
-#define WINNER_MSG_Y          150
-#define WINNER_MSG_X(w)       (MIDDLE_X(w) - 100)
-#define USER_SCORE_X          50
-#define COMPUTER_SCORE_X(w)   (WINDOW_WIDTH - 50 - w)
-#define PLAYER_SCORE_Y        20 
+#define EXIT_GAME_X           (SELECTOR_EXIT_GAME_X + 30)
+#define EXIT_GAME_Y           (SELECTOR_EXIT_GAME_Y - 6)
+#define WINNER_MSG_Y          200
+#define WINNER_MSG_X(w)       MIDDLE_X(w)
+#define USER_SCORE_X          70
+#define COMPUTER_SCORE_X(w)   (WINDOW_WIDTH - USER_SCORE_X - w)
+#define PLAYER_POINTS_Y       40
+#define PLAYER_CARDS_Y        (PLAYER_POINTS_Y + 50)
 
 /* file paths */
 #define WINNER_BG_FILE  GFX_DIR "winner.png"
 #define SELECTOR_FILE   GFX_DIR "selector.png"
 #define GEORGIA_I_FILE  FONTS_DIR "georgiai.ttf"
 #define URW_FONT_FILE   FONTS_DIR "urw-bookman-l.ttf"
+#define URWB_FONT_FILE  FONTS_DIR "urw-bookman-l-bold.ttf"
+
 /* static data */
 static SDL_Surface *winner_surf = NULL;
 static SDL_Surface *selector = NULL;
@@ -127,7 +134,7 @@ static void show_winner_msg(SDL_Surface *scr)
 	else
 		sprintf(buf, "Drawn");
 
-	SDL_Surface *surf = set_text_surf(URW_FONT_FILE, 36, buf, 255, 255, 255);
+	SDL_Surface *surf = set_text_surf(URW_FONT_FILE, 36, buf, 0, 0, 0);
 	SDL_Rect pos = {WINNER_MSG_X(surf->w), WINNER_MSG_Y};
 	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
 		sdl_error("Blit win message fail", __FILE__, __LINE__);
@@ -137,14 +144,29 @@ static void show_winner_msg(SDL_Surface *scr)
 static void show_final_score(SDL_Surface *scr)
 {
 	char buf[20] = "";
-	SDL_Rect pos;
-	sprintf(buf, "Your score : %d", user_score.points);
-	show_white_text(GEORGIA_I_FILE, 24, buf, USER_SCORE_X, PLAYER_SCORE_Y, scr);
 
-	sprintf(buf, "Computer score : %d", computer_score.points);
-	SDL_Surface *surf = set_text_surf(GEORGIA_I_FILE, 24, buf, 255, 255, 255);
-	pos.x = COMPUTER_SCORE_X(surf->w);
-	pos.y = PLAYER_SCORE_Y;
+	sprintf(buf, "Your points : %2d", user_score.points);
+	show_black_text(URW_FONT_FILE, 25, buf, USER_SCORE_X, PLAYER_POINTS_Y, scr);
+
+	sprintf(buf, "Your cards  : %2d", user_score.gained_cards);
+	show_black_text(URW_FONT_FILE, 25, buf, USER_SCORE_X, PLAYER_CARDS_Y, scr);
+
+	/* we want to get the larger between cards and points
+	 * and because cards are more likely to be more than points
+	 * we set them first
+	 */
+	sprintf(buf, "Computer cards  : %2d", computer_score.gained_cards);
+	SDL_Surface *surf = set_text_surf(URW_FONT_FILE, 25, buf, 0, 0, 0);
+	SDL_Rect pos = {COMPUTER_SCORE_X(surf->w), PLAYER_CARDS_Y};
+
+	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
+		sdl_error("Blit final score fail", __FILE__, __LINE__);
+	free_surface(surf);
+
+	sprintf(buf, "Computer points : %2d", computer_score.points);
+	surf = set_text_surf(URW_FONT_FILE, 25, buf, 0, 0, 0);
+	pos.y = PLAYER_POINTS_Y;
+
 	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
 		sdl_error("Blit final score fail", __FILE__, __LINE__);
 	free_surface(surf);
@@ -156,7 +178,10 @@ void winner_render(SDL_Surface *screen)
 		sdl_error("Blit winner background fail", __FILE__, __LINE__);
 	if (SDL_BlitSurface(selector, NULL, screen, &selector_pos) == -1)
 		sdl_error("Blit winner selector fail", __FILE__, __LINE__);
-
+	
+	show_black_text(URWB_FONT_FILE, 25, "New Game", NEW_GAME_X, NEW_GAME_Y, screen);
+	show_black_text(URWB_FONT_FILE, 25, "Exit Game", EXIT_GAME_X, EXIT_GAME_Y, screen);
+	
 	show_final_score(screen);
 	show_winner_msg(screen);
 

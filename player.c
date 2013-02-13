@@ -133,12 +133,12 @@ static void player_show_score(player *p, SDL_Surface *scr)
 	int y = PLAYER_SCORE_Y(p->type);
 
 	/* gained cards number */
-	sprintf(s, "cards   : %d", p->score.gained_cards);
+	sprintf(s, "cards   : %2d", p->score.gained_cards);
 	show_white_text(GEORGIA_I_FILE, 18, s, PLAYER_SCORE_X, y, scr);
 
 	/* points */
 	y += 35;
-	sprintf(s, "points : %d", p->score.points);
+	sprintf(s, "points : %2d", p->score.points);
 	show_white_text(GEORGIA_I_FILE, 18, s, PLAYER_SCORE_X, y, scr);
 }
 

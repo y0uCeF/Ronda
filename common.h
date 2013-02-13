@@ -115,4 +115,11 @@ void show_text(char *font, short size, char *txt, short posx, short posy,
  */
 inline void show_white_text(char *font, short size, char *txt, short posx, short posy, 
 		SDL_Surface *scr);
+
+/*
+ * displays text set in "txt" in black color using show_text()
+ */
+inline void show_black_text(char *font, short size, char *txt, short posx, 
+		short posy, SDL_Surface *scr);
+
 #endif

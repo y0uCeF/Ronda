@@ -175,3 +175,9 @@ inline void show_white_text(char *font, short size, char *txt, short posx,
 {
 	show_text(font, size, txt, posx, posy, 255, 255, 255, scr);
 }
+
+inline void show_black_text(char *font, short size, char *txt, short posx, 
+		short posy, SDL_Surface *scr)
+{
+	show_text(font, size, txt, posx, posy, 0, 0, 0, scr);
+}

@@ -47,7 +47,7 @@ void winner_init()
 	selector = load_image(SELECTOR_FILE, __FILE__, __LINE__);
 
 	if (TTF_Init() == -1)
-		sdl_ttf_error("Initialisation failed", __FILE__, __LINE__);
+		sdl_ttf_error("Initialisation failed");
 	new_game = 0;
 	entry = NEW_GAME;
 	selector_pos.x = SELECTOR_NEW_GAME_X;
@@ -137,7 +137,7 @@ static void show_winner_msg(SDL_Surface *scr)
 	SDL_Surface *surf = set_text_surf(URW_FONT_FILE, 36, buf, 0, 0, 0);
 	SDL_Rect pos = {WINNER_MSG_X(surf->w), WINNER_MSG_Y};
 	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
-		sdl_error("Blit win message fail", __FILE__, __LINE__);
+		sdl_error("Blit win message fail");
 	free_surface(surf);
 }
 
@@ -160,7 +160,7 @@ static void show_final_score(SDL_Surface *scr)
 	SDL_Rect pos = {COMPUTER_SCORE_X(surf->w), PLAYER_CARDS_Y};
 
 	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
-		sdl_error("Blit final score fail", __FILE__, __LINE__);
+		sdl_error("Blit final score fail");
 	free_surface(surf);
 
 	sprintf(buf, "Computer points : %2d", computer_score.points);
@@ -168,16 +168,16 @@ static void show_final_score(SDL_Surface *scr)
 	pos.y = PLAYER_POINTS_Y;
 
 	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
-		sdl_error("Blit final score fail", __FILE__, __LINE__);
+		sdl_error("Blit final score fail");
 	free_surface(surf);
 }
 
 void winner_render(SDL_Surface *screen)
 {
 	if (SDL_BlitSurface(winner_surf, NULL, screen, NULL) == -1)
-		sdl_error("Blit winner background fail", __FILE__, __LINE__);
+		sdl_error("Blit winner background fail");
 	if (SDL_BlitSurface(selector, NULL, screen, &selector_pos) == -1)
-		sdl_error("Blit winner selector fail", __FILE__, __LINE__);
+		sdl_error("Blit winner selector fail");
 	
 	show_black_text(URWB_FONT_FILE, 25, "New Game", NEW_GAME_X, NEW_GAME_Y, screen);
 	show_black_text(URWB_FONT_FILE, 25, "Exit Game", EXIT_GAME_X, EXIT_GAME_Y, screen);
@@ -186,7 +186,7 @@ void winner_render(SDL_Surface *screen)
 	show_winner_msg(screen);
 
 	if (SDL_Flip(screen) == -1)
-		sdl_error("SDL_flip fail", __FILE__, __LINE__);
+		sdl_error("SDL_flip fail");
 }
 
 void winner_free()

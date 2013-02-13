@@ -130,7 +130,7 @@ void set_card(card *c, card_num num, short xpos, short ypos, bool back)
 	}
 
 	if (c->surf == NULL) 
-		sdl_error("file not found", __FILE__, __LINE__);
+		sdl_error("file not found");
 }
 
 bool passed(short max_frames, int *nb_frames)
@@ -149,12 +149,12 @@ SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
 {
 	TTF_Font* font = TTF_OpenFont(font_name, size);
 	if (!font)
-		sdl_ttf_error("TTF_OpenFont", __FILE__, __LINE__);
+		sdl_ttf_error("TTF_OpenFont");
 	SDL_Color foreground = {r, g, b};
 
 	SDL_Surface *surf = TTF_RenderText_Blended(font, text, foreground);
 	if (!surf)
-		sdl_ttf_error("TTF_RenderText", __FILE__, __LINE__);
+		sdl_ttf_error("TTF_RenderText");
 	TTF_CloseFont(font);
 
 	return surf;
@@ -166,7 +166,7 @@ void show_text(char *font, short size, char *txt, short posx, short posy,
 	SDL_Rect pos = {posx, posy};
 	SDL_Surface *surf = set_text_surf(font, size, txt, r, g, b);
 	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
-		sdl_error("Blit fail", __FILE__, __LINE__);
+		sdl_error("Blit fail");
 	free_surface(surf);
 }
 

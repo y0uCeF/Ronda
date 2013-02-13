@@ -9,14 +9,14 @@
 #define between(x, a, b)   (((x) >= (a)) && ((x) <= (b)))
 #define equal(a, b)        (((a) % 10) == ((b) % 10))
 
-#define sdl_error(msg, file, line)     \
-	error(file, line, "%s : %s\n", msg, SDL_GetError())
+#define sdl_error(msg)     \
+	error(__FILE__, __LINE__, "%s : %s\n", msg, SDL_GetError())
 
 #define sdl_image_error(msg, file, line)    \
 	error(file, line, "%s : %s\n", msg, IMG_GetError());
 
-#define sdl_ttf_error(msg, file, line)  \
-	error(file, line, "%s : %s\n", msg, TTF_GetError()); 
+#define sdl_ttf_error(msg)  \
+	error(__FILE__, __LINE__, "%s : %s\n", msg, TTF_GetError()); 
 
 #define try_malloc(size)       malloc_(size, __FILE__, __LINE__)
 #define try_calloc(n, size)    calloc_(n, size, __FILE__, __LINE__)

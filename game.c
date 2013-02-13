@@ -22,7 +22,7 @@ static void env_init()
 {
 	srand(time(NULL));
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) 
-		sdl_error("Unable to init SDL", __FILE__, __LINE__);
+		sdl_error("Unable to init SDL");
 	putenv("SDL_VIDEO_CENTERED=1");
 
 	SDL_Surface *icon = SDL_LoadBMP(ICON_FILE);
@@ -34,9 +34,9 @@ static void env_init()
 	screen = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 32,  
 				SDL_DOUBLEBUF | SDL_HWSURFACE );
 	if (screen == NULL) 
-		sdl_error("Video initialization failed", __FILE__, __LINE__);
+		sdl_error("Video initialization failed");
 	if (SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 53, 131, 68)) == -1) 
-		sdl_error("Setting screen failed", __FILE__, __LINE__);
+		sdl_error("Setting screen failed");
 
 	SDL_WM_SetCaption("Ronda", NULL);
 }

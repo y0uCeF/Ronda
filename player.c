@@ -48,7 +48,7 @@ player* player_init(type_t t)
 	player *p = try_malloc(sizeof(player));
 
 	if (TTF_Init() == -1)
-		sdl_ttf_error("Initialisation failed", __FILE__, __LINE__);
+		sdl_ttf_error("Initialisation failed");
 
 	for (i = 0; i < MAX_NB_CARDS_HAND; i++) {
 		p->hand[i].value = EMPTY;
@@ -149,7 +149,7 @@ static void display_bonus(bonus_t *b, char *s, short ypos, SDL_Surface *scr)
 			b->surf = set_text_surf(GEORGIA_I_FILE, 20, s, 255, 255, 255);
 		SDL_Rect pos = {PLAYER_BONUS_X + (130 - b->surf->w)/2 , ypos};
 		if (SDL_BlitSurface(b->surf, NULL, scr, &pos) == -1)
-			sdl_error("Blit text bonus fail", __FILE__, __LINE__);
+			sdl_error("Blit text bonus fail");
 		return;
 	}
 
@@ -208,9 +208,9 @@ void player_render(player *p, SDL_Surface *scr)
 
 	for (i=0; i < MAX_NB_CARDS_HAND; i++)
 		if (SDL_BlitSurface(p->hand[i].surf, NULL, scr, p->hand[i].position) == -1) 
-			sdl_error("Blit card fail", __FILE__, __LINE__); 
+			sdl_error("Blit card fail"); 
 	if (SDL_BlitSurface(p->score_box, NULL, scr, &p->pos_score_box) == -1) 
-		sdl_error("Blit score_box fail", __FILE__, __LINE__);
+		sdl_error("Blit score_box fail");
 
 	player_show_score(p, scr);
 

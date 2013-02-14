@@ -21,7 +21,7 @@
 #define WINNER_MSG_Y          200
 #define WINNER_MSG_X(w)       MIDDLE_X(w)
 #define USER_SCORE_X          70
-#define COMPUTER_SCORE_X(w)   (WINDOW_WIDTH - USER_SCORE_X - w)
+#define COMPUTER_SCORE_X      468
 #define PLAYER_POINTS_Y       40
 #define PLAYER_CARDS_Y        (PLAYER_POINTS_Y + 50)
 
@@ -135,9 +135,8 @@ static void show_winner_msg(SDL_Surface *scr)
 		sprintf(buf, "Drawn");
 
 	SDL_Surface *surf = set_text_surf(URW_FONT_FILE, 36, buf, 0, 0, 0);
-	SDL_Rect pos = {WINNER_MSG_X(surf->w), WINNER_MSG_Y};
-	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
-		sdl_error("Blit win message fail");
+	blit_surf(surf, WINNER_MSG_X(surf->w), WINNER_MSG_Y, scr);
+
 	free_surface(surf);
 }
 
@@ -157,28 +156,22 @@ static void show_final_score(SDL_Surface *scr)
 	 */
 	sprintf(buf, "Computer cards  : %2d", computer_score.gained_cards);
 	SDL_Surface *surf = set_text_surf(URW_FONT_FILE, 25, buf, 0, 0, 0);
-	SDL_Rect pos = {COMPUTER_SCORE_X(surf->w), PLAYER_CARDS_Y};
 
-	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
-		sdl_error("Blit final score fail");
+	blit_surf(surf, COMPUTER_SCORE_X, PLAYER_CARDS_Y, scr);
 	free_surface(surf);
 
 	sprintf(buf, "Computer points : %2d", computer_score.points);
 	surf = set_text_surf(URW_FONT_FILE, 25, buf, 0, 0, 0);
-	pos.y = PLAYER_POINTS_Y;
 
-	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
-		sdl_error("Blit final score fail");
+	blit_surf(surf, COMPUTER_SCORE_X, PLAYER_POINTS_Y, scr);
 	free_surface(surf);
 }
 
 void winner_render(SDL_Surface *screen)
 {
-	if (SDL_BlitSurface(winner_surf, NULL, screen, NULL) == -1)
-		sdl_error("Blit winner background fail");
-	if (SDL_BlitSurface(selector, NULL, screen, &selector_pos) == -1)
-		sdl_error("Blit winner selector fail");
-	
+	blit_surf(winner_surf, 0, 0, screen);
+	blit_surf(selector, selector_pos.x, selector_pos.y, screen);
+
 	show_black_text(URWB_FONT_FILE, 25, "New Game", NEW_GAME_X, NEW_GAME_Y, screen);
 	show_black_text(URWB_FONT_FILE, 25, "Exit Game", EXIT_GAME_X, EXIT_GAME_Y, screen);
 	

@@ -97,7 +97,12 @@ bool passed(short max_frames, int *nb_frames);
  * loads image specified by path 
  */
 SDL_Surface *load_image(char *path, char *file, int line);
- 
+
+/*
+ * blits the surface "surf" on the screen "scr" in the given position
+ */
+void blit_surf(SDL_Surface *surf, short posx, short posy, SDL_Surface *scr);
+
 /*
  * returns text surface
  */

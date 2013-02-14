@@ -92,6 +92,16 @@ SDL_Surface *load_image(char *path, char *file, int line)
 	return tmp;
 }
 
+void blit_surf(SDL_Surface *surf, short posx, short posy, SDL_Surface *scr)
+{
+	if(!surf)
+		return;
+
+	SDL_Rect pos = {posx, posy};
+	if(SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
+		sdl_error("Blit failed");
+}
+
 char* get_card_file(card_num n) 
 {
 #define CARD_FILE_SIZE 5
@@ -163,10 +173,8 @@ SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
 void show_text(char *font, short size, char *txt, short posx, short posy, 
 			short r, short g, short b, SDL_Surface *scr)
 {
-	SDL_Rect pos = {posx, posy};
 	SDL_Surface *surf = set_text_surf(font, size, txt, r, g, b);
-	if (SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
-		sdl_error("Blit fail");
+	blit_surf(surf, posx, posy, scr);
 	free_surface(surf);
 }
 

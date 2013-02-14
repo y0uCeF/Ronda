@@ -240,20 +240,17 @@ void main_game_render(SDL_Surface *screen)
 	unsigned short i;
 	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 
-	if (SDL_BlitSurface(bg, NULL, screen, NULL) == -1) 
-		sdl_error("Blit screen fail");
+	blit_surf(bg, 0, 0, screen);
 
 	player_render(user, screen); 
 
 	player_render(comp, screen);
 
-	for (i=0; i < MAX_NB_CARDS_TABLE; i++) 
-		if (SDL_BlitSurface(table[i].surf, NULL, screen, table[i].position) == -1) 
-			sdl_error("Blit table card fail");
+	for (i=0; i < MAX_NB_CARDS_TABLE; i++)
+		blit_surf(table[i].surf, table[i].position->x, table[i].position->y, screen);
 
 	if (selection_pos != NULL)
-		if (SDL_BlitSurface(selection, NULL, screen, selection_pos) == -1) 
-			sdl_error("Blit selection fail");
+		blit_surf(selection, selection_pos->x, selection_pos->y, screen);
 
 	SDL_Flip(screen);
 }

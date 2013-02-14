@@ -147,15 +147,13 @@ static void display_bonus(bonus_t *b, char *s, short ypos, SDL_Surface *scr)
 	if (!passed(BONUS_SHOW_TIME, &b->show_frames)) {
 		if (s != NULL)
 			b->surf = set_text_surf(GEORGIA_I_FILE, 20, s, 255, 255, 255);
-		SDL_Rect pos = {PLAYER_BONUS_X + (130 - b->surf->w)/2 , ypos};
-		if (SDL_BlitSurface(b->surf, NULL, scr, &pos) == -1)
-			sdl_error("Blit text bonus fail");
-		return;
+		short xpos = PLAYER_BONUS_X + (130 - b->surf->w)/2;
+		blit_surf(b->surf, xpos, ypos, scr);
+	} else {
+		b->bonus_shown = 1;
+		free_surface(b->surf);
+		b->surf = NULL;
 	}
-
-	b->bonus_shown = 1;
-	free_surface(b->surf);
-	b->surf = NULL;
 }
 
 static void player_show_bonus(player *p, SDL_Surface *scr)
@@ -207,10 +205,9 @@ void player_render(player *p, SDL_Surface *scr)
 	unsigned short i;
 
 	for (i=0; i < MAX_NB_CARDS_HAND; i++)
-		if (SDL_BlitSurface(p->hand[i].surf, NULL, scr, p->hand[i].position) == -1) 
-			sdl_error("Blit card fail"); 
-	if (SDL_BlitSurface(p->score_box, NULL, scr, &p->pos_score_box) == -1) 
-		sdl_error("Blit score_box fail");
+		blit_surf(p->hand[i].surf, p->hand[i].position->x, p->hand[i].position->y, scr);
+
+	blit_surf(p->score_box, p->pos_score_box.x, p->pos_score_box.y, scr);
 
 	player_show_score(p, scr);
 

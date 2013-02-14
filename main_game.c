@@ -103,10 +103,10 @@ void main_game_init()
 	unsigned short i;
 	card_num j;
 
-	empty_card = load_image(BLANK_CARD_FILE, __FILE__, __LINE__);
-	back_card = load_image(BACK_CARD_FILE, __FILE__, __LINE__);
-	selection = load_image(SELECTION_FILE, __FILE__, __LINE__);
-	bg = load_image(BG_FILE, __FILE__, __LINE__);
+	empty_card = load_image(BLANK_CARD_FILE);
+	back_card = load_image(BACK_CARD_FILE);
+	selection = load_image(SELECTION_FILE);
+	bg = load_image(BG_FILE);
 
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
 		table[i].value=EMPTY;

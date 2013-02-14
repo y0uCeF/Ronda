@@ -69,7 +69,7 @@ player* player_init(type_t t)
 	for (i = 0; i < MAX_BONUS; i++)
 		p->action_bonus[i] = NULL;
 
-	p->score_box = load_image(SCOREBOX_FILE, __FILE__, __LINE__);
+	p->score_box = load_image(SCOREBOX_FILE);
 	return p;
 }
 

@@ -84,7 +84,7 @@ void *realloc_(void *ptr, size_t size,char *file, int line)
 	return tmp;
 }
 
-SDL_Surface *load_image(char *path, char *file, int line)
+SDL_Surface *load_image_(char *path, char *file, int line)
 {
 	SDL_Surface *tmp = IMG_Load(path);
 	if (!tmp)
@@ -136,7 +136,7 @@ void set_card(card *c, card_num num, short xpos, short ypos, bool back)
 		c->surf = back_card;
 	} else {
 		char *file = get_card_file(num);
-		c->surf = load_image(file, __FILE__, __LINE__);
+		c->surf = load_image(file);
 	}
 
 	if (c->surf == NULL) 

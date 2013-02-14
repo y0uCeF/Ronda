@@ -18,6 +18,7 @@
 #define sdl_ttf_error(msg)  \
 	error(__FILE__, __LINE__, "%s : %s\n", msg, TTF_GetError()); 
 
+#define load_image(path)       load_image_(path, __FILE__, __LINE__)
 #define try_malloc(size)       malloc_(size, __FILE__, __LINE__)
 #define try_calloc(n, size)    calloc_(n, size, __FILE__, __LINE__)
 #define try_realloc(ptr, size) realloc_(ptr, size, __FILE__, __LINE__)
@@ -94,9 +95,9 @@ void set_card(card *c, card_num num, short posx, short posy, bool back);
 bool passed(short max_frames, int *nb_frames);  
 
 /*
- * loads image specified by path 
+ * loads image specified by path, use the macro load_image() instead
  */
-SDL_Surface *load_image(char *path, char *file, int line);
+SDL_Surface *load_image_(char *path, char *file, int line);
 
 /*
  * blits the surface "surf" on the screen "scr" in the given position

@@ -43,8 +43,8 @@ static enum{USER_WINS, COMPUTER_WINS, DRAWN} game_result;
 
 void winner_init()
 {
-	winner_surf = load_image(WINNER_BG_FILE, __FILE__, __LINE__);
-	selector = load_image(SELECTOR_FILE, __FILE__, __LINE__);
+	winner_surf = load_image(WINNER_BG_FILE);
+	selector = load_image(SELECTOR_FILE);
 
 	if (TTF_Init() == -1)
 		sdl_ttf_error("Initialisation failed");

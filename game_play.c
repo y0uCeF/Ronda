@@ -81,7 +81,7 @@ void player_turn(player *p, card table[])
 		if (p->type == USER)
 			table[p->sel_table].surf = get_sel_hand_surf(*p);
 		else
-			table[p->sel_table].surf = load_image(get_card_file(selected_hand), __FILE__, __LINE__);
+			table[p->sel_table].surf = load_image(get_card_file(selected_hand));
 
 		table[p->sel_table].value = selected_hand;
 		dropped_card = selected_hand;

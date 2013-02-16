@@ -176,7 +176,7 @@ void main_game_update()
 		return;
 	}
 
-	if (c_data->selected_card_hand != -1)
+	if (c_data->selected_card_hand != -1 && current_player == USER)
 		user->sel_hand = c_data->selected_card_hand;
 
 	if ((c_data->selected_card_table != -1) && (user->sel_hand != -1))

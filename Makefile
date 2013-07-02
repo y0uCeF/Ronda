@@ -1,7 +1,9 @@
 CC = gcc
 CFLAGS = -c -Wall
-LDFLAGS = -lSDL -lSDL_image -lSDL_ttf
-LIBS = -I/usr/include/SDL
+PKGCONFIG=pkg-config
+LDFLAGS = $(shell $(PKGCONFIG) --libs sdl) $(shell $(PKGCONFIG) --libs SDL_image) $(shell $(PKGCONFIG) --libs SDL_ttf)
+LIBS = $(shell $(PKGCONFIG) --cflags sdl) 
+
 SOURCES = common.c \
           player.c \
           game_state.c \
@@ -10,8 +12,10 @@ SOURCES = common.c \
           game_play.c \
           main_game.c \
           game.c \
-          main.c
-OBJECTS = $(SOURCES:.c=.o)
+          main.c 
+          
+
+OBJECTS = $(SOURCES:.c=.o) $(RESFILE)
 EXECUTABLE = ronda
 prefix = $(DESTDIR)/usr
 BINDIR = $(prefix)/bin
@@ -41,6 +45,12 @@ $(EXECUTABLE): $(OBJECTS)
 .c.o:
 	$(CC) $(CFLAGS) $< -o $@
 
+
+ifdef RESFILE
+$(RESFILE): win32/ronda.rc
+	$(WINDRES) -i $< -o $@
+endif	
+
 install:
 	install -D -m755 ronda $(BINDIR)/ronda
 	install -d -m755 $(GFXDIR)
@@ -52,10 +62,18 @@ install:
 	install -D -m755 data/ronda.desktop $(DESKTOPDIR)/ronda.desktop
 	install -D -m775 data/ronda.png $(ICONDIR)/ronda.png
 
-
+win32-installer: exec
+	mkdir -p dist/installer
+	cp win32/install.nsi dist/installer/install.nsi
+	cp -r win32/dlls dist/dlls
+	cp win32/ronda.ico dist/
+	
+	makensis dist/installer/install.nsi
+	
+	
 uninstall:
 	rm -rf $(BINDIR)/ronda $(DATADIR) $(ICONDIR)/ronda.png $(DESKTOPDIR)/ronda.desktop
 	
 
 clean:
-	rm -rf *o ronda	
+	rm -rf *.o ronda ronda.exe dist

@@ -2,7 +2,7 @@
 #include "game_state.h"
 
 
-int main() 
+int main(int argc, char* argv[])
 {
 	game_init();
 

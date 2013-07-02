@@ -1,0 +1,22 @@
+1 ICON "ronda.ico"
+1 VERSIONINFO
+FILEVERSION     0,1,0,0
+PRODUCTVERSION  0,1,0,0
+
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "080904E4"
+    BEGIN
+      VALUE "CompanyName", "My Company Name"
+      VALUE "FileDescription", "Ronda card game"
+      VALUE "FileVersion", "0.1"
+      VALUE "InternalName", "ronda"
+      VALUE "LegalCopyright", "Ronda"
+      VALUE "OriginalFilename", "ronda.exe"
+      VALUE "ProductName", "Ronda"
+      VALUE "ProductVersion", "0.1"
+    END
+  END
+
+END

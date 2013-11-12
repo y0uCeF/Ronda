@@ -1,7 +1,7 @@
 #ifndef MAIN_GAME_H
 #define MAIN_GAME_H
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include "game_state.h"
 #include "player.h"
 #include "define.h"
@@ -30,7 +30,7 @@ void main_game_update();
 /*
  * draws everything on the screen
  */ 
-void main_game_render(SDL_Surface *screen);
+void main_game_render(SDL_Renderer *renderer);
 
 /*
  * frees memory held by the game state

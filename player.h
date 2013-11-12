@@ -27,7 +27,7 @@ typedef enum {NONE, RONDA, TRINGLA, ESTE, MESA} bonus_type_t;
 
 typedef struct {
 	bonus_type_t type;
-	SDL_Surface *surf; /* bonus text */
+	SDL_Texture *tex; /* bonus text */
 	short bonus_card; /* the card concerned with the Ronda/Tringla */
 	bool bonus_shown; /* bonus displayed ? */
 	int show_frames;
@@ -37,7 +37,7 @@ typedef struct player {
 	card hand[MAX_NB_CARDS_HAND];
 	int nb_cards_in_hand;
 	score_t score;
-	SDL_Surface *score_box;
+	SDL_Texture *score_box;
 	SDL_Rect pos_score_box;
 	bonus_t *action_bonus[MAX_BONUS]; /* este/mesa */
 	bonus_t card_bonus;
@@ -56,7 +56,7 @@ inline card_num get_sel_hand_val(player p);
 /*
  * returns card surface specified by sel_hand
  */
-inline SDL_Surface* get_sel_hand_surf(player p);
+inline SDL_Texture* get_sel_hand_tex(player p);
 
 /*
  * Checks if player has Ronda
@@ -86,7 +86,7 @@ void set_final_score(player *p);
 /*
  * initializes player data
  */
-player* player_init(type_t t);
+player* player_init(type_t t, SDL_Renderer *renderer);
 
 /*
  * distributes cards to player p
@@ -100,7 +100,7 @@ void player_update_bonus(player *p);
 /*
  * renders player cards and score on the screen
  */
-void player_render(player *p, SDL_Surface *scr);
+void player_render(player *p, SDL_Renderer *renderer);
 
 /*
  * frees memory taken by player data

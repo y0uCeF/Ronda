@@ -1,7 +1,7 @@
 #ifndef GAME_STATE_H
 #define GAME_STATE_H
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include "define.h"
 #include "common.h"
 
@@ -10,7 +10,7 @@ typedef struct {
 	void (*init)();
 	void (*handle_input)();
 	void (*update)();
-	void (*render)(SDL_Surface *screen);
+	void (*render)(SDL_Renderer *renderer);
 	void (*free)();
 } game_state_t;
 

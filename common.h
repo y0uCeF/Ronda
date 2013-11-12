@@ -18,7 +18,7 @@
 #define sdl_ttf_error(msg)  \
 	error(__FILE__, __LINE__, "%s : %s\n", msg, TTF_GetError()); 
 
-#define load_image(path)       load_image_(path, __FILE__, __LINE__)
+#define load_image(path, ren)       load_image_(path, ren, __FILE__, __LINE__)
 #define try_malloc(size)       malloc_(size, __FILE__, __LINE__)
 #define try_calloc(n, size)    calloc_(n, size, __FILE__, __LINE__)
 #define try_realloc(ptr, size) realloc_(ptr, size, __FILE__, __LINE__)
@@ -30,8 +30,8 @@
 				SDL_FreeSurface(surf); surf = NULL; \
 				} while(0)
 
-extern SDL_Surface *back_card;
-extern SDL_Surface *empty_card;
+extern SDL_Texture *back_card;
+extern SDL_Texture *empty_card;
 
 
 /* error handling and memory functions */
@@ -97,35 +97,45 @@ bool passed(short max_frames, int *nb_frames);
 /*
  * loads image specified by path, use the macro load_image() instead
  */
-SDL_Surface *load_image_(char *path, char *file, int line);
+SDL_Texture *load_image_(const char *path, SDL_Renderer *ren, char *file, int line);
 
 /*
- * blits the surface "surf" on the screen "scr" in the given position
+ * renders the texture "tex" on the screen in the given position
  */
-void blit_surf(SDL_Surface *surf, short posx, short posy, SDL_Surface *scr);
+void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, SDL_Rect *clip);
+
+/*
+ * returns the texture's width
+ */ 
+int tex_w(SDL_Texture *tex);
+
+/*
+ * returns the texture's height
+ */ 
+int tex_h(SDL_Texture *tex);
 
 /*
  * returns text surface
  */
-SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
-								short g, short b);
+SDL_Texture* set_text_surf(char *font_name, int size, char* text, short r,
+				short g, short b, SDL_Renderer *renderer);
 
 /*
  * displays text "txt" on the screen, position specified by posx, posy
  */
 void show_text(char *font, short size, char *txt, short posx, short posy, 
-			short r, short g, short b, SDL_Surface *scr); 
+			short r, short g, short b, SDL_Renderer *renderer);
 
 /*
  * displays text set in "txt" in white color using show_text()
  */
-inline void show_white_text(char *font, short size, char *txt, short posx, short posy, 
-		SDL_Surface *scr);
+inline void show_white_text(char *font, short size, char *txt, short posx, 
+		short posy, SDL_Renderer *renderer);
 
 /*
  * displays text set in "txt" in black color using show_text()
  */
 inline void show_black_text(char *font, short size, char *txt, short posx, 
-		short posy, SDL_Surface *scr);
+		short posy, SDL_Renderer *renderer);
 
 #endif

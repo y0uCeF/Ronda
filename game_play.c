@@ -1,5 +1,3 @@
-#include <SDL/SDL_image.h>
-
 #include "game_play.h"
 #include "player.h"
 #include "common.h"
@@ -10,6 +8,7 @@
 
 /*extern data*/
 extern type_t current_player;
+extern SDL_Renderer *renderer;
 
 /*local data*/
 static card_num current_card = EMPTY; /*used when player is taking cards*/
@@ -27,7 +26,7 @@ static bool take_card(player *p, card table[])
 	if (index != -1) {
 		if (passed(PAUSE_FRAMES_CARDS, &nb_frames)) {
 			/*the card exists and it's time*/
-			free_surface(table[index].surf);
+			SDL_DestroyTexture(table[index].tex);
 			set_card(&table[index], EMPTY, -1, -1, 0);
 			p->score.gained_cards++;
 			if (current_card != 9)
@@ -79,9 +78,9 @@ void player_turn(player *p, card table[])
 
 		/*moving the card from hand to table*/
 		if (p->type == USER)
-			table[p->sel_table].surf = get_sel_hand_surf(*p);
+			table[p->sel_table].tex = get_sel_hand_tex(*p);
 		else
-			table[p->sel_table].surf = load_image(get_card_file(selected_hand));
+			table[p->sel_table].tex = load_image(get_card_file(selected_hand), renderer);
 
 		table[p->sel_table].value = selected_hand;
 		dropped_card = selected_hand;
@@ -106,7 +105,7 @@ void player_turn(player *p, card table[])
 
 		/*removing both cards from hand/table */
 		set_card(&p->hand[p->sel_hand], EMPTY, -1, -1, 0);
-		free_surface(table[p->sel_table].surf);
+		SDL_DestroyTexture(table[p->sel_table].tex);
 		set_card(&table[p->sel_table], EMPTY, -1, -1, 0);
 		p->score.gained_cards += 2;
 		p->nb_cards_in_hand--;
@@ -222,7 +221,7 @@ void take_all_cards(player *p, card table[])
 	unsigned short i;
 	for (i = 0; i < MAX_NB_CARDS_TABLE; ++i) 
 		if (table[i].value != EMPTY){
-			free_surface(table[i].surf);
+			SDL_DestroyTexture(table[i].tex);
 			set_card(&table[i], EMPTY, -1, -1, 0);
 			p->score.gained_cards++;
 		}

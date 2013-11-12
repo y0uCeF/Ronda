@@ -1,16 +1,18 @@
 #include <stdarg.h>
 #include <errno.h>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_ttf.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "common.h"
 #include "game.h"
 
 /* global data */
-SDL_Surface *back_card = NULL;
-SDL_Surface *empty_card = NULL;
+SDL_Texture *back_card = NULL;
+SDL_Texture *empty_card = NULL;
+
+extern SDL_Renderer *renderer;
 
 void swap(card_num *a, card_num *b) 
 {
@@ -84,22 +86,53 @@ void *realloc_(void *ptr, size_t size,char *file, int line)
 	return tmp;
 }
 
-SDL_Surface *load_image_(char *path, char *file, int line)
+SDL_Texture *load_image_(const char *path, SDL_Renderer *ren, char *file, int line)
 {
-	SDL_Surface *tmp = IMG_Load(path);
-	if (!tmp)
-		sdl_image_error("file not found", file, line);
-	return tmp;
+	SDL_Texture *texture = IMG_LoadTexture(ren, path);
+
+	if (!texture)		
+		sdl_image_error("LoadTexture", file, line);
+
+	return texture;
 }
 
-void blit_surf(SDL_Surface *surf, short posx, short posy, SDL_Surface *scr)
+void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, SDL_Rect *clip)
 {
-	if(!surf)
+	int w, h;
+	
+	if (!tex)
 		return;
+	
+	SDL_QueryTexture(tex, NULL, NULL, &w, &h);
+	
+	SDL_Rect dst = {x, y, w, h};
+	
+	if(SDL_RenderCopy(ren, tex, clip, &dst) < 0)
+		sdl_error("render failed");
+}
 
-	SDL_Rect pos = {posx, posy};
-	if(SDL_BlitSurface(surf, NULL, scr, &pos) == -1)
-		sdl_error("Blit failed");
+int tex_w(SDL_Texture *tex)
+{
+	int w = 0;
+	
+	if (!tex)
+		return -1;
+	
+	SDL_QueryTexture(tex, NULL, NULL, &w, NULL);
+	
+	return w;
+}
+
+int tex_h(SDL_Texture *tex)
+{
+	int h = 0;
+	
+	if (!tex)
+		return -1;
+	
+	SDL_QueryTexture(tex, NULL, NULL, NULL, &h);
+	
+	return h;
 }
 
 char* get_card_file(card_num n) 
@@ -131,15 +164,15 @@ void set_card(card *c, card_num num, short xpos, short ypos, bool back)
 		c->position->y = ypos;
 
 	if (num == EMPTY) {
-		c->surf = empty_card;
+		c->tex = empty_card;
 	} else if (back){
-		c->surf = back_card;
+		c->tex = back_card;
 	} else {
 		char *file = get_card_file(num);
-		c->surf = load_image(file);
+		c->tex = load_image(file, renderer);
 	}
 
-	if (c->surf == NULL) 
+	if (c->tex == NULL) 
 		sdl_error("file not found");
 }
 
@@ -154,8 +187,8 @@ bool passed(short max_frames, int *nb_frames)
 	}
 }
 
-SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
-								short g, short b)
+SDL_Texture* set_text_surf(char *font_name, int size, char* text, short r,
+	short g, short b, SDL_Renderer *renderer)
 {
 	TTF_Font* font = TTF_OpenFont(font_name, size);
 	if (!font)
@@ -165,27 +198,30 @@ SDL_Surface* set_text_surf(char *font_name, int size, char* text, short r,
 	SDL_Surface *surf = TTF_RenderText_Blended(font, text, foreground);
 	if (!surf)
 		sdl_ttf_error("TTF_RenderText");
+		
 	TTF_CloseFont(font);
+	
+	SDL_Texture *tex = SDL_CreateTextureFromSurface(renderer, surf);
+	SDL_FreeSurface(surf);
 
-	return surf;
+	return tex;
 }
 
 void show_text(char *font, short size, char *txt, short posx, short posy, 
-			short r, short g, short b, SDL_Surface *scr)
+			short r, short g, short b, SDL_Renderer *renderer)
 {
-	SDL_Surface *surf = set_text_surf(font, size, txt, r, g, b);
-	blit_surf(surf, posx, posy, scr);
-	free_surface(surf);
+	SDL_Texture *tex = set_text_surf(font, size, txt, r, g, b, renderer);
+	renderTexture(tex, renderer, posx, posy, NULL);
 }
 
 inline void show_white_text(char *font, short size, char *txt, short posx, 
-		short posy, SDL_Surface *scr)
+		short posy, SDL_Renderer *renderer)
 {
-	show_text(font, size, txt, posx, posy, 255, 255, 255, scr);
+	show_text(font, size, txt, posx, posy, 255, 255, 255, renderer);
 }
 
 inline void show_black_text(char *font, short size, char *txt, short posx, 
-		short posy, SDL_Surface *scr)
+		short posy, SDL_Renderer *renderer)
 {
-	show_text(font, size, txt, posx, posy, 0, 0, 0, scr);
+	show_text(font, size, txt, posx, posy, 0, 0, 0, renderer);
 }

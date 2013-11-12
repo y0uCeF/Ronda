@@ -1,7 +1,7 @@
 #ifndef WINNER_H
 #define WINNER_H
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include "define.h"
 #include "game_state.h"
 
@@ -23,7 +23,7 @@ void winner_update();
 /*
  * rendering on the screen
  */ 
-void winner_render(SDL_Surface *screen);
+void winner_render(SDL_Renderer *renderer);
 
 /*
  * frees memory held by the game state

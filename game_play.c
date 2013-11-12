@@ -234,19 +234,21 @@ void handle_bonus(score_t *p1_score, bonus_t *p1_bonus, score_t *p2_score, bonus
 		return;
 
 	/*check "HowToPlay" for points calculation*/
-	if (p1_bonus->type > p2_bonus->type)
+	if (p1_bonus->type > p2_bonus->type) {
 		p1_score->points += ((p1_bonus->type == RONDA)? 1:5) +
 			((p2_bonus->type == NONE)? 0:1);
-	else if (p1_bonus->type < p2_bonus->type)
+	} else if (p1_bonus->type < p2_bonus->type) {
 		p2_score->points += ((p2_bonus->type == RONDA)? 1:5) +
 			((p1_bonus->type == NONE)? 0:1);
-	else if (p1_bonus->bonus_card > p2_bonus->bonus_card)
+	} else if (p1_bonus->bonus_card > p2_bonus->bonus_card) {
 		p1_score->points += (p1_bonus->type == RONDA)? 2:10;
-	else if (p1_bonus->bonus_card < p2_bonus->bonus_card)
+	} else if (p1_bonus->bonus_card < p2_bonus->bonus_card) {
 		p2_score->points += (p2_bonus->type == RONDA)? 2:10;
-	else 
-		p1_score->points = p2_score->points = (p1_bonus->type == RONDA)? 1:5;
-
+	} else {
+		p1_score->points += (p1_bonus->type == RONDA)? 1:5;
+		p2_score->points += (p1_bonus->type == RONDA)? 1:5;
+	}
+	
 	p1_bonus->bonus_card = -1;
 	p1_bonus->type = NONE;
 	p2_bonus->bonus_card = -1;

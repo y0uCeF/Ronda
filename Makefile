@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -c -Wall
 PKGCONFIG=pkg-config
-LDFLAGS = $(shell $(PKGCONFIG) --libs sdl) $(shell $(PKGCONFIG) --libs SDL_image) $(shell $(PKGCONFIG) --libs SDL_ttf)
-LIBS = $(shell $(PKGCONFIG) --cflags sdl) 
+LDFLAGS = $(shell $(PKGCONFIG) --libs sdl2) $(shell $(PKGCONFIG) --libs SDL2_image) $(shell $(PKGCONFIG) --libs SDL2_ttf)
+LIBS = $(shell $(PKGCONFIG) --cflags sdl2) 
 
 SOURCES = common.c \
           player.c \

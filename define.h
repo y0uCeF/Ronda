@@ -1,7 +1,7 @@
 #ifndef DEFINE_H
 #define DEFINE_H
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 /* 
  * some constants definitions
@@ -30,8 +30,8 @@ typedef enum { EMPTY=-1,
 
 
 typedef struct {
-	SDL_Surface* surf;  /* sprite of the card */
-	SDL_Rect* position; /* position on the screen */
+	SDL_Texture *tex;  /* sprite of the card */
+	SDL_Rect *position; /* position on the screen */
 	card_num value;  /* value of the card */
 } card;
 

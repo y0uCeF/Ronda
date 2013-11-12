@@ -1,5 +1,5 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #include "main_game.h"
 #include "game_play.h"
@@ -30,6 +30,7 @@
 extern player_state_type state;
 extern player *last_card_taker;
 extern card_num dropped_card;
+extern SDL_Renderer *renderer;
 
 /* global data */
 score_t user_score = {0,0};
@@ -42,9 +43,9 @@ static player *user, *comp;
 static card table[MAX_NB_CARDS_TABLE];  
 static card_num card_list[NB_CARDS];
 static unsigned short nb_cards_remaining;
-static SDL_Surface *selection;  /*highlight the selected card*/
+static SDL_Texture *selection;  /*highlight the selected card*/
 static SDL_Rect *selection_pos = NULL;
-static SDL_Surface *bg = NULL;
+static SDL_Texture *bg = NULL;
 static controller_data *c_data = NULL;
 
 
@@ -103,14 +104,14 @@ void main_game_init()
 	unsigned short i;
 	card_num j;
 
-	empty_card = load_image(BLANK_CARD_FILE);
-	back_card = load_image(BACK_CARD_FILE);
-	selection = load_image(SELECTION_FILE);
-	bg = load_image(BG_FILE);
+	empty_card = load_image(BLANK_CARD_FILE, renderer);
+	back_card = load_image(BACK_CARD_FILE, renderer);
+	selection = load_image(SELECTION_FILE, renderer);
+	bg = load_image(BG_FILE, renderer);
 
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++) {
 		table[i].value=EMPTY;
-		table[i].surf=NULL;
+		table[i].tex=NULL;
 		table[i].position=NULL;
 	}
 
@@ -122,8 +123,8 @@ void main_game_init()
 	mix(card_list, NB_CARDS);
 
 	/*initializing users*/
-	user = player_init(USER);
-	comp = player_init(COMPUTER);
+	user = player_init(USER, renderer);
+	comp = player_init(COMPUTER, renderer);
 
 	c_data = controller_data_init();
 	nb_cards_remaining = NB_CARDS; 
@@ -235,38 +236,38 @@ void main_game_update()
 	}
 }
 
-void main_game_render(SDL_Surface *screen)
+void main_game_render(SDL_Renderer *renderer)
 {
 	unsigned short i;
-	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 0, 0));
 
-	blit_surf(bg, 0, 0, screen);
+	renderTexture(bg, renderer, 0, 0, NULL);
 
-	player_render(user, screen); 
+	player_render(user, renderer); 
 
-	player_render(comp, screen);
+	player_render(comp, renderer);
 
 	for (i=0; i < MAX_NB_CARDS_TABLE; i++)
-		blit_surf(table[i].surf, table[i].position->x, table[i].position->y, screen);
+		renderTexture(table[i].tex, renderer, table[i].position->x, table[i].position->y, NULL);
 
 	if (selection_pos != NULL)
-		blit_surf(selection, selection_pos->x, selection_pos->y, screen);
+		renderTexture(selection, renderer, selection_pos->x, selection_pos->y, NULL);
 
-	SDL_Flip(screen);
+	SDL_RenderPresent(renderer);
 }
 
 void main_game_free()
 {
 	unsigned short i;
 
-	free_surface(empty_card);
-	free_surface(back_card);
-	free_surface(selection);
-	free_surface(bg);
+	
+	SDL_DestroyTexture(empty_card);
+	SDL_DestroyTexture(back_card);
+	SDL_DestroyTexture(selection);
+	SDL_DestroyTexture(bg);
 
 	for (i=0;i < MAX_NB_CARDS_TABLE;i++) {
 		if (table[i].value != EMPTY)
-			free_surface(table[i].surf);
+			SDL_DestroyTexture(table[i].tex);
  
 		try_free(table[i].position);
 	}

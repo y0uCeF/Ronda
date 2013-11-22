@@ -22,7 +22,7 @@ Building Ronda
 --------------
 
 This was only tested on *Linux*,  
-Ronda requires *SDL-1.2+*, *SDL_image* and *SDL_ttf* to be installed in your
+Ronda requires *SDL-2.0+*, *SDL_image-2.0* and *SDL_ttf-2.0* to be installed in your
 system. You can get them from [here](http://libsdl.org/).
 Once you got the requirements you can run :  
 
@@ -31,7 +31,7 @@ make
 make install
 ```
 
-In case you want to run Ronda *in-place* without installit it, then
+In case you want to run Ronda *in-place* without installing it, then
 running :  
 
 ```

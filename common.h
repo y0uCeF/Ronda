@@ -129,13 +129,13 @@ void show_text(char *font, short size, char *txt, short posx, short posy,
 /*
  * displays text set in "txt" in white color using show_text()
  */
-inline void show_white_text(char *font, short size, char *txt, short posx, 
+void show_white_text(char *font, short size, char *txt, short posx, 
 		short posy, SDL_Renderer *renderer);
 
 /*
  * displays text set in "txt" in black color using show_text()
  */
-inline void show_black_text(char *font, short size, char *txt, short posx, 
+void show_black_text(char *font, short size, char *txt, short posx, 
 		short posy, SDL_Renderer *renderer);
 
 #endif

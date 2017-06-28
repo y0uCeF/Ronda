@@ -51,12 +51,12 @@ typedef struct player {
 /*
  * returns card value specified by sel_hand
  */
-inline card_num get_sel_hand_val(player p);
+card_num get_sel_hand_val(player p);
 
 /*
  * returns card surface specified by sel_hand
  */
-inline SDL_Texture* get_sel_hand_tex(player p);
+SDL_Texture* get_sel_hand_tex(player p);
 
 /*
  * Checks if player has Ronda
